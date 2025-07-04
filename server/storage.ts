@@ -694,7 +694,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPosts(limit = 20, offset = 0): Promise<(Post & { author: User, linkedActivity?: Activity })[]> {
-    return await db
+    const results = await db
       .select()
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
@@ -702,6 +702,34 @@ export class DatabaseStorage implements IStorage {
       .limit(limit)
       .offset(offset)
       .orderBy(desc(posts.createdAt));
+    
+    return results.map(result => ({
+      ...result.posts,
+      author: result.users || {
+        id: 0,
+        username: "unknown",
+        email: "",
+        password: "",
+        displayName: "Unbekannter Benutzer",
+        firstName: null,
+        lastName: null,
+        bio: null,
+        avatarUrl: null,
+        location: null,
+        isEmailVerified: false,
+        emailVerificationToken: null,
+        role: "user",
+        subscriptionTier: "free",
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        activitiesCreated: 0,
+        postsCreated: 0,
+        likesReceived: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      linkedActivity: result.activities || undefined
+    }));
   }
 
   async getPost(id: number): Promise<(Post & { author: User, linkedActivity?: Activity }) | undefined> {
@@ -711,7 +739,36 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(activities, eq(posts.linkedActivityId, activities.id))
       .where(eq(posts.id, id));
-    return result || undefined;
+    
+    if (!result) return undefined;
+    
+    return {
+      ...result.posts,
+      author: result.users || {
+        id: 0,
+        username: "unknown",
+        email: "",
+        password: "",
+        displayName: "Unbekannter Benutzer",
+        firstName: null,
+        lastName: null,
+        bio: null,
+        avatarUrl: null,
+        location: null,
+        isEmailVerified: false,
+        emailVerificationToken: null,
+        role: "user",
+        subscriptionTier: "free",
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        activitiesCreated: 0,
+        postsCreated: 0,
+        likesReceived: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      linkedActivity: result.activities || undefined
+    };
   }
 
   async getPostsByAuthor(authorId: number): Promise<Post[]> {
