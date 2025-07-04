@@ -239,6 +239,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/user-progress/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      // This would need to be implemented in storage - for now return empty array
+      res.json([]);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Events
   app.get("/api/events", async (req, res) => {
     try {

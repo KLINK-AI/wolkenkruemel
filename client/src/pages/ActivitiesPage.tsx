@@ -1,12 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Users, Star, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Clock, Users, Star, Plus, Search, Filter, Heart } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { useState, useMemo } from "react";
 
 interface Activity {
   id: number;
@@ -16,6 +20,8 @@ interface Activity {
   duration: number;
   likes: number;
   completions: number;
+  tags?: string[];
+  createdAt?: string;
   author: {
     displayName: string;
     username: string;
@@ -24,10 +30,81 @@ interface Activity {
 
 export default function ActivitiesPage() {
   const { t } = useLanguage();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("newest");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  
+  // Mock user ID - in real app this would come from auth
+  const userId = 1;
   
   const { data: activities = [], isLoading } = useQuery<Activity[]>({
     queryKey: ["/api/activities"],
   });
+
+  const { data: userProgress = [] } = useQuery({
+    queryKey: ["/api/user-progress", userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/user-progress/${userId}`);
+      if (!response.ok) return [];
+      return response.json();
+    },
+  });
+
+  // Get all available tags from activities
+  const availableTags = useMemo(() => {
+    const tagsSet = new Set<string>();
+    activities.forEach(activity => {
+      activity.tags?.forEach(tag => tagsSet.add(tag));
+    });
+    return Array.from(tagsSet).sort();
+  }, [activities]);
+
+  const filteredAndSortedActivities = useMemo(() => {
+    let filtered = activities.filter((activity) => {
+      // Text search
+      const matchesSearch = activity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           activity.description.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Difficulty filter
+      const matchesDifficulty = difficultyFilter === "all" || activity.difficulty === difficultyFilter;
+      
+      // Tags filter
+      const matchesTags = selectedTags.length === 0 || 
+                         selectedTags.some(tag => activity.tags?.includes(tag));
+      
+      // Favorites filter
+      const isFavorite = userProgress.some((progress: any) => 
+        progress.activityId === activity.id && progress.favorite
+      );
+      const matchesFavorites = !showFavoritesOnly || isFavorite;
+      
+      return matchesSearch && matchesDifficulty && matchesTags && matchesFavorites;
+    });
+
+    // Sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "newest":
+          return new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime();
+        case "oldest":
+          return new Date(a.createdAt || "").getTime() - new Date(b.createdAt || "").getTime();
+        case "likes":
+          return b.likes - a.likes;
+        case "alphabetical":
+          return a.title.localeCompare(b.title);
+        case "difficulty":
+          const difficultyOrder = { "beginner": 1, "intermediate": 2, "advanced": 3 };
+          return (difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0) - 
+                 (difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [activities, searchTerm, difficultyFilter, sortBy, showFavoritesOnly, selectedTags, userProgress]);
 
   if (isLoading) {
     return (
@@ -134,8 +211,99 @@ export default function ActivitiesPage() {
           </Link>
         </div>
 
+        {/* Filter and Search Section */}
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Aktivitäten durchsuchen..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              {/* Filter Row */}
+              <div className="flex flex-wrap gap-4 items-center">
+                {/* Difficulty Filter */}
+                <div className="flex items-center space-x-2">
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                  <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Schwierigkeit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Alle Schwierigkeiten</SelectItem>
+                      <SelectItem value="beginner">Anfänger</SelectItem>
+                      <SelectItem value="intermediate">Fortgeschritten</SelectItem>
+                      <SelectItem value="advanced">Experte</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Sort Filter */}
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Sortieren nach" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Neueste</SelectItem>
+                    <SelectItem value="oldest">Älteste</SelectItem>
+                    <SelectItem value="likes">Beliebteste</SelectItem>
+                    <SelectItem value="alphabetical">A-Z</SelectItem>
+                    <SelectItem value="difficulty">Schwierigkeit</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Favorites Toggle */}
+                <Button
+                  variant={showFavoritesOnly ? "default" : "outline"}
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  className="flex items-center space-x-2"
+                >
+                  <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                  <span>Nur Favoriten</span>
+                </Button>
+              </div>
+
+              {/* Tags Filter */}
+              {availableTags.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Tags:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableTags.map(tag => (
+                      <Button
+                        key={tag}
+                        variant={selectedTags.includes(tag) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          setSelectedTags(prev => 
+                            prev.includes(tag) 
+                              ? prev.filter(t => t !== tag)
+                              : [...prev, tag]
+                          );
+                        }}
+                      >
+                        {tag}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Results Count */}
+              <div className="text-sm text-muted-foreground">
+                {filteredAndSortedActivities.length} von {activities.length} Aktivitäten
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activities.map((activity) => (
+          {filteredAndSortedActivities.map((activity) => (
             <Link key={activity.id} href={`/activities/${activity.id}`}>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader>
