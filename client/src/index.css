@@ -4,7 +4,7 @@
 
 :root {
   /* Light mode - matching screenshot colors */
-  --background: hsl(240, 20%, 98%); /* Very light grayish background from screenshot */
+  --background: hsl(146, 38%, 96%); /* eff8f3 mint background */
   --foreground: hsl(240, 10%, 3.9%);
   --header-background: hsl(0, 0%, 100%); /* White header */
   --header-foreground: hsl(240, 10%, 3.9%);
@@ -32,9 +32,9 @@
 
 .dark {
   /* Dark mode - matching screenshot colors */
-  --background: hsl(240, 10%, 3.9%); /* Black background */
+  --background: hsl(213, 27%, 22%); /* 1f2937 background */
   --foreground: hsl(148, 18%, 85%); /* b5dcc7 mint green text */
-  --header-background: hsl(220, 13%, 18%); /* Dark gray header */
+  --header-background: hsl(213, 27%, 22%); /* 1f2937 header background */
   --header-foreground: hsl(148, 18%, 85%); /* b5dcc7 mint green text in header */
   --muted: hsl(240, 3.7%, 15.9%);
   --muted-foreground: hsl(160, 50%, 60%);

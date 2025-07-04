@@ -13,6 +13,7 @@ import ActivitiesPage from "@/pages/ActivitiesPage";
 import ActivityDetailPage from "@/pages/ActivityDetailPage";
 import CreateActivityPage from "@/pages/CreateActivityPage";
 import EditActivityPage from "@/pages/EditActivityPage";
+import ProfilePage from "@/pages/ProfilePage";
 
 function Router() {
   return (
@@ -27,6 +28,8 @@ function Router() {
         <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
         <Route path="/create-activity" component={CreateActivityPage} />
         <Route path="/create" component={CreateActivityPage} />
+        <Route path="/profile" component={ProfilePage} />
+        <Route path="/profil" component={ProfilePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
