@@ -205,20 +205,21 @@ export default function ActivityPost({ post }: ActivityPostProps) {
           <div className="space-y-4">
             {comments?.map((comment: any) => (
               <div key={comment.id} className="flex items-start space-x-3">
-                <img 
-                  className="w-8 h-8 rounded-full" 
-                  src={comment.author.avatarUrl || "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"}
-                  alt="Commenter Avatar" 
-                />
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={comment.author?.avatarUrl} alt={comment.author?.displayName || "User"} />
+                  <AvatarFallback>
+                    {(comment.author?.displayName || "U").charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex-1">
-                  <div className="bg-gray-100 rounded-lg p-3">
-                    <p className="text-sm font-medium text-neutral">{comment.author.displayName || "Anonymous User"}</p>
-                    <p className="text-sm text-gray-700">{comment.content}</p>
+                  <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                    <p className="text-sm font-medium text-foreground">{comment.author?.displayName || "Unbekannter Benutzer"}</p>
+                    <p className="text-sm text-muted-foreground">{comment.content}</p>
                   </div>
                   <div className="flex items-center space-x-4 mt-2">
-                    <button className="text-xs text-gray-500 hover:text-primary">Like</button>
-                    <button className="text-xs text-gray-500 hover:text-primary">Reply</button>
-                    <span className="text-xs text-gray-400">{formatTimeAgo(comment.createdAt)}</span>
+                    <button className="text-xs text-muted-foreground hover:text-primary">Like</button>
+                    <button className="text-xs text-muted-foreground hover:text-primary">Reply</button>
+                    <span className="text-xs text-muted-foreground">{formatTimeAgo(comment.createdAt)}</span>
                   </div>
                 </div>
               </div>

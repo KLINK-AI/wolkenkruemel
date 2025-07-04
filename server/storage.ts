@@ -809,12 +809,39 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {
-    return await db
+    const results = await db
       .select()
       .from(comments)
       .leftJoin(users, eq(comments.authorId, users.id))
       .where(eq(comments.postId, postId))
       .orderBy(desc(comments.createdAt));
+    
+    return results.map(result => ({
+      ...result.comments,
+      author: result.users || {
+        id: 0,
+        username: "unknown",
+        email: "",
+        password: "",
+        displayName: "Unbekannter Benutzer",
+        firstName: null,
+        lastName: null,
+        bio: null,
+        avatarUrl: null,
+        location: null,
+        isEmailVerified: false,
+        emailVerificationToken: null,
+        role: "user",
+        subscriptionTier: "free",
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        activitiesCreated: 0,
+        postsCreated: 0,
+        likesReceived: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    }));
   }
 
   async createComment(insertComment: InsertComment): Promise<Comment> {
