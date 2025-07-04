@@ -3,46 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star, Users, BookOpen, Heart, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/components/LanguageProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageToggle } from "@/components/LanguageToggle";
 
 export default function HomePage() {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <Link href="/" className="flex items-center space-x-2">
-                <img
-                  src="/Wolkenkruemel.png"
-                  alt="Wolkenkrümel"
-                  className="h-8 w-8"
-                />
-                <span className="text-xl font-bold text-foreground">Wolkenkrümel</span>
-              </Link>
-              <nav className="flex space-x-6">
-                <Link href="/" className="text-primary font-medium">
-                  {t('nav.home')}
-                </Link>
-                <Link href="/activities" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('nav.activities')}
-                </Link>
-                <Link href="/community" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('nav.community')}
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              <LanguageToggle />
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen">{/* Now using app-background from Layout */}
 
       {/* Hero Section */}
       <section className="py-20 px-4">

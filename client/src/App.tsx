@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import { Layout } from "@/components/Layout";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import CommunityPage from "@/pages/CommunityPage";
@@ -15,18 +16,20 @@ import EditActivityPage from "@/pages/EditActivityPage";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={HomePage} />
-      <Route path="/community" component={CommunityPage} />
-      <Route path="/activities" component={ActivitiesPage} />
-      <Route path="/aktivitäten" component={ActivitiesPage} />
-      <Route path="/activities/:id" component={ActivityDetailPage} />
-      <Route path="/activities/:id/edit" component={EditActivityPage} />
-      <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
-      <Route path="/create-activity" component={CreateActivityPage} />
-      <Route path="/create" component={CreateActivityPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <Layout>
+      <Switch>
+        <Route path="/" component={HomePage} />
+        <Route path="/community" component={CommunityPage} />
+        <Route path="/activities" component={ActivitiesPage} />
+        <Route path="/aktivitäten" component={ActivitiesPage} />
+        <Route path="/activities/:id" component={ActivityDetailPage} />
+        <Route path="/activities/:id/edit" component={EditActivityPage} />
+        <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
+        <Route path="/create-activity" component={CreateActivityPage} />
+        <Route path="/create" component={CreateActivityPage} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
   );
 }
 
