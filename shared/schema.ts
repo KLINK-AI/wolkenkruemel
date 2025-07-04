@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -143,6 +144,99 @@ export const insertEventSchema = createInsertSchema(events).omit({
 });
 
 // Types
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  activities: many(activities),
+  posts: many(posts),
+  comments: many(comments),
+  likes: many(likes),
+  followers: many(follows, { relationName: "follower" }),
+  following: many(follows, { relationName: "following" }),
+  events: many(events),
+  notifications: many(notifications),
+}));
+
+export const activitiesRelations = relations(activities, ({ one, many }) => ({
+  author: one(users, {
+    fields: [activities.authorId],
+    references: [users.id],
+  }),
+  posts: many(posts),
+}));
+
+export const postsRelations = relations(posts, ({ one, many }) => ({
+  author: one(users, {
+    fields: [posts.authorId],
+    references: [users.id],
+  }),
+  linkedActivity: one(activities, {
+    fields: [posts.linkedActivityId],
+    references: [activities.id],
+  }),
+  comments: many(comments),
+  likes: many(likes),
+}));
+
+export const commentsRelations = relations(comments, ({ one, many }) => ({
+  author: one(users, {
+    fields: [comments.authorId],
+    references: [users.id],
+  }),
+  post: one(posts, {
+    fields: [comments.postId],
+    references: [posts.id],
+  }),
+  parent: one(comments, {
+    fields: [comments.parentId],
+    references: [comments.id],
+    relationName: "parent",
+  }),
+  replies: many(comments, { relationName: "parent" }),
+  likes: many(likes),
+}));
+
+export const likesRelations = relations(likes, ({ one }) => ({
+  user: one(users, {
+    fields: [likes.userId],
+    references: [users.id],
+  }),
+  post: one(posts, {
+    fields: [likes.postId],
+    references: [posts.id],
+  }),
+  comment: one(comments, {
+    fields: [likes.commentId],
+    references: [comments.id],
+  }),
+}));
+
+export const followsRelations = relations(follows, ({ one }) => ({
+  follower: one(users, {
+    fields: [follows.followerId],
+    references: [users.id],
+    relationName: "follower",
+  }),
+  following: one(users, {
+    fields: [follows.followingId],
+    references: [users.id],
+    relationName: "following",
+  }),
+}));
+
+export const eventsRelations = relations(events, ({ one }) => ({
+  organizer: one(users, {
+    fields: [events.organizerId],
+    references: [users.id],
+  }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Activity = typeof activities.$inferSelect;

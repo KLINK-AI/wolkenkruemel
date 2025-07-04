@@ -459,4 +459,278 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async updateUserSubscription(id: number, customerId: string, subscriptionId: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        stripeCustomerId: customerId,
+        stripeSubscriptionId: subscriptionId,
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async getActivities(limit = 20, offset = 0): Promise<Activity[]> {
+    return await db
+      .select()
+      .from(activities)
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(activities.createdAt));
+  }
+
+  async getActivity(id: number): Promise<Activity | undefined> {
+    const [activity] = await db.select().from(activities).where(eq(activities.id, id));
+    return activity || undefined;
+  }
+
+  async getActivitiesByAuthor(authorId: number): Promise<Activity[]> {
+    return await db
+      .select()
+      .from(activities)
+      .where(eq(activities.authorId, authorId))
+      .orderBy(desc(activities.createdAt));
+  }
+
+  async createActivity(insertActivity: InsertActivity): Promise<Activity> {
+    const [activity] = await db
+      .insert(activities)
+      .values(insertActivity)
+      .returning();
+    return activity;
+  }
+
+  async updateActivity(id: number, updates: Partial<Activity>): Promise<Activity> {
+    const [activity] = await db
+      .update(activities)
+      .set(updates)
+      .where(eq(activities.id, id))
+      .returning();
+    return activity;
+  }
+
+  async deleteActivity(id: number): Promise<void> {
+    await db.delete(activities).where(eq(activities.id, id));
+  }
+
+  async approveActivity(id: number): Promise<Activity> {
+    const [activity] = await db
+      .update(activities)
+      .set({ isApproved: true })
+      .where(eq(activities.id, id))
+      .returning();
+    return activity;
+  }
+
+  async getPosts(limit = 20, offset = 0): Promise<(Post & { author: User, linkedActivity?: Activity })[]> {
+    return await db
+      .select()
+      .from(posts)
+      .leftJoin(users, eq(posts.authorId, users.id))
+      .leftJoin(activities, eq(posts.linkedActivityId, activities.id))
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(posts.createdAt));
+  }
+
+  async getPost(id: number): Promise<(Post & { author: User, linkedActivity?: Activity }) | undefined> {
+    const [result] = await db
+      .select()
+      .from(posts)
+      .leftJoin(users, eq(posts.authorId, users.id))
+      .leftJoin(activities, eq(posts.linkedActivityId, activities.id))
+      .where(eq(posts.id, id));
+    return result || undefined;
+  }
+
+  async getPostsByAuthor(authorId: number): Promise<Post[]> {
+    return await db
+      .select()
+      .from(posts)
+      .where(eq(posts.authorId, authorId))
+      .orderBy(desc(posts.createdAt));
+  }
+
+  async createPost(insertPost: InsertPost): Promise<Post> {
+    const [post] = await db
+      .insert(posts)
+      .values(insertPost)
+      .returning();
+    return post;
+  }
+
+  async updatePost(id: number, updates: Partial<Post>): Promise<Post> {
+    const [post] = await db
+      .update(posts)
+      .set(updates)
+      .where(eq(posts.id, id))
+      .returning();
+    return post;
+  }
+
+  async deletePost(id: number): Promise<void> {
+    await db.delete(posts).where(eq(posts.id, id));
+  }
+
+  async likePost(userId: number, postId: number): Promise<void> {
+    await db.insert(likes).values({ userId, postId });
+  }
+
+  async unlikePost(userId: number, postId: number): Promise<void> {
+    await db.delete(likes).where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
+  }
+
+  async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {
+    return await db
+      .select()
+      .from(comments)
+      .leftJoin(users, eq(comments.authorId, users.id))
+      .where(eq(comments.postId, postId))
+      .orderBy(desc(comments.createdAt));
+  }
+
+  async createComment(insertComment: InsertComment): Promise<Comment> {
+    const [comment] = await db
+      .insert(comments)
+      .values(insertComment)
+      .returning();
+    return comment;
+  }
+
+  async updateComment(id: number, updates: Partial<Comment>): Promise<Comment> {
+    const [comment] = await db
+      .update(comments)
+      .set(updates)
+      .where(eq(comments.id, id))
+      .returning();
+    return comment;
+  }
+
+  async deleteComment(id: number): Promise<void> {
+    await db.delete(comments).where(eq(comments.id, id));
+  }
+
+  async likeComment(userId: number, commentId: number): Promise<void> {
+    await db.insert(likes).values({ userId, commentId });
+  }
+
+  async followUser(followerId: number, followingId: number): Promise<void> {
+    await db.insert(follows).values({ followerId, followingId });
+  }
+
+  async unfollowUser(followerId: number, followingId: number): Promise<void> {
+    await db.delete(follows).where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)));
+  }
+
+  async getFollowers(userId: number): Promise<User[]> {
+    return await db
+      .select()
+      .from(follows)
+      .leftJoin(users, eq(follows.followerId, users.id))
+      .where(eq(follows.followingId, userId));
+  }
+
+  async getFollowing(userId: number): Promise<User[]> {
+    return await db
+      .select()
+      .from(follows)
+      .leftJoin(users, eq(follows.followingId, users.id))
+      .where(eq(follows.followerId, userId));
+  }
+
+  async getEvents(limit = 10): Promise<Event[]> {
+    return await db
+      .select()
+      .from(events)
+      .limit(limit)
+      .orderBy(desc(events.date));
+  }
+
+  async createEvent(insertEvent: InsertEvent): Promise<Event> {
+    const [event] = await db
+      .insert(events)
+      .values(insertEvent)
+      .returning();
+    return event;
+  }
+
+  async joinEvent(userId: number, eventId: number): Promise<void> {
+    // This would typically be a separate table, but for simplicity we'll increment the attendees count
+    await db
+      .update(events)
+      .set({ attendees: sql`${events.attendees} + 1` })
+      .where(eq(events.id, eventId));
+  }
+
+  async getNotifications(userId: number): Promise<Notification[]> {
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async createNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification> {
+    const [newNotification] = await db
+      .insert(notifications)
+      .values(notification)
+      .returning();
+    return newNotification;
+  }
+
+  async markNotificationRead(id: number): Promise<void> {
+    await db
+      .update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.id, id));
+  }
+
+  async getTrendingTags(): Promise<{ tag: string; count: number }[]> {
+    // This would require a more complex query to extract tags from posts
+    return [];
+  }
+
+  async getSuggestedUsers(userId: number): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(ne(users.id, userId))
+      .limit(5);
+  }
+}
+
+export const storage = new DatabaseStorage();
