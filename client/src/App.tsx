@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import CommunityPage from "@/pages/CommunityPage";
 import ActivitiesPage from "@/pages/ActivitiesPage";
+import ActivityDetailPage from "@/pages/ActivityDetailPage";
 import CreateActivityPage from "@/pages/CreateActivityPage";
 
 function Router() {
@@ -18,6 +19,8 @@ function Router() {
       <Route path="/community" component={CommunityPage} />
       <Route path="/activities" component={ActivitiesPage} />
       <Route path="/aktivitäten" component={ActivitiesPage} />
+      <Route path="/activities/:id" component={ActivityDetailPage} />
+      <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
       <Route path="/create-activity" component={CreateActivityPage} />
       <Route component={NotFound} />
     </Switch>

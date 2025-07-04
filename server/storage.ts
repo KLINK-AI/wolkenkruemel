@@ -157,8 +157,32 @@ export class MemStorage implements IStorage {
     return allActivities.slice(offset, offset + limit);
   }
 
-  async getActivity(id: number): Promise<Activity | undefined> {
-    return this.activities.get(id);
+  async getActivity(id: number): Promise<(Activity & { author: User }) | undefined> {
+    const activity = this.activities.get(id);
+    if (!activity) return undefined;
+    
+    const author = activity.authorId ? await this.getUser(activity.authorId) : null;
+    const defaultAuthor = {
+      id: 0,
+      username: 'Unknown',
+      email: '',
+      password: '',
+      displayName: 'Unbekannter Autor',
+      bio: null,
+      avatarUrl: null,
+      role: 'user',
+      subscriptionTier: 'free',
+      activitiesCreated: 0,
+      postsCreated: 0,
+      likesReceived: 0,
+      isEmailVerified: false,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    return { ...activity, author: author || defaultAuthor };
   }
 
   async getActivitiesByAuthor(authorId: number): Promise<Activity[]> {

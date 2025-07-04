@@ -136,50 +136,52 @@ export default function ActivitiesPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {activities.map((activity) => (
-            <Card key={activity.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{activity.title}</CardTitle>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {activity.description}
-                    </p>
+            <Link key={activity.id} href={`/activities/${activity.id}`}>
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg mb-2">{activity.title}</CardTitle>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {activity.description}
+                      </p>
+                    </div>
+                    <Badge variant={
+                      activity.difficulty === 'beginner' ? 'default' :
+                      activity.difficulty === 'intermediate' ? 'secondary' : 'destructive'
+                    }>
+                      {t(`difficulty.${activity.difficulty}`)}
+                    </Badge>
                   </div>
-                  <Badge variant={
-                    activity.difficulty === 'beginner' ? 'default' :
-                    activity.difficulty === 'intermediate' ? 'secondary' : 'destructive'
-                  }>
-                    {t(`difficulty.${activity.difficulty}`)}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-4 h-4" />
-                      <span>{activity.duration} {t('activities.minutes')}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Users className="w-4 h-4" />
-                      <span>{activity.completions}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4" />
-                      <span>{activity.likes}</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{activity.duration} {t('activities.minutes')}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Users className="w-4 h-4" />
+                        <span>{activity.completions}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Star className="w-4 h-4" />
+                        <span>{activity.likes}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    {t('activities.by')} {activity.author?.displayName || activity.author?.username || 'Unbekannter Autor'}
-                  </span>
-                  <Button variant="outline" size="sm">
-                    {t('activities.view')}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      {t('activities.by')} {activity.author?.displayName || activity.author?.username || 'Unbekannter Autor'}
+                    </span>
+                    <Button variant="outline" size="sm">
+                      {t('activities.view')}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
