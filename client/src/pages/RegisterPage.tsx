@@ -13,10 +13,12 @@ import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Benutzername muss mindestens 3 Zeichen haben"),
+  username: z.string().min(3, "Benutzername muss mindestens 3 Zeichen haben").max(50, "Benutzername darf maximal 50 Zeichen haben"),
   email: z.string().email("Gültige E-Mail-Adresse erforderlich"),
-  password: z.string().min(6, "Passwort muss mindestens 6 Zeichen haben"),
-  displayName: z.string().min(2, "Name muss mindestens 2 Zeichen haben"),
+  password: z.string()
+    .min(8, "Passwort muss mindestens 8 Zeichen haben")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/, "Passwort muss mindestens einen Kleinbuchstaben, einen Großbuchstaben und eine Zahl enthalten"),
+  displayName: z.string().min(2, "Name muss mindestens 2 Zeichen haben").max(100, "Name darf maximal 100 Zeichen haben"),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -146,8 +148,11 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Passwort</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="Mindestens 6 Zeichen" {...field} />
+                      <Input type="password" placeholder="Mindestens 8 Zeichen" {...field} />
                     </FormControl>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Passwort muss mindestens 8 Zeichen haben und einen Kleinbuchstaben, einen Großbuchstaben und eine Zahl enthalten
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
