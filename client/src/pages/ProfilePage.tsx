@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,36 +7,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Save, User, Mail, MapPin, Calendar, Edit3 } from "lucide-react";
-
-// Mock current user - in real app this would come from auth context
-const currentUser = {
-  id: 1,
-  username: "steve",
-  email: "steve@example.com",
-  displayName: "Steve",
-  bio: "Hundeliebhaber und Trainer aus Berlin. Spezialisiert auf Agility-Training und Verhaltenskorrektur.",
-  avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200",
-  location: "Berlin, Deutschland",
-  joinedDate: "2024-03-15",
-  activitiesCreated: 8,
-  postsCreated: 15,
-  likesReceived: 127,
-  subscriptionTier: "premium"
-};
+import { Save, Mail, MapPin, Calendar, Edit3 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    displayName: currentUser.displayName,
-    bio: currentUser.bio,
-    location: currentUser.location,
-    email: currentUser.email
+    displayName: "",
+    bio: "",
+    location: "",
+    email: ""
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
+
+  // Update form data when user loads
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        displayName: currentUser.displayName || currentUser.username || "",
+        bio: currentUser.bio || "",
+        location: currentUser.location || "",
+        email: currentUser.email || ""
+      });
+    }
+  }, [currentUser]);
+
+  if (!currentUser) {
+    return <div className="flex justify-center items-center h-64">Not authenticated</div>;
+  }
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -48,7 +49,10 @@ export default function ProfilePage() {
         description: "Ihre Profildaten wurden erfolgreich gespeichert.",
       });
       setIsEditing(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/users", currentUser.id] });
+      // Update local storage
+      const updatedUser = { ...currentUser, ...formData };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      window.dispatchEvent(new CustomEvent('userChanged'));
     },
     onError: () => {
       toast({
@@ -86,95 +90,71 @@ export default function ProfilePage() {
               {/* Avatar */}
               <div className="relative">
                 <Avatar className="w-24 h-24 md:w-32 md:h-32">
-                  <AvatarImage src={currentUser.avatarUrl} alt={currentUser.displayName} />
+                  <AvatarImage src={currentUser.avatarUrl} alt={currentUser.displayName || currentUser.username} />
                   <AvatarFallback className="text-2xl">
-                    {currentUser.displayName.charAt(0)}
+                    {(currentUser.displayName || currentUser.username || "U").charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute -bottom-2 -right-2 rounded-full w-8 h-8"
-                >
-                  <Camera className="w-4 h-4" />
-                </Button>
               </div>
 
-              {/* User Info */}
+              {/* Profile Info */}
               <div className="flex-1">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h1 className="text-3xl font-bold text-foreground">
-                      {currentUser.displayName}
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                      {currentUser.displayName || currentUser.username || "Unnamed User"}
                     </h1>
-                    <p className="text-muted-foreground">@{currentUser.username}</p>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {currentUser.location}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        Dabei seit {formatDate(currentUser.joinedDate)}
-                      </div>
-                    </div>
+                    <p className="text-lg text-muted-foreground">@{currentUser.username}</p>
                   </div>
                   <Button
+                    variant="outline"
                     onClick={() => setIsEditing(!isEditing)}
-                    variant={isEditing ? "outline" : "default"}
                     className="flex items-center gap-2"
                   >
                     <Edit3 className="w-4 h-4" />
-                    {isEditing ? "Abbrechen" : "Profil bearbeiten"}
+                    {isEditing ? "Abbrechen" : "Bearbeiten"}
                   </Button>
                 </div>
-              </div>
-            </div>
 
-            {/* Stats */}
-            <Separator className="my-6" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">
-                  {currentUser.activitiesCreated}
+                {/* Bio */}
+                <p className="text-muted-foreground mb-4">
+                  {currentUser.bio || "Noch keine Beschreibung hinzugefügt."}
+                </p>
+
+                {/* Quick Stats */}
+                <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                  <div className="flex items-center gap-1">
+                    <Mail className="w-4 h-4" />
+                    {currentUser.email}
+                  </div>
+                  {currentUser.location && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {currentUser.location}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    Seit {formatDate(currentUser.createdAt || new Date().toISOString())}
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">Aktivitäten erstellt</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">
-                  {currentUser.postsCreated}
-                </div>
-                <div className="text-sm text-muted-foreground">Beiträge verfasst</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">
-                  {currentUser.likesReceived}
-                </div>
-                <div className="text-sm text-muted-foreground">Likes erhalten</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
-                  {currentUser.subscriptionTier === "premium" ? "Premium" : "Basic"}
-                </div>
-                <div className="text-sm text-muted-foreground">Mitgliedschaft</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Profile Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Personal Information */}
-          <Card>
+        {/* Edit Profile Form */}
+        {isEditing && (
+          <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Persönliche Informationen
+                <Edit3 className="w-5 h-5" />
+                Profil bearbeiten
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {isEditing ? (
-                <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="displayName">Anzeigename</Label>
                     <Input
@@ -182,16 +162,6 @@ export default function ProfilePage() {
                       value={formData.displayName}
                       onChange={(e) => handleInputChange("displayName", e.target.value)}
                       placeholder="Ihr Anzeigename"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">E-Mail</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      placeholder="ihre@email.com"
                     />
                   </div>
                   <div>
@@ -203,86 +173,116 @@ export default function ProfilePage() {
                       placeholder="Stadt, Land"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="bio">Über mich</Label>
-                    <Textarea
-                      id="bio"
-                      value={formData.bio}
-                      onChange={(e) => handleInputChange("bio", e.target.value)}
-                      placeholder="Erzählen Sie etwas über sich und Ihre Erfahrung mit Hunden..."
-                      rows={4}
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    disabled={updateProfileMutation.isPending}
-                    className="w-full"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    {updateProfileMutation.isPending ? "Speichere..." : "Änderungen speichern"}
-                  </Button>
-                </form>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-muted-foreground">Anzeigename</Label>
-                    <p className="text-foreground">{currentUser.displayName}</p>
-                  </div>
-                  <div>
-                    <Label className="text-muted-foreground">E-Mail</Label>
-                    <p className="text-foreground">{currentUser.email}</p>
-                  </div>
-                  <div>
-                    <Label className="text-muted-foreground">Standort</Label>
-                    <p className="text-foreground">{currentUser.location}</p>
-                  </div>
-                  <div>
-                    <Label className="text-muted-foreground">Über mich</Label>
-                    <p className="text-foreground">{currentUser.bio}</p>
-                  </div>
                 </div>
-              )}
+
+                <div>
+                  <Label htmlFor="email">E-Mail</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    placeholder="ihre@email.com"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="bio">Über mich</Label>
+                  <Textarea
+                    id="bio"
+                    value={formData.bio}
+                    onChange={(e) => handleInputChange("bio", e.target.value)}
+                    placeholder="Erzählen Sie etwas über sich und Ihre Hundeerfahrung..."
+                    rows={4}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsEditing(false)}
+                  >
+                    Abbrechen
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={updateProfileMutation.isPending}
+                    className="flex items-center gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    {updateProfileMutation.isPending ? "Speichern..." : "Speichern"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Profile Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Aktivitäten</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">
+                {currentUser.activitiesCreated || 0}
+              </div>
+              <p className="text-sm text-muted-foreground">erstellt</p>
             </CardContent>
           </Card>
 
-          {/* Account Settings */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Mail className="w-5 h-5" />
-                Konto-Einstellungen
-              </CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Beiträge</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="text-muted-foreground">Benutzername</Label>
-                <p className="text-foreground">@{currentUser.username}</p>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">
+                {currentUser.postsCreated || 0}
               </div>
-              <div>
-                <Label className="text-muted-foreground">Mitglied seit</Label>
-                <p className="text-foreground">{formatDate(currentUser.joinedDate)}</p>
+              <p className="text-sm text-muted-foreground">verfasst</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Likes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">
+                {currentUser.likesReceived || 0}
               </div>
-              <div>
-                <Label className="text-muted-foreground">Aktueller Plan</Label>
-                <p className="text-foreground">
-                  {currentUser.subscriptionTier === "premium" ? "Premium Mitgliedschaft" : "Basis Mitgliedschaft"}
-                </p>
-              </div>
-              <Separator />
-              <div className="space-y-2">
-                <Button variant="outline" className="w-full">
-                  Passwort ändern
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Plan verwalten
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Benachrichtigungen
-                </Button>
-              </div>
+              <p className="text-sm text-muted-foreground">erhalten</p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Subscription Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Abonnement</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">
+                  {currentUser.subscriptionTier === "premium" ? "Premium" : 
+                   currentUser.subscriptionTier === "professional" ? "Professional" : "Kostenlos"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {currentUser.subscriptionTier === "premium" ? "Unbegrenzte Aktivitäten und Premium-Features" : 
+                   currentUser.subscriptionTier === "professional" ? "Alle Features für Profis" : "Begrenzte Features"}
+                </p>
+              </div>
+              {currentUser.subscriptionTier === "free" && (
+                <Button>
+                  Upgrade
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

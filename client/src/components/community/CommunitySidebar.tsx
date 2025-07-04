@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Home, Users, MessageCircle } from "lucide-react";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 interface CommunitySidebarProps {
   user: {
     id: number;
@@ -14,17 +16,19 @@ interface CommunitySidebarProps {
 }
 
 export default function CommunitySidebar({ user }: CommunitySidebarProps) {
+  const { t } = useLanguage();
+  
   const navigationItems = [
-    { icon: Home, label: "Feed", active: true },
-    { icon: Users, label: "My Network", active: false },
-    { icon: MessageCircle, label: "Q&A Forum", active: false },
+    { icon: Home, label: t('community.feed'), active: true },
+    { icon: Users, label: t('community.network'), active: false },
+    { icon: MessageCircle, label: t('community.forum'), active: false },
   ];
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Community</CardTitle>
+          <CardTitle className="text-lg">{t('community.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <nav className="space-y-2">

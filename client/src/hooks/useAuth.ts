@@ -5,11 +5,15 @@ interface User {
   username: string;
   email: string;
   displayName?: string;
+  bio?: string;
+  avatarUrl?: string;
   role?: string;
+  subscriptionTier?: string;
   activitiesCreated?: number;
   postsCreated?: number;
   likesReceived?: number;
-  avatarUrl?: string;
+  location?: string;
+  createdAt?: string;
 }
 
 let globalCurrentUser: User | null = null;
@@ -52,6 +56,7 @@ if (typeof window !== 'undefined') {
 
 export function useAuth() {
   const [currentUser, setCurrentUser] = useState<User | null>(globalCurrentUser);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const updateUser = () => {
@@ -85,6 +90,7 @@ export function useAuth() {
   return {
     currentUser,
     isAuthenticated: !!currentUser,
+    isLoading,
     login,
     logout
   };
