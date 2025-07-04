@@ -162,7 +162,9 @@ export class MemStorage implements IStorage {
   }
 
   async getActivitiesByAuthor(authorId: number): Promise<Activity[]> {
-    return Array.from(this.activities.values()).filter(activity => activity.authorId === authorId);
+    return Array.from(this.activities.values()).filter(activity => 
+      typeof activity.authorId === 'string' ? parseInt(activity.authorId) === authorId : activity.authorId === authorId
+    );
   }
 
   async createActivity(insertActivity: InsertActivity): Promise<Activity> {
@@ -782,4 +784,4 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemStorage();
