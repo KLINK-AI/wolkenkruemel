@@ -37,13 +37,14 @@ export default function CommunityPage() {
             {/* Logo */}
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <div className="flex items-center">
+                <Link href="/" className="flex items-center space-x-2">
                   <img 
-                    src="/Wolkenkruemel.png" 
+                    src="/wolkenkruemel.png" 
                     alt="Wolkenkrümel Logo" 
-                    className="h-12 w-auto mr-2"
+                    className="h-8 w-8"
                   />
-                </div>
+                  <span className="text-xl font-bold text-foreground">Wolkenkrümel</span>
+                </Link>
               </div>
             </div>
 
