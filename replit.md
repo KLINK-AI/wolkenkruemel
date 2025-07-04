@@ -121,6 +121,7 @@ Changelog:
 - July 04, 2025. Initial setup
 - July 04, 2025. Replaced all placeholder logos with authentic Wolkenkrümel SVG design featuring clouds and dogs
 - July 04, 2025. Updated homepage content: changed title to "Warum die Wolkenkrümel Platform?" and removed "Bewährte Methoden" section per user request
+- July 04, 2025. Switched from MemStorage to DatabaseStorage for permanent data persistence - all activities, users, and progress now survive server restarts
 
 ## User Preferences
 
