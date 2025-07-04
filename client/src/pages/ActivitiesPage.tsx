@@ -32,11 +32,24 @@ export default function ActivitiesPage() {
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("newest");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   
   const { currentUser } = useAuth();
+  const userId = currentUser?.id;
   
   const { data: activities = [], isLoading } = useQuery<Activity[]>({
     queryKey: ["/api/activities"],
+  });
+
+  const { data: userProgress = [] } = useQuery({
+    queryKey: ["/api/user-progress", userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const response = await fetch(`/api/user-progress/${userId}`);
+      if (!response.ok) return [];
+      return response.json();
+    },
+    enabled: !!userId,
   });
 
   const availableTags = useMemo(() => {
@@ -53,8 +66,9 @@ export default function ActivitiesPage() {
                            activity.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesDifficulty = difficultyFilter === "all" || activity.difficulty === difficultyFilter;
       const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => activity.tags?.includes(tag));
+      const matchesFavorites = !showFavoritesOnly || userProgress.some((p: any) => p.activityId === activity.id && p.isFavorite);
       
-      return matchesSearch && matchesDifficulty && matchesTags;
+      return matchesSearch && matchesDifficulty && matchesTags && matchesFavorites;
     });
 
     filtered.sort((a, b) => {
@@ -79,7 +93,7 @@ export default function ActivitiesPage() {
     });
 
     return filtered;
-  }, [activities, searchTerm, difficultyFilter, sortBy, selectedTags]);
+  }, [activities, searchTerm, difficultyFilter, sortBy, selectedTags, showFavoritesOnly, userProgress]);
 
   if (isLoading) {
     return (
@@ -161,6 +175,18 @@ export default function ActivitiesPage() {
                   <SelectItem value="difficulty">Schwierigkeit</SelectItem>
                 </SelectContent>
               </Select>
+
+              {/* Favorites Filter */}
+              {currentUser && (
+                <Button
+                  variant={showFavoritesOnly ? "default" : "outline"}
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  className="flex items-center space-x-2"
+                >
+                  <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                  <span>Nur Favoriten</span>
+                </Button>
+              )}
             </div>
 
             {availableTags.length > 0 && (
