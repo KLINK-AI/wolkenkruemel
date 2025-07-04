@@ -4,8 +4,10 @@ import Stripe from "stripe";
 import { storage } from "./storage";
 import { 
   insertActivitySchema, insertPostSchema, insertCommentSchema, 
-  insertEventSchema 
+  insertEventSchema, activityProgress 
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -242,9 +244,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user-progress/:userId", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
-      // This would need to be implemented in storage - for now return empty array
-      res.json([]);
+      
+      // Get all activity progress for this user from database
+      const progressData = await db
+        .select()
+        .from(activityProgress)
+        .where(eq(activityProgress.userId, userId));
+      
+      res.json(progressData);
     } catch (error: any) {
+      console.error("Error fetching user progress:", error);
       res.status(500).json({ message: error.message });
     }
   });

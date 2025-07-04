@@ -80,6 +80,8 @@ export default function ActivitiesPage() {
       );
       const matchesFavorites = !showFavoritesOnly || isFavorite;
       
+
+      
       return matchesSearch && matchesDifficulty && matchesTags && matchesFavorites;
     });
 
