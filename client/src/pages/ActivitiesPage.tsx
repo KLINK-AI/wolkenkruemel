@@ -215,9 +215,9 @@ export default function ActivitiesPage() {
 
             <div className="text-sm text-muted-foreground">
               {filteredAndSortedActivities.length} von {activities.length} Aktivitäten
-              {showFavoritesOnly && userProgress.length > 0 && (
+              {showFavoritesOnly && (
                 <span className="ml-2">
-                  ({userProgress.filter((p: any) => p.favorite).length} Favoriten)
+                  (User ID: {userId}, Progress entries: {userProgress.length}, Favoriten: {userProgress.filter((p: any) => p.favorite).length})
                 </span>
               )}
             </div>
