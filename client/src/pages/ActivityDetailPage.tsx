@@ -39,10 +39,13 @@ export default function ActivityDetailPage() {
 
   const updateProgressMutation = useMutation({
     mutationFn: async (progressUpdate: { tried?: boolean; mastered?: boolean; favorite?: boolean }) => {
-      return apiRequest(`/api/activity-progress/${userId}/${id}`, "POST", progressUpdate);
+      await apiRequest("POST", `/api/activity-progress/${userId}/${id}`, progressUpdate);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/activity-progress", userId, id] });
+    },
+    onError: (error) => {
+      console.error("Failed to update progress:", error);
     },
   });
 

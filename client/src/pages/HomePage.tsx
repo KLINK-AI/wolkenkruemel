@@ -137,7 +137,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <img
-                  src="/wolkenkruemel.png"
+                  src="/Wolkenkruemel.png"
                   alt="Wolkenkrümel"
                   className="h-8 w-8"
                 />
