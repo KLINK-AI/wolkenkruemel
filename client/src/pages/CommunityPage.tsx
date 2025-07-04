@@ -39,7 +39,7 @@ export default function CommunityPage() {
               <div className="flex-shrink-0 flex items-center">
                 <Link href="/" className="flex items-center space-x-2">
                   <img 
-                    src="/wolkenkruemel.png" 
+                    src="/Wolkenkruemel.png" 
                     alt="Wolkenkrümel Logo" 
                     className="h-8 w-8"
                   />

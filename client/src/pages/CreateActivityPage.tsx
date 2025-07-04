@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Plus, X } from "lucide-react";
+import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from "lucide-react";
 
 const createActivitySchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title must be under 100 characters"),
@@ -22,6 +22,7 @@ const createActivitySchema = z.object({
   difficulty: z.enum(["beginner", "intermediate", "advanced"]),
   duration: z.number().min(1, "Duration must be at least 1 minute").max(300, "Duration must be under 5 hours"),
   authorId: z.number(),
+  imageUrl: z.string().optional(),
   isOfficial: z.boolean().default(false),
   isApproved: z.boolean().default(false),
 });
@@ -32,6 +33,8 @@ export default function CreateActivityPage() {
   const [, setLocation] = useLocation();
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isImageUploading, setIsImageUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -44,6 +47,7 @@ export default function CreateActivityPage() {
       difficulty: "beginner",
       duration: 15,
       authorId: 1, // Mock user ID
+      imageUrl: "",
       isOfficial: false,
       isApproved: false,
     },
@@ -84,6 +88,33 @@ export default function CreateActivityPage() {
 
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "Image size must be less than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        form.setValue("imageUrl", result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    form.setValue("imageUrl", "");
   };
 
   return (
@@ -148,6 +179,66 @@ export default function CreateActivityPage() {
                       </FormControl>
                       <FormDescription>
                         This will be shown in activity previews and search results.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Image Upload Section */}
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Activity Image (Optional)</FormLabel>
+                      <FormControl>
+                        <div className="space-y-4">
+                          {imagePreview ? (
+                            <div className="relative">
+                              <img
+                                src={imagePreview}
+                                alt="Activity preview"
+                                className="w-full h-48 object-cover rounded-lg border border-border"
+                              />
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={removeImage}
+                                className="absolute top-2 right-2"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                              <ImageIcon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                              <div className="space-y-2">
+                                <p className="text-sm text-muted-foreground">
+                                  Upload an image to make your activity more engaging
+                                </p>
+                                <label className="cursor-pointer">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                  />
+                                  <Button type="button" variant="outline" asChild>
+                                    <span>
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      Choose Image
+                                    </span>
+                                  </Button>
+                                </label>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormDescription>
+                        Supported formats: JPG, PNG, GIF. Max size: 5MB
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
