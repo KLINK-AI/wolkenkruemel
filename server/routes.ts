@@ -165,6 +165,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/activities/:id", async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.id);
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "Invalid activity ID" });
+      }
+
+      // Check if activity exists
+      const existingActivity = await storage.getActivity(activityId);
+      if (!existingActivity) {
+        return res.status(404).json({ message: "Activity not found" });
+      }
+
+      // TODO: Check if user is the author
+      // if (existingActivity.authorId !== authenticatedUserId) {
+      //   return res.status(403).json({ message: "You can only edit your own activities" });
+      // }
+
+      const updateSchema = insertActivitySchema.partial();
+      const result = updateSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid input", errors: result.error.issues });
+      }
+
+      const updatedActivity = await storage.updateActivity(activityId, result.data);
+      res.json(updatedActivity);
+    } catch (error: any) {
+      console.error("Error updating activity:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.put("/api/activities/:id/approve", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

@@ -127,6 +127,14 @@ export default function ActivityDetailPage() {
                     <p className="text-muted-foreground">{activity.description}</p>
                   </div>
                   <div className="flex gap-2">
+                    {activity.authorId === 1 && ( // TODO: Replace with actual user check
+                      <Link href={`/activities/${id}/edit`}>
+                        <Button variant="outline" size="sm">
+                          <Edit className="w-4 h-4 mr-1" />
+                          Bearbeiten
+                        </Button>
+                      </Link>
+                    )}
                     <Button variant="outline" size="sm">
                       <Heart className="w-4 h-4 mr-1" />
                       {activity.likes}

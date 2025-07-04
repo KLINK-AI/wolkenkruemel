@@ -11,6 +11,7 @@ import CommunityPage from "@/pages/CommunityPage";
 import ActivitiesPage from "@/pages/ActivitiesPage";
 import ActivityDetailPage from "@/pages/ActivityDetailPage";
 import CreateActivityPage from "@/pages/CreateActivityPage";
+import EditActivityPage from "@/pages/EditActivityPage";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/activities" component={ActivitiesPage} />
       <Route path="/aktivitäten" component={ActivitiesPage} />
       <Route path="/activities/:id" component={ActivityDetailPage} />
+      <Route path="/activities/:id/edit" component={EditActivityPage} />
       <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
       <Route path="/create-activity" component={CreateActivityPage} />
       <Route path="/create" component={CreateActivityPage} />
