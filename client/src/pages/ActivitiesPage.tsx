@@ -10,6 +10,7 @@ import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { useAuth } from "@/hooks/useAuth";
 import { useState, useMemo } from "react";
 
 interface Activity {
@@ -37,11 +38,7 @@ export default function ActivitiesPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   // Check if user is authenticated
-  const getCurrentUser = () => {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-  };
-  const currentUser = getCurrentUser();
+  const { currentUser } = useAuth();
   const userId = currentUser?.id;
   
   const { data: activities = [], isLoading } = useQuery<Activity[]>({

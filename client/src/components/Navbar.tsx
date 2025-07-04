@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Home, User, Settings, Moon, Sun, Users, Calendar, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import {
 import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/components/LanguageProvider";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { useAuth } from "@/hooks/useAuth";
 // SVG Logo as fallback when PNG not available
 const LogoFallback = () => (
   <svg width="40" height="40" viewBox="0 0 40 40" className="w-full h-full">
@@ -23,35 +23,7 @@ export function Navbar() {
   const [location] = useLocation();
   const { theme, setTheme } = useTheme();
   const { t } = useLanguage();
-
-  // Get current user from localStorage
-  const getCurrentUser = () => {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-  };
-  const [currentUser, setCurrentUser] = useState(getCurrentUser());
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  // Initialize state on first render
-  useEffect(() => {
-    setCurrentUser(getCurrentUser());
-    setIsInitialized(true);
-  }, []);
-  
-  // Listen for storage changes to update user state
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setCurrentUser(getCurrentUser());
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  // Don't render until initialized to prevent double navbar flash
-  if (!isInitialized) {
-    return null;
-  }
+  const { currentUser, logout } = useAuth();
   
   const navItems = [
     { path: "/", label: "Home", icon: Home },
@@ -153,8 +125,7 @@ export function Navbar() {
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => {
-                      localStorage.removeItem('currentUser');
-                      setCurrentUser(null);
+                      logout();
                       window.location.href = '/';
                     }}
                     className="text-red-600 focus:text-red-600"

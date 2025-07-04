@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
+import { useAuth } from "@/hooks/useAuth";
 
 const loginSchema = z.object({
   email: z.string().email("Gültige E-Mail-Adresse erforderlich"),
@@ -23,6 +24,7 @@ export default function LoginPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { login } = useAuth();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -38,10 +40,7 @@ export default function LoginPage() {
       return response.json();
     },
     onSuccess: (user) => {
-      // Store user in localStorage (simple auth state management)
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      // Trigger storage event to update navbar
-      window.dispatchEvent(new Event('storage'));
+      login(user);
       toast({
         title: "Anmeldung erfolgreich",
         description: `Willkommen zurück, ${user.displayName || user.username}!`,

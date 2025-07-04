@@ -7,14 +7,11 @@ import SuggestedUsers from "@/components/community/SuggestedUsers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CommunityPage() {
   // Check if user is authenticated
-  const getCurrentUser = () => {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-  };
-  const currentUser = getCurrentUser();
+  const { currentUser } = useAuth();
 
   // If user is not authenticated, show login prompt
   if (!currentUser) {
