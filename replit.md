@@ -119,6 +119,7 @@ The application uses a comprehensive schema with the following main entities:
 
 Changelog:
 - July 04, 2025. Initial setup
+- July 04, 2025. Replaced all placeholder logos with authentic Wolkenkrümel SVG design featuring clouds and dogs
 
 ## User Preferences
 
