@@ -4,6 +4,9 @@ import { Home, Users, MessageCircle } from "lucide-react";
 
 interface CommunitySidebarProps {
   user: {
+    id: number;
+    name: string;
+    avatar: string;
     activitiesCompleted: number;
     postsCreated: number;
     likesReceived: number;

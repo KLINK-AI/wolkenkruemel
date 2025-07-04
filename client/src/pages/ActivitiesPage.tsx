@@ -36,8 +36,13 @@ export default function ActivitiesPage() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  // Mock user ID - in real app this would come from auth
-  const userId = 1;
+  // Check if user is authenticated
+  const getCurrentUser = () => {
+    const userStr = localStorage.getItem('currentUser');
+    return userStr ? JSON.parse(userStr) : null;
+  };
+  const currentUser = getCurrentUser();
+  const userId = currentUser?.id;
   
   const { data: activities = [], isLoading } = useQuery<Activity[]>({
     queryKey: ["/api/activities"],
@@ -275,64 +280,107 @@ export default function ActivitiesPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAndSortedActivities.map((activity) => (
-            <Link key={activity.id} href={`/activities/${activity.id}`}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardHeader>
-                  {activity.imageUrl && (
-                    <div className="mb-3">
-                      <img 
-                        src={activity.imageUrl} 
-                        alt={activity.title}
-                        className="w-full h-32 object-cover rounded-md"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
+            <div key={activity.id}>
+              {currentUser ? (
+                <Link href={`/activities/${activity.id}`}>
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg mb-2">{activity.title}</CardTitle>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            {activity.description}
+                          </p>
+                        </div>
+                        <Badge variant={
+                          activity.difficulty === 'beginner' ? 'default' :
+                          activity.difficulty === 'intermediate' ? 'secondary' : 'destructive'
+                        }>
+                          {t(`difficulty.${activity.difficulty}`)}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-1">
+                            <Clock className="w-4 h-4" />
+                            <span>{activity.duration} {t('activities.minutes')}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Users className="w-4 h-4" />
+                            <span>{activity.completions}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Star className="w-4 h-4" />
+                            <span>{activity.likes}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          {t('activities.by')} {activity.author?.displayName || activity.author?.username || 'Unbekannter Autor'}
+                        </span>
+                        <Button variant="outline" size="sm">
+                          {t('activities.view')}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ) : (
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg mb-2">{activity.title}</CardTitle>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {activity.description}
+                        </p>
+                      </div>
+                      <Badge variant={
+                        activity.difficulty === 'beginner' ? 'default' :
+                        activity.difficulty === 'intermediate' ? 'secondary' : 'destructive'
+                      }>
+                        {t(`difficulty.${activity.difficulty}`)}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-1">
+                          <Clock className="w-4 h-4" />
+                          <span>{activity.duration} {t('activities.minutes')}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Users className="w-4 h-4" />
+                          <span>{activity.completions}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-4 h-4" />
+                          <span>{activity.likes}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        {t('activities.by')} {activity.author?.displayName || activity.author?.username || 'Unbekannter Autor'}
+                      </span>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          alert('Bitte melden Sie sich an, um Aktivitäten anzusehen. Nur registrierte Benutzer können auf die vollständigen Aktivitätsinhalte zugreifen.');
                         }}
-                      />
+                      >
+                        Anmelden erforderlich
+                      </Button>
                     </div>
-                  )}
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-2">{activity.title}</CardTitle>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {activity.description}
-                      </p>
-                    </div>
-                    <Badge variant={
-                      activity.difficulty === 'beginner' ? 'default' :
-                      activity.difficulty === 'intermediate' ? 'secondary' : 'destructive'
-                    }>
-                      {t(`difficulty.${activity.difficulty}`)}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{activity.duration} {t('activities.minutes')}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Users className="w-4 h-4" />
-                        <span>{activity.completions}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4" />
-                        <span>{activity.likes}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {t('activities.by')} {activity.author?.displayName || activity.author?.username || 'Unbekannter Autor'}
-                    </span>
-                    <Button variant="outline" size="sm">
-                      {t('activities.view')}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           ))}
         </div>
 

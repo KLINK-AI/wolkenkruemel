@@ -40,6 +40,8 @@ export default function LoginPage() {
     onSuccess: (user) => {
       // Store user in localStorage (simple auth state management)
       localStorage.setItem('currentUser', JSON.stringify(user));
+      // Trigger storage event to update navbar
+      window.dispatchEvent(new Event('storage'));
       toast({
         title: "Anmeldung erfolgreich",
         description: `Willkommen zurück, ${user.displayName || user.username}!`,
