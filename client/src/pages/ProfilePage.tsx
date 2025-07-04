@@ -149,7 +149,13 @@ export default function ProfilePage() {
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                       {currentUser.displayName || currentUser.username || "Unnamed User"}
                     </h1>
-                    <p className="text-lg text-muted-foreground">@{currentUser.username}</p>
+                    {(currentUser.firstName || currentUser.lastName) ? (
+                      <p className="text-lg text-muted-foreground">
+                        {currentUser.firstName} {currentUser.lastName}
+                      </p>
+                    ) : (
+                      <p className="text-lg text-muted-foreground">@{currentUser.username}</p>
+                    )}
                   </div>
                   <Button
                     variant="outline"
