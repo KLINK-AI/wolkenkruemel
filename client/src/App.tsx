@@ -22,6 +22,7 @@ function Router() {
       <Route path="/activities/:id" component={ActivityDetailPage} />
       <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
       <Route path="/create-activity" component={CreateActivityPage} />
+      <Route path="/create" component={CreateActivityPage} />
       <Route component={NotFound} />
     </Switch>
   );

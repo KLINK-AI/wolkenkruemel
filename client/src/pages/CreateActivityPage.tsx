@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from "lucide-react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const createActivitySchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title must be under 100 characters"),
@@ -37,6 +38,7 @@ export default function CreateActivityPage() {
   const [isImageUploading, setIsImageUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useLanguage();
 
   const form = useForm<CreateActivityForm>({
     resolver: zodResolver(createActivitySchema),
@@ -60,15 +62,15 @@ export default function CreateActivityPage() {
     },
     onSuccess: () => {
       toast({
-        title: "Activity Created",
-        description: "Your training activity has been submitted for review.",
+        title: t('createActivity.successTitle'),
+        description: t('createActivity.successMessage'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/activities"] });
       setLocation("/community");
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: t('createActivity.errorTitle'),
         description: error.message,
         variant: "destructive",
       });
@@ -95,8 +97,8 @@ export default function CreateActivityPage() {
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: "Error",
-          description: "Image size must be less than 5MB",
+          title: t('createActivity.errorTitle'),
+          description: t('createActivity.imageError'),
           variant: "destructive",
         });
         return;
@@ -125,7 +127,7 @@ export default function CreateActivityPage() {
           <div className="flex items-center h-16">
             <Button variant="ghost" onClick={() => setLocation("/community")} className="mr-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Community
+              {t('createActivity.backToCommunity')}
             </Button>
             <div className="flex items-center">
               <img 
@@ -142,9 +144,9 @@ export default function CreateActivityPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Create New Training Activity</CardTitle>
+            <CardTitle className="text-2xl">{t('createActivity.title')}</CardTitle>
             <CardDescription>
-              Share your dog training knowledge with the community. Your activity will be reviewed before being published.
+              {t('createActivity.subtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -155,9 +157,9 @@ export default function CreateActivityPage() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Activity Title</FormLabel>
+                      <FormLabel>{t('createActivity.titleLabel')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., Basic Sit Command Training" {...field} />
+                        <Input placeholder={t('createActivity.titlePlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -169,16 +171,16 @@ export default function CreateActivityPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Short Description</FormLabel>
+                      <FormLabel>{t('createActivity.descriptionLabel')}</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Brief overview of what this activity teaches..."
+                          placeholder={t('createActivity.descriptionPlaceholder')}
                           rows={3}
                           {...field} 
                         />
                       </FormControl>
                       <FormDescription>
-                        This will be shown in activity previews and search results.
+                        {t('createActivity.descriptionHelper')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -191,7 +193,7 @@ export default function CreateActivityPage() {
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Activity Image (Optional)</FormLabel>
+                      <FormLabel>{t('createActivity.imageLabel')}</FormLabel>
                       <FormControl>
                         <div className="space-y-4">
                           {imagePreview ? (
@@ -351,14 +353,14 @@ export default function CreateActivityPage() {
                     variant="outline" 
                     onClick={() => setLocation("/community")}
                   >
-                    Cancel
+                    {t('createActivity.cancel')}
                   </Button>
                   <Button 
                     type="submit" 
                     className="bg-primary hover:bg-primary/90"
                     disabled={createActivityMutation.isPending}
                   >
-                    {createActivityMutation.isPending ? "Creating..." : "Create Activity"}
+                    {createActivityMutation.isPending ? t('createActivity.creating') : t('createActivity.createButton')}
                   </Button>
                 </div>
               </form>

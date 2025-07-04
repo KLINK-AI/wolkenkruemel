@@ -293,13 +293,29 @@ export default function ActivityDetailPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="space-y-3">
-                  <Button className="w-full" size="lg">
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => {
+                      const newTriedState = !progress?.tried;
+                      updateProgressMutation.mutate({ tried: newTriedState });
+                    }}
+                    disabled={updateProgressMutation.isPending}
+                  >
                     <Star className="w-4 h-4 mr-2" />
-                    Aktivität starten
+                    {progress?.tried ? "Aktivität durchgeführt" : "Aktivität starten"}
                   </Button>
-                  <Button variant="outline" className="w-full">
-                    <Heart className="w-4 h-4 mr-2" />
-                    Zu Favoriten
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      const newFavoriteState = !progress?.favorite;
+                      updateProgressMutation.mutate({ favorite: newFavoriteState });
+                    }}
+                    disabled={updateProgressMutation.isPending}
+                  >
+                    <Heart className={`w-4 h-4 mr-2 ${progress?.favorite ? 'fill-red-500 text-red-500' : ''}`} />
+                    {progress?.favorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
                   </Button>
                   <Button variant="outline" className="w-full">
                     <Share2 className="w-4 h-4 mr-2" />
