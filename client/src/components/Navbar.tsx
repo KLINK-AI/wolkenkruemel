@@ -30,6 +30,13 @@ export function Navbar() {
     return userStr ? JSON.parse(userStr) : null;
   };
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Initialize state on first render
+  useEffect(() => {
+    setCurrentUser(getCurrentUser());
+    setIsInitialized(true);
+  }, []);
   
   // Listen for storage changes to update user state
   useEffect(() => {
@@ -40,6 +47,11 @@ export function Navbar() {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  // Don't render until initialized to prevent double navbar flash
+  if (!isInitialized) {
+    return null;
+  }
   
   const navItems = [
     { path: "/", label: "Home", icon: Home },

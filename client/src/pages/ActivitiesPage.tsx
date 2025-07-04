@@ -55,6 +55,7 @@ export default function ActivitiesPage() {
       if (!response.ok) return [];
       return response.json();
     },
+    enabled: !!userId, // Only run query if userId exists
   });
 
   // Get all available tags from activities
