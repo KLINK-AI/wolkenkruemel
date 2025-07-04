@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Activity } from "lucide-react";
@@ -107,14 +108,15 @@ export default function ActivityPost({ post }: ActivityPostProps) {
       <CardContent className="p-6 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img 
-              className="w-10 h-10 rounded-full" 
-              src={post.author?.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"}
-              alt="User Avatar" 
-            />
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={post.author?.avatarUrl} alt={post.author?.displayName || "User"} />
+              <AvatarFallback>
+                {(post.author?.displayName || "U").charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <div>
-              <h3 className="font-semibold text-neutral">{post.author?.displayName || "Unbekannter Benutzer"}</h3>
-              <p className="text-sm text-gray-600">{formatTimeAgo(post.createdAt)}</p>
+              <h3 className="font-semibold text-foreground">{post.author?.displayName || "Unbekannter Benutzer"}</h3>
+              <p className="text-sm text-muted-foreground">{formatTimeAgo(post.createdAt)}</p>
             </div>
           </div>
           <Button variant="ghost" size="icon">
@@ -125,18 +127,18 @@ export default function ActivityPost({ post }: ActivityPostProps) {
 
       {/* Post Content */}
       <CardContent className="px-6 pb-4">
-        <p className="text-gray-800 mb-4">{post.content}</p>
+        <p className="text-foreground mb-4">{post.content}</p>
         
         {/* Linked Activity */}
         {post.linkedActivity && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <div className="bg-muted rounded-lg p-4 mb-4">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
                 <Activity className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h4 className="font-medium text-neutral">{post.linkedActivity.title}</h4>
-                <p className="text-sm text-gray-600">{post.linkedActivity.description}</p>
+                <h4 className="font-medium text-foreground">{post.linkedActivity.title}</h4>
+                <p className="text-sm text-muted-foreground">{post.linkedActivity.description}</p>
               </div>
             </div>
           </div>

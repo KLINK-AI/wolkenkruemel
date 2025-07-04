@@ -8,8 +8,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import { Camera, Link, Activity } from "lucide-react";
 
 const createPostSchema = z.object({
@@ -21,22 +23,22 @@ const createPostSchema = z.object({
 
 type CreatePostForm = z.infer<typeof createPostSchema>;
 
-const mockUser = {
-  id: 1,
-  avatar: "https://images.unsplash.com/photo-1494790108755-2616c6d5e37c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"
-};
-
 export default function CreatePostCard() {
   const [showTypeSelector, setShowTypeSelector] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
+
+  if (!currentUser) {
+    return null;
+  }
 
   const form = useForm<CreatePostForm>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
       content: "",
       type: "post",
-      authorId: mockUser.id,
+      authorId: currentUser.id,
     },
   });
 
@@ -77,11 +79,12 @@ export default function CreatePostCard() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex items-center space-x-3">
-              <img 
-                className="w-10 h-10 rounded-full" 
-                src={mockUser.avatar} 
-                alt="User Avatar" 
-              />
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={currentUser.avatarUrl} alt={currentUser.displayName || currentUser.username} />
+                <AvatarFallback>
+                  {(currentUser.displayName || currentUser.username || "U").charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1">
                 <FormField
                   control={form.control}
