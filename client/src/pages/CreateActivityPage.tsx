@@ -87,9 +87,9 @@ export default function CreateActivityPage() {
   };
 
   return (
-    <div className="bg-light-gray min-h-screen">
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-background shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
             <Button variant="ghost" onClick={() => setLocation("/community")} className="mr-4">
@@ -102,7 +102,7 @@ export default function CreateActivityPage() {
                 <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span className="text-xl font-bold text-neutral">Wolkenkruemel</span>
+              <span className="text-xl font-bold text-foreground">Wolkenkruemel</span>
             </div>
           </div>
         </div>

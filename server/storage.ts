@@ -4,6 +4,8 @@ import {
   type Post, type InsertPost, type Comment, type InsertComment,
   type Event, type InsertEvent, type Notification
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, and, ne, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations

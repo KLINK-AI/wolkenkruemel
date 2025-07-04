@@ -41,7 +41,7 @@ export default function CommunityFeed() {
       {isLoading && (
         <div className="space-y-6">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow-sm p-6">
+            <div key={i} className="bg-card rounded-lg shadow-sm p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <Skeleton className="w-10 h-10 rounded-full" />
                 <div className="space-y-2">
@@ -59,7 +59,7 @@ export default function CommunityFeed() {
       
       {posts && posts.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500">No posts yet. Be the first to share something!</p>
+          <p className="text-muted-foreground">No posts yet. Be the first to share something!</p>
         </div>
       )}
       

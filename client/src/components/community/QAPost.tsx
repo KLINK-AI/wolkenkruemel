@@ -104,7 +104,7 @@ export default function QAPost({ post }: QAPostProps) {
           </div>
           <div>
             <span className="text-sm font-medium text-blue-600">Q&A</span>
-            <p className="text-xs text-gray-500">Community Question</p>
+            <p className="text-xs text-muted-foreground">Community Question</p>
           </div>
         </div>
 
@@ -115,17 +115,17 @@ export default function QAPost({ post }: QAPostProps) {
             alt="User Avatar" 
           />
           <div>
-            <h3 className="font-semibold text-neutral">{post.author.displayName || "Anonymous User"}</h3>
-            <p className="text-sm text-gray-600">{formatTimeAgo(post.createdAt)}</p>
+            <h3 className="font-semibold text-foreground">{post.author.displayName || "Anonymous User"}</h3>
+            <p className="text-sm text-muted-foreground">{formatTimeAgo(post.createdAt)}</p>
           </div>
         </div>
 
         <div className="mb-4">
-          <p className="text-gray-700 mb-4">{post.content}</p>
+          <p className="text-foreground mb-4">{post.content}</p>
 
           {post.tags && post.tags.length > 0 && (
             <div className="flex items-center space-x-2 mb-4">
-              <Tag className="w-4 h-4 text-gray-500" />
+              <Tag className="w-4 h-4 text-muted-foreground" />
               <div className="flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
                   <Badge key={tag} variant="secondary" className="text-xs">
@@ -137,14 +137,14 @@ export default function QAPost({ post }: QAPostProps) {
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="flex items-center space-x-6">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleUpvote}
               className={`flex items-center space-x-2 ${
-                upvoted ? 'text-blue-500' : 'text-gray-600 hover:text-blue-500'
+                upvoted ? 'text-blue-500' : 'text-muted-foreground hover:text-blue-500'
               }`}
             >
               <ChevronUp className="w-5 h-5" />
@@ -153,7 +153,7 @@ export default function QAPost({ post }: QAPostProps) {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="flex items-center space-x-2 text-gray-600 hover:text-blue-500"
+              className="flex items-center space-x-2 text-muted-foreground hover:text-blue-500"
             >
               <MessageSquare className="w-5 h-5" />
               <span className="text-sm font-medium">{post.comments} answers</span>
@@ -170,7 +170,7 @@ export default function QAPost({ post }: QAPostProps) {
 
         {/* Answer Form */}
         {showAnswerForm && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <div className="mt-4 p-4 bg-muted rounded-lg">
             <Textarea
               placeholder="Share your knowledge and help this person..."
               value={answerContent}
@@ -200,8 +200,8 @@ export default function QAPost({ post }: QAPostProps) {
 
         {/* Answers */}
         {comments && comments.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <h4 className="font-medium text-neutral mb-4">Answers</h4>
+          <div className="mt-4 pt-4 border-t border-border">
+            <h4 className="font-medium text-foreground mb-4">Answers</h4>
             <div className="space-y-4">
               {comments.map((comment: any) => (
                 <div key={comment.id} className="flex items-start space-x-3">
@@ -211,13 +211,13 @@ export default function QAPost({ post }: QAPostProps) {
                     alt="Commenter Avatar" 
                   />
                   <div className="flex-1">
-                    <div className="bg-white rounded-lg p-3 border">
-                      <p className="text-sm font-medium text-neutral">{comment.author.displayName || "Anonymous User"}</p>
-                      <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
+                    <div className="bg-background rounded-lg p-3 border border-border">
+                      <p className="text-sm font-medium text-foreground">{comment.author.displayName || "Anonymous User"}</p>
+                      <p className="text-sm text-foreground mt-1">{comment.content}</p>
                     </div>
                     <div className="flex items-center space-x-4 mt-2">
-                      <button className="text-xs text-gray-500 hover:text-primary">Helpful</button>
-                      <span className="text-xs text-gray-400">{formatTimeAgo(comment.createdAt)}</span>
+                      <button className="text-xs text-muted-foreground hover:text-primary">Helpful</button>
+                      <span className="text-xs text-muted-foreground/70">{formatTimeAgo(comment.createdAt)}</span>
                     </div>
                   </div>
                 </div>
