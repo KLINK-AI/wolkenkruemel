@@ -120,6 +120,17 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const activityProgress = pgTable("activity_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  activityId: integer("activity_id").references(() => activities.id),
+  tried: boolean("tried").default(false),
+  mastered: boolean("mastered").default(false),
+  favorite: boolean("favorite").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -153,6 +164,12 @@ export const insertEventSchema = createInsertSchema(events).omit({
   id: true,
   createdAt: true,
   attendees: true,
+});
+
+export const insertActivityProgressSchema = createInsertSchema(activityProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 // Types
@@ -249,6 +266,17 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
 }));
 
+export const activityProgressRelations = relations(activityProgress, ({ one }) => ({
+  user: one(users, {
+    fields: [activityProgress.userId],
+    references: [users.id],
+  }),
+  activity: one(activities, {
+    fields: [activityProgress.activityId],
+    references: [activities.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Activity = typeof activities.$inferSelect;
@@ -260,3 +288,5 @@ export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type Notification = typeof notifications.$inferSelect;
+export type ActivityProgress = typeof activityProgress.$inferSelect;
+export type InsertActivityProgress = z.infer<typeof insertActivityProgressSchema>;

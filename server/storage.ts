@@ -1,8 +1,8 @@
 import { 
-  users, activities, posts, comments, likes, follows, events, notifications,
+  users, activities, posts, comments, likes, follows, events, notifications, activityProgress,
   type User, type InsertUser, type Activity, type InsertActivity, 
   type Post, type InsertPost, type Comment, type InsertComment,
-  type Event, type InsertEvent, type Notification
+  type Event, type InsertEvent, type Notification, type ActivityProgress, type InsertActivityProgress
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, ne, sql } from "drizzle-orm";
@@ -58,6 +58,10 @@ export interface IStorage {
   createNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification>;
   markNotificationRead(id: number): Promise<void>;
   
+  // Activity Progress operations
+  getActivityProgress(userId: number, activityId: number): Promise<ActivityProgress | undefined>;
+  updateActivityProgress(userId: number, activityId: number, progress: Partial<ActivityProgress>): Promise<ActivityProgress>;
+  
   // Analytics
   getTrendingTags(): Promise<{ tag: string; count: number }[]>;
   getSuggestedUsers(userId: number): Promise<User[]>;
@@ -72,6 +76,7 @@ export class MemStorage implements IStorage {
   private follows: Map<number, { followerId: number; followingId: number }> = new Map();
   private events: Map<number, Event> = new Map();
   private notifications: Map<number, Notification> = new Map();
+  private activityProgress: Map<string, ActivityProgress> = new Map();
   
   private currentUserId = 1;
   private currentActivityId = 1;
@@ -81,6 +86,7 @@ export class MemStorage implements IStorage {
   private currentFollowId = 1;
   private currentEventId = 1;
   private currentNotificationId = 1;
+  private currentActivityProgressId = 1;
 
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
@@ -526,6 +532,33 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.likesReceived - a.likesReceived)
       .slice(0, 5);
   }
+
+  // Activity Progress operations
+  async getActivityProgress(userId: number, activityId: number): Promise<ActivityProgress | undefined> {
+    const key = `${userId}-${activityId}`;
+    return this.activityProgress.get(key);
+  }
+
+  async updateActivityProgress(userId: number, activityId: number, progress: Partial<ActivityProgress>): Promise<ActivityProgress> {
+    const key = `${userId}-${activityId}`;
+    const existing = this.activityProgress.get(key);
+    
+    const updatedProgress: ActivityProgress = {
+      id: existing?.id || this.currentActivityProgressId++,
+      userId,
+      activityId,
+      tried: false,
+      mastered: false,
+      favorite: false,
+      createdAt: existing?.createdAt || new Date(),
+      updatedAt: new Date(),
+      ...existing,
+      ...progress,
+    };
+    
+    this.activityProgress.set(key, updatedProgress);
+    return updatedProgress;
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -824,6 +857,41 @@ export class DatabaseStorage implements IStorage {
       .from(users)
       .where(ne(users.id, userId))
       .limit(5);
+  }
+
+  // Activity Progress operations
+  async getActivityProgress(userId: number, activityId: number): Promise<ActivityProgress | undefined> {
+    const [progress] = await db
+      .select()
+      .from(activityProgress)
+      .where(and(eq(activityProgress.userId, userId), eq(activityProgress.activityId, activityId)));
+    return progress || undefined;
+  }
+
+  async updateActivityProgress(userId: number, activityId: number, progress: Partial<ActivityProgress>): Promise<ActivityProgress> {
+    const existing = await this.getActivityProgress(userId, activityId);
+    
+    if (existing) {
+      const [updated] = await db
+        .update(activityProgress)
+        .set({ ...progress, updatedAt: new Date() })
+        .where(and(eq(activityProgress.userId, userId), eq(activityProgress.activityId, activityId)))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(activityProgress)
+        .values({
+          userId,
+          activityId,
+          tried: false,
+          mastered: false,
+          favorite: false,
+          ...progress,
+        })
+        .returning();
+      return created;
+    }
   }
 }
 

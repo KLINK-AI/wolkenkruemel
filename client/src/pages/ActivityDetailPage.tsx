@@ -1,15 +1,21 @@
 import { useParams } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Clock, User, Heart, Star, Share2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft, Clock, User, Heart, Star, Share2, Edit } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function ActivityDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useLanguage();
+  const queryClient = useQueryClient();
+
+  // Mock user ID - in real app this would come from auth
+  const userId = 1;
 
   const { data: activity, isLoading, error } = useQuery({
     queryKey: ["/api/activities", id],
@@ -17,6 +23,26 @@ export default function ActivityDetailPage() {
       const response = await fetch(`/api/activities/${id}`);
       if (!response.ok) throw new Error("Failed to fetch activity");
       return response.json();
+    },
+  });
+
+  const { data: progress } = useQuery({
+    queryKey: ["/api/activity-progress", userId, id],
+    queryFn: async () => {
+      const response = await fetch(`/api/activity-progress/${userId}/${id}`);
+      if (response.status === 404) return null;
+      if (!response.ok) throw new Error("Failed to fetch progress");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const updateProgressMutation = useMutation({
+    mutationFn: async (progressUpdate: { tried?: boolean; mastered?: boolean; favorite?: boolean }) => {
+      return apiRequest(`/api/activity-progress/${userId}/${id}`, "POST", progressUpdate);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/activity-progress", userId, id] });
     },
   });
 
@@ -165,6 +191,73 @@ export default function ActivityDetailPage() {
                     </div>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Progress Tracking Card */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold">Mein Fortschritt</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      id="tried"
+                      checked={progress?.tried || false}
+                      onCheckedChange={(checked) => {
+                        updateProgressMutation.mutate({ tried: !!checked });
+                      }}
+                      disabled={updateProgressMutation.isPending}
+                    />
+                    <label
+                      htmlFor="tried"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Ich habe diese Aktivität ausprobiert
+                    </label>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      id="mastered"
+                      checked={progress?.mastered || false}
+                      onCheckedChange={(checked) => {
+                        updateProgressMutation.mutate({ mastered: !!checked });
+                      }}
+                      disabled={updateProgressMutation.isPending}
+                    />
+                    <label
+                      htmlFor="mastered"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Mein Hund beherrscht diese Übung
+                    </label>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      id="favorite"
+                      checked={progress?.favorite || false}
+                      onCheckedChange={(checked) => {
+                        updateProgressMutation.mutate({ favorite: !!checked });
+                      }}
+                      disabled={updateProgressMutation.isPending}
+                    />
+                    <label
+                      htmlFor="favorite"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Diese Aktivität ist ein Favorit unserer Routine
+                    </label>
+                  </div>
+
+                  {updateProgressMutation.isPending && (
+                    <div className="text-sm text-muted-foreground">
+                      Fortschritt wird gespeichert...
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>

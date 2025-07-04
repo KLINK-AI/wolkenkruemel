@@ -216,6 +216,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Activity Progress
+  app.get("/api/activity-progress/:userId/:activityId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const activityId = parseInt(req.params.activityId);
+      const progress = await storage.getActivityProgress(userId, activityId);
+      res.json(progress);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/activity-progress/:userId/:activityId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const activityId = parseInt(req.params.activityId);
+      const progress = await storage.updateActivityProgress(userId, activityId, req.body);
+      res.json(progress);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Events
   app.get("/api/events", async (req, res) => {
     try {

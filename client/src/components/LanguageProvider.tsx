@@ -66,6 +66,48 @@ const translations = {
     'footer.social': 'Social Media',
     'footer.rights': 'Alle Rechte vorbehalten.',
     
+    // Activity Detail Page
+    'activityDetail.backToActivities': 'Zurück zu den Aktivitäten',
+    'activityDetail.createdBy': 'Erstellt von',
+    'activityDetail.difficulty': 'Schwierigkeit',
+    'activityDetail.duration': 'Dauer',
+    'activityDetail.minutes': 'Minuten',
+    'activityDetail.likes': 'Likes',
+    'activityDetail.completions': 'Abgeschlossen',
+    'activityDetail.instructions': 'Anleitung',
+    'activityDetail.progress': 'Fortschritt verfolgen',
+    'activityDetail.tried': 'Ich habe diese Aktivität ausprobiert',
+    'activityDetail.mastered': 'Mein Hund beherrscht diese Übung',
+    'activityDetail.favorite': 'Diese Aktivität ist ein Favorit unserer Routine',
+    'activityDetail.edit': 'Aktivität bearbeiten',
+    'activityDetail.notFound': 'Aktivität nicht gefunden',
+    'activityDetail.author': 'Autor',
+    
+    // User Profile
+    'profile.title': 'Profil',
+    'profile.edit': 'Profil bearbeiten',
+    'profile.username': 'Benutzername',
+    'profile.email': 'E-Mail',
+    'profile.displayName': 'Anzeigename',
+    'profile.bio': 'Biografie',
+    'profile.bioPlaceholder': 'Erzähl uns etwas über dich und deinen Hund...',
+    'profile.activitiesCreated': 'Aktivitäten erstellt',
+    'profile.postsCreated': 'Beiträge erstellt',
+    'profile.likesReceived': 'Likes erhalten',
+    'profile.memberSince': 'Mitglied seit',
+    'profile.updateProfile': 'Profil aktualisieren',
+    'profile.updating': 'Aktualisiere...',
+    'profile.updated': 'Profil erfolgreich aktualisiert',
+    'profile.error': 'Fehler beim Aktualisieren des Profils',
+    
+    // Edit Activity
+    'editActivity.title': 'Aktivität bearbeiten',
+    'editActivity.backToActivity': 'Zurück zur Aktivität',
+    'editActivity.update': 'Aktivität aktualisieren',
+    'editActivity.updating': 'Aktualisiere...',
+    'editActivity.updated': 'Aktivität erfolgreich aktualisiert',
+    'editActivity.error': 'Fehler beim Aktualisieren der Aktivität',
+    
     // Common
     'common.loading': 'Laden...',
     'common.error': 'Fehler',
@@ -78,6 +120,7 @@ const translations = {
     'common.comment': 'Kommentar',
     'common.share': 'Teilen',
     'common.follow': 'Folgen',
+    'common.back': 'Zurück',
     
     // Activities Page
     'activities.title': 'Trainingsaktivitäten',
