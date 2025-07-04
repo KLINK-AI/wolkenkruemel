@@ -7,6 +7,8 @@ import SuggestedUsers from "@/components/community/SuggestedUsers";
 import UpcomingEvents from "@/components/community/UpcomingEvents";
 import { Button } from "@/components/ui/button";
 import { Bell, Menu } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+// Logo will be inline SVG
 
 // Mock user data - in real app this would come from auth context
 const mockUser = {
@@ -22,43 +24,68 @@ export default function CommunityPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="bg-light-gray min-h-screen">
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-background dark:bg-background shadow-sm border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <svg className="h-10 w-10 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Wolke/Cloud */}
-                  <path d="M36 20c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 1.5.3 2.9.8 4.2C10.5 25.1 9 27.4 9 30c0 3.3 2.7 6 6 6h21c4.4 0 8-3.6 8-8 0-3.8-2.7-7-6.3-7.7-.4-2.8-1.5-5.4-3.1-7.6z" fill="#87CEEB" stroke="#4A90E2" strokeWidth="1.5"/>
-                  {/* Hund/Dog silhouette */}
-                  <path d="M20 28c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2v-2z" fill="#8B4513"/>
-                  <circle cx="21" cy="25" r="1" fill="#8B4513"/>
-                  <circle cx="27" cy="25" r="1" fill="#8B4513"/>
-                  <path d="M19 22c0-.6.4-1 1-1h8c.6 0 1 .4 1 1v1c0 .6-.4 1-1 1h-8c-.6 0-1-.4-1-1v-1z" fill="#8B4513"/>
-                  <circle cx="18" cy="21" r="1.5" fill="#8B4513"/>
-                  <circle cx="30" cy="21" r="1.5" fill="#8B4513"/>
-                  {/* Kleine Wolken-Krümel */}
-                  <circle cx="12" cy="18" r="2" fill="#B0E0E6" opacity="0.7"/>
-                  <circle cx="38" cy="22" r="1.5" fill="#B0E0E6" opacity="0.7"/>
-                  <circle cx="16" cy="35" r="1.5" fill="#B0E0E6" opacity="0.7"/>
-                </svg>
-                <span className="text-xl font-bold text-blue-600">Wolkenkruemel</span>
+                <div className="flex items-center">
+                  <svg className="h-12 w-auto mr-2" viewBox="0 0 200 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Große Wolken im Hintergrund */}
+                    <ellipse cx="60" cy="25" rx="35" ry="20" fill="#87CEEB" opacity="0.8"/>
+                    <ellipse cx="80" cy="30" rx="25" ry="15" fill="#B0E0E6" opacity="0.7"/>
+                    <ellipse cx="40" cy="35" rx="20" ry="12" fill="#ADD8E6" opacity="0.6"/>
+                    <ellipse cx="120" cy="20" rx="30" ry="18" fill="#87CEEB" opacity="0.7"/>
+                    <ellipse cx="140" cy="30" rx="20" ry="12" fill="#B0E0E6" opacity="0.6"/>
+                    
+                    {/* Kleine Wolken-Krümel */}
+                    <circle cx="30" cy="50" r="8" fill="#B0E0E6" opacity="0.5"/>
+                    <circle cx="160" cy="45" r="6" fill="#ADD8E6" opacity="0.6"/>
+                    <circle cx="20" cy="70" r="5" fill="#87CEEB" opacity="0.4"/>
+                    
+                    {/* Springender Hund (weiß/hell) */}
+                    <path d="M50 70 Q45 65 40 70 Q35 75 30 70 Q25 75 20 80 Q25 85 35 85 Q45 85 55 80 Q60 75 55 70 Q50 65 45 70" fill="#F5F5F5" stroke="#333" strokeWidth="2"/>
+                    <circle cx="45" cy="72" r="2" fill="#333"/>
+                    <path d="M42 75 Q45 77 48 75" stroke="#333" strokeWidth="1.5" fill="none"/>
+                    <path d="M35 68 Q30 65 25 68" stroke="#333" strokeWidth="2" fill="none"/>
+                    <path d="M55 68 Q60 65 65 68" stroke="#333" strokeWidth="2" fill="none"/>
+                    <path d="M25 80 Q20 85 15 80" stroke="#333" strokeWidth="2" fill="none"/>
+                    
+                    {/* Sitzender Hund (dunkel) */}
+                    <ellipse cx="130" cy="85" rx="15" ry="20" fill="#2D2D2D"/>
+                    <circle cx="125" cy="75" r="8" fill="#2D2D2D"/>
+                    <ellipse cx="120" cy="73" rx="4" ry="6" fill="#2D2D2D"/>
+                    <ellipse cx="135" cy="73" rx="4" ry="6" fill="#2D2D2D"/>
+                    <circle cx="122" cy="72" r="1" fill="white"/>
+                    <circle cx="133" cy="72" r="1" fill="white"/>
+                    <path d="M127 75 Q130 77 133 75" stroke="white" strokeWidth="1" fill="none"/>
+                    <ellipse cx="140" cy="100" rx="5" ry="8" fill="#2D2D2D"/>
+                    
+                    {/* Schriftzug */}
+                    <text x="100" y="125" fontFamily="'Comic Sans MS', cursive" fontSize="18" fill="#4A90A4" textAnchor="middle" fontWeight="bold">
+                      Wolkenkrümel
+                    </text>
+                  </svg>
+                </div>
               </div>
             </div>
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-gray-700 hover:text-primary transition-colors">Home</a>
-              <a href="#" className="text-gray-700 hover:text-primary transition-colors">Activities</a>
+              <a href="#" className="text-foreground hover:text-primary transition-colors">Home</a>
+              <a href="#" className="text-foreground hover:text-primary transition-colors">Activities</a>
               <a href="#" className="text-primary font-medium border-b-2 border-primary">Community</a>
-              <a href="#" className="text-gray-700 hover:text-primary transition-colors">My Profile</a>
+              <a href="#" className="text-foreground hover:text-primary transition-colors">My Profile</a>
             </nav>
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
               {/* Notifications */}
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-5 h-5" />
@@ -69,7 +96,7 @@ export default function CommunityPage() {
               <div className="relative">
                 <Button variant="ghost" className="flex items-center space-x-2 p-2">
                   <img className="w-8 h-8 rounded-full" src={mockUser.avatar} alt="User Avatar" />
-                  <span className="text-sm font-medium text-gray-700">{mockUser.name}</span>
+                  <span className="text-sm font-medium text-foreground">{mockUser.name}</span>
                 </Button>
               </div>
 
