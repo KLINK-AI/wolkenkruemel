@@ -109,11 +109,11 @@ export default function ActivityPost({ post }: ActivityPostProps) {
           <div className="flex items-center space-x-3">
             <img 
               className="w-10 h-10 rounded-full" 
-              src={post.author.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"}
+              src={post.author?.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"}
               alt="User Avatar" 
             />
             <div>
-              <h3 className="font-semibold text-neutral">{post.author.displayName || "Anonymous User"}</h3>
+              <h3 className="font-semibold text-neutral">{post.author?.displayName || "Unbekannter Benutzer"}</h3>
               <p className="text-sm text-gray-600">{formatTimeAgo(post.createdAt)}</p>
             </div>
           </div>

@@ -216,9 +216,28 @@ export class MemStorage implements IStorage {
     
     const postsWithAuthors = await Promise.all(
       allPosts.map(async (post) => {
-        const author = await this.getUser(post.authorId);
+        const author = post.authorId ? await this.getUser(post.authorId) : null;
         const linkedActivity = post.linkedActivityId ? await this.getActivity(post.linkedActivityId) : undefined;
-        return { ...post, author: author!, linkedActivity };
+        const defaultAuthor = {
+          id: 0,
+          username: 'Unknown',
+          email: '',
+          password: '',
+          displayName: 'Unbekannter Benutzer',
+          bio: null,
+          avatarUrl: null,
+          role: 'user',
+          subscriptionTier: 'free',
+          activitiesCreated: 0,
+          postsCreated: 0,
+          likesReceived: 0,
+          isEmailVerified: false,
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        return { ...post, author: author || defaultAuthor, linkedActivity };
       })
     );
     

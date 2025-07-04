@@ -111,11 +111,11 @@ export default function QAPost({ post }: QAPostProps) {
         <div className="flex items-center space-x-3 mb-4">
           <img 
             className="w-10 h-10 rounded-full" 
-            src={post.author.avatarUrl || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"}
+            src={post.author?.avatarUrl || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"}
             alt="User Avatar" 
           />
           <div>
-            <h3 className="font-semibold text-foreground">{post.author.displayName || "Anonymous User"}</h3>
+            <h3 className="font-semibold text-foreground">{post.author?.displayName || "Unbekannter Benutzer"}</h3>
             <p className="text-sm text-muted-foreground">{formatTimeAgo(post.createdAt)}</p>
           </div>
         </div>
