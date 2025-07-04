@@ -1,0 +1,384 @@
+[
+  {
+    "id": "a1",
+    "title": "Grundkommando: Sitz",
+    "description": "Lernen Sie Ihrem Hund das Grundkommando 'Sitz'. Diese Übung ist ideal für Welpen und Anfänger und bildet die Basis für weitere Kommandos.",
+    "tips": [
+      "Verwenden Sie ein klares, kurzes Kommandowort",
+      "Belohnen Sie sofort, wenn der Hund sitzt",
+      "Üben Sie in ruhiger Umgebung, bevor Sie zu ablenkungsreichen Umgebungen übergehen",
+      "Halten Sie die Trainingseinheiten kurz und positiv"
+    ],
+    "troubleshooting": [
+      "Wenn Ihr Hund nicht reagiert, ist die Ablenkung möglicherweise zu groß",
+      "Bei Schwierigkeiten können Sie den Hund anfangs sanft in die Sitzposition führen",
+      "Vermeiden Sie Wiederholungen des Kommandos, wenn der Hund nicht reagiert",
+      "Achten Sie auf Ihre Körpersprache - sie sollte konsistent sein"
+    ],
+    "variations": [
+      "Üben Sie das Kommando aus unterschiedlichen Positionen",
+      "Erhöhen Sie langsam die Dauer des Sitzens",
+      "Fügen Sie Ablenkungen hinzu, wenn der Hund das Kommando beherrscht",
+      "Kombinieren Sie 'Sitz' mit anderen Kommandos wie 'Platz' oder 'Bleib'"
+    ],
+    "type": "training",
+    "experienceLevel": ["puppy", "beginner"],
+    "duration": 5,
+    "location": ["indoor", "outdoor"],
+    "engagementType": ["cognitive"],
+    "requiresMaterials": false,
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/1254140/pexels-photo-1254140.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a2",
+    "title": "Apportieren mit Variationen",
+    "description": "Eine erweiterte Apportierübung, die das Abrufen verschiedener Gegenstände beinhaltet. Diese Übung fordert Ihren Hund sowohl körperlich als auch geistig.",
+    "tips": [
+      "Beginnen Sie mit einem Gegenstand, den Ihr Hund bereits gerne apportiert",
+      "Führen Sie neue Gegenstände langsam ein",
+      "Belohnen Sie jede erfolgreiche Retrieval-Phase",
+      "Machen Sie die Übung zum Spiel, um die Motivation zu steigern"
+    ],
+    "troubleshooting": [
+      "Bei mangelndem Interesse variieren Sie die Gegenstände",
+      "Wenn der Hund den Gegenstand nicht zurückbringt, üben Sie kürzere Distanzen",
+      "Achten Sie darauf, dass die Gegenstände sicher sind und keine Verschluckungsgefahr besteht",
+      "Vermeiden Sie Nachjagen, wenn der Hund nicht sofort zurückkommt"
+    ],
+    "variations": [
+      "Verstecken Sie Gegenstände für eine Suchaufgabe",
+      "Verwenden Sie Gegenstände mit unterschiedlichem Gewicht und Textur",
+      "Kombinieren Sie das Apportieren mit anderen Kommandos",
+      "Lassen Sie den Hund zwischen verschiedenen Gegenständen wählen"
+    ],
+    "type": "exercise",
+    "experienceLevel": ["advanced", "professional"],
+    "duration": 15,
+    "location": ["outdoor"],
+    "engagementType": ["physical", "cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Verschiedene Apportiergegenstände (Ball, Frisbee, Dummy)"],
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/1662428/pexels-photo-1662428.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a3",
+    "title": "Versteckspiel: Leckerbissen finden",
+    "description": "Ein unterhaltsames Suchspiel, bei dem Ihr Hund versteckte Leckerbissen in der Wohnung finden muss. Dieses Spiel trainiert die Nase und den Verstand Ihres Hundes.",
+    "tips": [
+      "Beginnen Sie einfach, indem Sie die Leckerbissen anfangs nur leicht verdecken",
+      "Erhöhen Sie schrittweise den Schwierigkeitsgrad der Verstecke",
+      "Lassen Sie Ihren Hund beobachten, wie Sie die ersten Leckerbissen verstecken",
+      "Verwenden Sie besonders duftende Leckerbissen für Anfänger"
+    ],
+    "troubleshooting": [
+      "Wenn Ihr Hund frustriert wird, machen Sie die Verstecke einfacher",
+      "Bei mangelndem Interesse verwenden Sie wertvollere Leckerbissen",
+      "Vermeiden Sie zu viele Leckerbissen, um Übergewicht zu verhindern",
+      "Achten Sie darauf, dass keine Leckerbissen an unsicheren Orten zurückbleiben"
+    ],
+    "variations": [
+      "Verstecken Sie Leckerbissen unter Bechern",
+      "Legen Sie eine Spur von Leckerbissen aus, die zu einem größeren Schatz führt",
+      "Verstecken Sie Leckerbissen in Spielzeug oder speziellen Schnüffelmatten",
+      "Lassen Sie den Hund im Garten oder Park nach vergrabenen Leckerbissen suchen"
+    ],
+    "type": "game",
+    "experienceLevel": ["puppy", "beginner", "advanced"],
+    "duration": 10,
+    "location": ["indoor"],
+    "engagementType": ["cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Hundeleckerbissen", "Eventuell Schnüffelspielzeug"],
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/2607544/pexels-photo-2607544.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a4",
+    "title": "Agility-Parcours für Zuhause",
+    "description": "Bauen Sie einen einfachen Agility-Parcours mit Haushaltsgegenständen auf. Diese Aktivität bietet körperliche Bewegung und geistige Stimulation für Ihren Hund.",
+    "tips": [
+      "Stellen Sie sicher, dass alle Hindernisse stabil und sicher sind",
+      "Führen Sie Ihren Hund anfangs durch den Parcours",
+      "Belohnen Sie nach jedem erfolgreich absolvierten Hindernis",
+      "Erhöhen Sie schrittweise die Komplexität des Parcours"
+    ],
+    "troubleshooting": [
+      "Bei Ängstlichkeit: Beginnen Sie mit niedrigen, einfachen Hindernissen",
+      "Machen Sie Pausen, wenn Ihr Hund Anzeichen von Müdigkeit zeigt",
+      "Achten Sie auf rutschige Böden und sichern Sie diese ab",
+      "Vermeiden Sie zu enge Kurven oder unsichere Sprünge"
+    ],
+    "variations": [
+      "Verändern Sie die Reihenfolge der Hindernisse",
+      "Fügen Sie Zeitlimits oder Kommandos hinzu",
+      "Bauen Sie Pausen für Gehorsamsübungen ein",
+      "Erstellen Sie verschiedene Schwierigkeitsgrade"
+    ],
+    "type": "exercise",
+    "experienceLevel": ["beginner", "advanced", "professional"],
+    "duration": 15,
+    "location": ["indoor", "outdoor"],
+    "engagementType": ["physical", "cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Stühle", "Besenstiele", "Kissen", "Kartons", "Hula-Hoop-Reifen"],
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/7210277/pexels-photo-7210277.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a5",
+    "title": "Targettraining mit der Pfote",
+    "description": "Bringen Sie Ihrem Hund bei, mit der Pfote ein bestimmtes Ziel zu berühren. Diese Übung ist die Grundlage für viele Tricks und fördert die Körperkoordination.",
+    "tips": [
+      "Beginnen Sie mit einfachem Clickertraining",
+      "Belohnen Sie jede Berührung des Targets",
+      "Bleiben Sie geduldig und konsistent",
+      "Üben Sie kurz, aber regelmäßig"
+    ],
+    "troubleshooting": [
+      "Wenn Ihr Hund nur schnuppert, warten Sie auf die Pfotenbewegung",
+      "Bei scheuen Hunden: Lassen Sie sie sich zuerst an das Target gewöhnen",
+      "Achten Sie auf die richtige Höhe des Targets",
+      "Vermeiden Sie zu viel Druck oder Ungeduld"
+    ],
+    "variations": [
+      "Verwenden Sie verschiedene Targetobjekte",
+      "Bringen Sie dem Hund bei, verschiedene Targets zu unterscheiden",
+      "Lassen Sie den Hund das Target länger berühren",
+      "Führen Sie Kommandos für rechte und linke Pfote ein"
+    ],
+    "type": "training",
+    "experienceLevel": ["beginner", "advanced"],
+    "duration": 5,
+    "location": ["indoor"],
+    "engagementType": ["cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Target (z.B. kleiner Stick, Post-it, oder spezielle Targetstick)", "Leckerlis"],
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/406014/pexels-photo-406014.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a6",
+    "title": "Wasser-Apportierspiel",
+    "description": "Ein erfrischendes Spiel für heiße Tage, bei dem Ihr Hund schwimmende Objekte aus flachem Wasser apportieren muss. Ideal für wasserliebende Hunde.",
+    "tips": [
+      "Stellen Sie sicher, dass Ihr Hund schwimmen kann und Wasser mag",
+      "Beginnen Sie in sehr flachem Wasser",
+      "Verwenden Sie schwimmfähige, gut sichtbare Spielzeuge",
+      "Achten Sie auf die Wassertemperatur - nicht zu kalt"
+    ],
+    "troubleshooting": [
+      "Bei Angst vor Wasser: Langsam eingewöhnen ohne Druck",
+      "Achten Sie auf Erschöpfungszeichen und machen Sie Pausen",
+      "Halten Sie ein Handtuch bereit, um Ihren Hund abzutrocknen",
+      "Vermeiden Sie stark strömende oder tiefe Gewässer"
+    ],
+    "variations": [
+      "Verwenden Sie verschiedene schwimmende Spielzeuge",
+      "Werfen Sie mehrere Objekte und benennen Sie das zu holende",
+      "Lassen Sie das Spielzeug treiben und geben Sie dem Hund Zeit zum Suchen",
+      "Kombinieren Sie mit Kommandos wie Warten oder Zurückkommen"
+    ],
+    "type": "game",
+    "experienceLevel": ["advanced", "professional"],
+    "duration": 30,
+    "location": ["outdoor"],
+    "engagementType": ["physical"],
+    "requiresMaterials": true,
+    "materials": ["Schwimmfähiges Hundespielzeug", "Zugang zu sicherem, flachem Wasser"],
+    "premiumOnly": true,
+    "imageUrl": "https://images.pexels.com/photos/2695827/pexels-photo-2695827.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a7",
+    "title": "Tricks kombinieren: Rolle und High Five",
+    "description": "Diese fortgeschrittene Übung kombiniert zwei beliebte Tricks zu einer Sequenz. Ihr Hund rollt sich und gibt danach High Five.",
+    "tips": [
+      "Stellen Sie sicher, dass Ihr Hund beide Tricks einzeln beherrscht",
+      "Verbinden Sie die Tricks schrittweise mit einem Brückenkommando",
+      "Verwenden Sie klare, unterschiedliche Handzeichen für jeden Teil",
+      "Belohnen Sie anfangs nach jedem Trick, später nur nach der Sequenz"
+    ],
+    "troubleshooting": [
+      "Bei Verwirrung gehen Sie zurück zu den Einzelkommandos",
+      "Wenn der Hund einen Teil überspringt, üben Sie diesen isoliert",
+      "Reduzieren Sie Ablenkungen während des Lernprozesses",
+      "Achten Sie auf konsistente Signale und Kommandos"
+    ],
+    "variations": [
+      "Ändern Sie die Reihenfolge der Tricks",
+      "Fügen Sie weitere Tricks zur Sequenz hinzu",
+      "Variieren Sie die Belohnungen für komplexere Abfolgen",
+      "Üben Sie die Sequenz an verschiedenen Orten"
+    ],
+    "type": "training",
+    "experienceLevel": ["advanced", "professional"],
+    "duration": 10,
+    "location": ["indoor", "outdoor"],
+    "engagementType": ["cognitive"],
+    "requiresMaterials": false,
+    "premiumOnly": true,
+    "imageUrl": "https://images.pexels.com/photos/2582508/pexels-photo-2582508.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a8",
+    "title": "Teppich-Zieltraining",
+    "description": "Bringen Sie Ihrem Hund bei, auf Kommando zu einem bestimmten Platz (Teppich, Matte, Decke) zu gehen und dort zu bleiben. Eine praktische Übung für den Alltag.",
+    "tips": [
+      "Wählen Sie einen deutlich erkennbaren Platz mit klaren Grenzen",
+      "Beginnen Sie, indem Sie Leckerlis auf den Zielbereich legen",
+      "Führen Sie ein klares Kommando ein (z.B. 'Platz' oder 'Matte')",
+      "Erhöhen Sie schrittweise die Distanz und Dauer"
+    ],
+    "troubleshooting": [
+      "Wenn der Hund den Platz verlässt: Zurückführen ohne zu schimpfen",
+      "Bei Schwierigkeiten: Mehr Belohnungen und kürzere Zeitintervalle",
+      "Achten Sie auf konsistente Kommandos und Handzeichen",
+      "Üben Sie in ruhiger Umgebung, bevor Sie Ablenkungen hinzufügen"
+    ],
+    "variations": [
+      "Verwenden Sie verschiedene Zielunterlagen",
+      "Üben Sie von verschiedenen Ausgangspositionen",
+      "Kombinieren Sie mit anderen Kommandos ('Sitz' auf der Matte)",
+      "Erhöhen Sie den Schwierigkeitsgrad durch Ablenkungen"
+    ],
+    "type": "training",
+    "experienceLevel": ["beginner", "advanced"],
+    "duration": 10,
+    "location": ["indoor"],
+    "engagementType": ["cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Kleine Matte, Decke oder Teppich", "Leckerlis"],
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/1870301/pexels-photo-1870301.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a9",
+    "title": "Intelligenzspielzeug: Behandlungsdispenser",
+    "description": "Fordern Sie den Geist Ihres Hundes mit Spielzeug, das Leckerbissen freigibt, wenn es auf bestimmte Weise manipuliert wird.",
+    "tips": [
+      "Führen Sie das Spielzeug langsam ein, anfangs mit leicht zugänglichen Leckerbissen",
+      "Zeigen Sie Ihrem Hund anfangs, wie er an die Leckerbissen kommt",
+      "Erhöhen Sie nach und nach den Schwierigkeitsgrad",
+      "Beaufsichtigen Sie Ihren Hund, besonders bei neuem Spielzeug"
+    ],
+    "troubleshooting": [
+      "Bei Frustration: Machen Sie es leichter, dann schrittweise schwerer",
+      "Bei übermäßigem Kauen: Wählen Sie robusteres Spielzeug",
+      "Achten Sie auf die richtige Größe der Leckerbissen",
+      "Wechseln Sie regelmäßig zwischen verschiedenen Spielzeugen"
+    ],
+    "variations": [
+      "Verwenden Sie verschiedene Arten von Intelligenzspielzeug",
+      "Verstecken Sie das Spielzeug für eine zusätzliche Herausforderung",
+      "Variieren Sie die Art der Leckerbissen",
+      "Kombinieren Sie mehrere Spielzeuge für fortgeschrittene Hunde"
+    ],
+    "type": "game",
+    "experienceLevel": ["puppy", "beginner", "advanced"],
+    "duration": 15,
+    "location": ["indoor"],
+    "engagementType": ["cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Intelligenzspielzeug für Hunde", "Geeignete Leckerbissen"],
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/1254140/pexels-photo-1254140.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a10",
+    "title": "Impulskontrolle: Warten auf das Kommando",
+    "description": "Diese Übung lehrt Ihren Hund Selbstbeherrschung, indem er lernt, auf Erlaubnis zu warten, bevor er einen Leckerbissen nimmt oder durch eine Tür geht.",
+    "tips": [
+      "Beginnen Sie mit kurzen Wartezeiten und steigern Sie langsam",
+      "Verwenden Sie ein klares Freigabekommando wie 'Nimm' oder 'OK'",
+      "Belohnen Sie ruhiges Warten, nicht nur das Befolgen des Freigabekommandos",
+      "Üben Sie in verschiedenen Situationen (Fütterung, Türen, Spiel)"
+    ],
+    "troubleshooting": [
+      "Bei Ungeduld: Kürzere Wartezeiten, graduelle Steigerung",
+      "Wenn der Hund vorgreift: Neu ansetzen ohne zu schimpfen",
+      "Achten Sie auf Ihre eigene Körpersprache und Konsequenz",
+      "Vermeiden Sie unbeabsichtigte Signale, die den Hund verwirren könnten"
+    ],
+    "variations": [
+      "Leckerbissen auf die Pfote legen und warten lassen",
+      "Futter in den Napf geben und warten lassen",
+      "An Türen und Ausgängen warten lassen",
+      "Mit mehreren Hunden gleichzeitig üben (fortgeschritten)"
+    ],
+    "type": "training",
+    "experienceLevel": ["beginner", "advanced", "professional"],
+    "duration": 5,
+    "location": ["indoor", "outdoor"],
+    "engagementType": ["cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Leckerbissen oder Spielzeug als Anreiz"],
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/3196887/pexels-photo-3196887.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a11",
+    "title": "Ballspiel mit Kommandos",
+    "description": "Eine erweiterte Version des klassischen Ballspiels, bei der Ihr Hund zusätzlich Kommandos befolgen muss, bevor er den Ball holen darf.",
+    "tips": [
+      "Stellen Sie sicher, dass Ihr Hund grundlegende Kommandos bereits beherrscht",
+      "Beginnen Sie mit einem einfachen Kommando vor dem Werfen",
+      "Steigern Sie langsam die Komplexität und Anzahl der Kommandos",
+      "Halten Sie das Spiel positiv und belohnend"
+    ],
+    "troubleshooting": [
+      "Bei Überexzitation: Kurze Pausen für Beruhigungsübungen einbauen",
+      "Wenn der Hund Kommandos ignoriert: Zurück zu einfacheren Übungen",
+      "Vermeiden Sie Frustration durch zu komplexe Anforderungen",
+      "Achten Sie auf Anzeichen von Müdigkeit"
+    ],
+    "variations": [
+      "Verschiedene Kommandos vor dem Werfen einbauen",
+      "Den Ball werfen, aber erst nach einem Kommando freigeben",
+      "Mehrere Bälle verwenden und nach Namen apportieren lassen",
+      "Kombination mit Hindernissen auf dem Weg zum Ball"
+    ],
+    "type": "game",
+    "experienceLevel": ["advanced", "professional"],
+    "duration": 15,
+    "location": ["outdoor"],
+    "engagementType": ["physical", "cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Bälle oder andere Wurfobjekte"],
+    "premiumOnly": true,
+    "imageUrl": "https://images.pexels.com/photos/1619690/pexels-photo-1619690.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "a12",
+    "title": "Hindernislauf für Welpen",
+    "description": "Ein einfacher, welpensicherer Hindernisparcours, der speziell für junge Hunde konzipiert ist, um ihre Koordination und ihr Selbstvertrauen zu fördern.",
+    "tips": [
+      "Verwenden Sie nur niedrige, sichere Hindernisse für Welpen",
+      "Lassen Sie den Welpen anfangs den Parcours erkunden",
+      "Führen Sie den Welpen mit Leckerlis durch den Parcours",
+      "Halten Sie die Übung kurz und positiv"
+    ],
+    "troubleshooting": [
+      "Bei Ängstlichkeit: Beginnen Sie mit nur einem Hindernis",
+      "Forcieren Sie nichts - lassen Sie den Welpen sein eigenes Tempo bestimmen",
+      "Achten Sie auf rutschige Oberflächen und sichern Sie diese ab",
+      "Vermeiden Sie Sprünge oder Hindernisse, die Gelenke belasten könnten"
+    ],
+    "variations": [
+      "Kriechen unter niedrigen Hindernissen",
+      "Gehen über flache, stabile Oberflächen",
+      "Slalom um Pylonen oder andere Markierungen",
+      "Durch einen Tunnel aus Decken kriechen"
+    ],
+    "type": "exercise",
+    "experienceLevel": ["puppy"],
+    "duration": 5,
+    "location": ["indoor"],
+    "engagementType": ["physical", "cognitive"],
+    "requiresMaterials": true,
+    "materials": ["Kissen", "Decken", "Kartons", "Kleine Hütchen oder Markierungen"],
+    "premiumOnly": false,
+    "imageUrl": "https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "origin": ["https://*.webcontainer.io", "http://*.webcontainer.io"],
+    "method": ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"],
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "Content-Length",
+      "User-Agent",
+      "X-Request-With"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]
