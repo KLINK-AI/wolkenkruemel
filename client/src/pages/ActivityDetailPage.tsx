@@ -8,14 +8,15 @@ import { ArrowLeft, Clock, User, Heart, Star, Share2, Edit } from "lucide-react"
 import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ActivityDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useLanguage();
   const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
 
-  // Mock user ID - in real app this would come from auth
-  const userId = 1;
+  const userId = currentUser?.id;
 
   const { data: activity, isLoading, error } = useQuery({
     queryKey: ["/api/activities", id],
@@ -34,15 +35,17 @@ export default function ActivityDetailPage() {
       if (!response.ok) throw new Error("Failed to fetch progress");
       return response.json();
     },
-    enabled: !!id,
+    enabled: !!id && !!userId,
   });
 
   const updateProgressMutation = useMutation({
     mutationFn: async (progressUpdate: { tried?: boolean; mastered?: boolean; favorite?: boolean }) => {
+      if (!userId) throw new Error("User not authenticated");
       await apiRequest("POST", `/api/activity-progress/${userId}/${id}`, progressUpdate);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/activity-progress", userId, id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user-progress", userId] });
     },
     onError: (error) => {
       console.error("Failed to update progress:", error);
