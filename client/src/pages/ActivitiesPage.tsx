@@ -172,7 +172,7 @@ export default function ActivitiesPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
-                    {t('activities.by')} {activity.author.displayName}
+                    {t('activities.by')} {activity.author?.displayName || activity.author?.username || 'Unbekannter Autor'}
                   </span>
                   <Button variant="outline" size="sm">
                     {t('activities.view')}

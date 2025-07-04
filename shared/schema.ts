@@ -1,16 +1,30 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table compatible with Replit Auth
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(),
+  id: varchar("id").primaryKey().notNull(), // Changed to varchar for Replit Auth compatibility
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  // Additional fields for our app
+  username: text("username").unique(),
   displayName: text("display_name"),
   bio: text("bio"),
-  avatarUrl: text("avatar_url"),
   isEmailVerified: boolean("is_email_verified").default(false),
   role: text("role").default("user"), // user, admin, moderator
   subscriptionTier: text("subscription_tier").default("free"), // free, premium, pro
@@ -19,6 +33,7 @@ export const users = pgTable("users", {
   activitiesCreated: integer("activities_created").default(0),
   postsCreated: integer("posts_created").default(0),
   likesReceived: integer("likes_received").default(0),
+  hasCompletedOnboarding: boolean("has_completed_onboarding").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -33,7 +48,7 @@ export const activities = pgTable("activities", {
   tags: text("tags").array(),
   imageUrl: text("image_url"),
   videoUrl: text("video_url"),
-  authorId: integer("author_id").references(() => users.id),
+  authorId: text("author_id").references(() => users.id),
   isOfficial: boolean("is_official").default(false),
   isApproved: boolean("is_approved").default(false),
   likes: integer("likes").default(0),

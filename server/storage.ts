@@ -17,7 +17,7 @@ export interface IStorage {
   updateUserSubscription(id: number, customerId: string, subscriptionId: string): Promise<User>;
   
   // Activity operations
-  getActivities(limit?: number, offset?: number): Promise<Activity[]>;
+  getActivities(limit?: number, offset?: number): Promise<(Activity & { author: User })[]>;
   getActivity(id: number): Promise<Activity | undefined>;
   getActivitiesByAuthor(authorId: number): Promise<Activity[]>;
   createActivity(activity: InsertActivity): Promise<Activity>;
@@ -129,9 +129,31 @@ export class MemStorage implements IStorage {
     });
   }
 
-  async getActivities(limit = 20, offset = 0): Promise<Activity[]> {
+  async getActivities(limit = 20, offset = 0): Promise<(Activity & { author: User })[]> {
     const allActivities = Array.from(this.activities.values())
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort((a, b) => (b.createdAt || new Date()).getTime() - (a.createdAt || new Date()).getTime())
+      .map(activity => {
+        const author = this.users.get(activity.authorId as any) || {
+          id: 0,
+          username: 'Unknown',
+          email: '',
+          password: '',
+          displayName: 'Unbekannter Benutzer',
+          bio: null,
+          avatarUrl: null,
+          role: 'user',
+          subscriptionTier: 'free',
+          activitiesCreated: 0,
+          postsCreated: 0,
+          likesReceived: 0,
+          isEmailVerified: false,
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        return { ...activity, author };
+      });
     return allActivities.slice(offset, offset + limit);
   }
 
@@ -506,13 +528,38 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getActivities(limit = 20, offset = 0): Promise<Activity[]> {
+  async getActivities(limit = 20, offset = 0): Promise<(Activity & { author: User })[]> {
     return await db
       .select()
       .from(activities)
+      .leftJoin(users, eq(activities.authorId, users.id))
       .limit(limit)
       .offset(offset)
-      .orderBy(desc(activities.createdAt));
+      .orderBy(desc(activities.createdAt))
+      .then(results => 
+        results.map(result => ({
+          ...result.activities,
+          author: result.users || {
+            id: 0,
+            username: 'Unknown',
+            displayName: 'Unbekannter Benutzer',
+            email: '',
+            password: '',
+            bio: null,
+            avatarUrl: null,
+            role: 'user',
+            subscriptionTier: 'free',
+            activitiesCreated: 0,
+            postsCreated: 0,
+            likesReceived: 0,
+            isEmailVerified: false,
+            stripeCustomerId: null,
+            stripeSubscriptionId: null,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        }))
+      );
   }
 
   async getActivity(id: number): Promise<Activity | undefined> {
