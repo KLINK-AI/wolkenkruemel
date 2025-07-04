@@ -30,12 +30,22 @@ export default function CommunityPage() {
             {/* Logo */}
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <svg className="h-8 w-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg className="h-10 w-10 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Wolke/Cloud */}
+                  <path d="M36 20c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 1.5.3 2.9.8 4.2C10.5 25.1 9 27.4 9 30c0 3.3 2.7 6 6 6h21c4.4 0 8-3.6 8-8 0-3.8-2.7-7-6.3-7.7-.4-2.8-1.5-5.4-3.1-7.6z" fill="#87CEEB" stroke="#4A90E2" strokeWidth="1.5"/>
+                  {/* Hund/Dog silhouette */}
+                  <path d="M20 28c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2v-2z" fill="#8B4513"/>
+                  <circle cx="21" cy="25" r="1" fill="#8B4513"/>
+                  <circle cx="27" cy="25" r="1" fill="#8B4513"/>
+                  <path d="M19 22c0-.6.4-1 1-1h8c.6 0 1 .4 1 1v1c0 .6-.4 1-1 1h-8c-.6 0-1-.4-1-1v-1z" fill="#8B4513"/>
+                  <circle cx="18" cy="21" r="1.5" fill="#8B4513"/>
+                  <circle cx="30" cy="21" r="1.5" fill="#8B4513"/>
+                  {/* Kleine Wolken-Krümel */}
+                  <circle cx="12" cy="18" r="2" fill="#B0E0E6" opacity="0.7"/>
+                  <circle cx="38" cy="22" r="1.5" fill="#B0E0E6" opacity="0.7"/>
+                  <circle cx="16" cy="35" r="1.5" fill="#B0E0E6" opacity="0.7"/>
                 </svg>
-                <span className="text-xl font-bold text-neutral">Wolkenkruemel</span>
+                <span className="text-xl font-bold text-blue-600">Wolkenkruemel</span>
               </div>
             </div>
 
