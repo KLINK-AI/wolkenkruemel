@@ -120,6 +120,7 @@ The application uses a comprehensive schema with the following main entities:
 Changelog:
 - July 04, 2025. Initial setup
 - July 04, 2025. Replaced all placeholder logos with authentic Wolkenkrümel SVG design featuring clouds and dogs
+- July 04, 2025. Updated homepage content: changed title to "Warum die Wolkenkrümel Platform?" and removed "Bewährte Methoden" section per user request
 
 ## User Preferences
 
