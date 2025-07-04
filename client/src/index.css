@@ -33,9 +33,9 @@
 .dark {
   /* Dark mode - matching screenshot colors */
   --background: hsl(240, 10%, 3.9%); /* Black background */
-  --foreground: hsl(160, 100%, 75%); /* Mint green text */
+  --foreground: hsl(148, 18%, 85%); /* b5dcc7 mint green text */
   --header-background: hsl(220, 13%, 18%); /* Dark gray header */
-  --header-foreground: hsl(160, 100%, 75%); /* Mint green text in header */
+  --header-foreground: hsl(148, 18%, 85%); /* b5dcc7 mint green text in header */
   --muted: hsl(240, 3.7%, 15.9%);
   --muted-foreground: hsl(160, 50%, 60%);
   --popover: hsl(220, 13%, 18%);

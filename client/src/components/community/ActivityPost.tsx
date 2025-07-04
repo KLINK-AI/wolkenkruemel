@@ -167,7 +167,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
               }`}
             >
               <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-              <span className="text-sm font-medium">{post.likes + (isLiked ? 1 : 0)}</span>
+              <span className="text-sm font-medium">{(post.likes || 0) + (isLiked ? 1 : 0)}</span>
             </Button>
             <Button 
               variant="ghost" 
@@ -176,7 +176,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
               className="flex items-center space-x-2 text-gray-600 hover:text-blue-500"
             >
               <MessageCircle className="w-5 h-5" />
-              <span className="text-sm font-medium">{post.comments}</span>
+              <span className="text-sm font-medium">{post.comments || 0}</span>
             </Button>
             <Button 
               variant="ghost" 

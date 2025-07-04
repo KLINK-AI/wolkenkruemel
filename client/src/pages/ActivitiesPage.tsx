@@ -166,41 +166,7 @@ export default function ActivitiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <Link href="/" className="flex items-center space-x-2">
-                <img
-                  src="/wolkenkruemel.png"
-                  alt="Wolkenkrümel"
-                  className="h-8 w-8"
-                  onError={(e) => {
-                    e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%234f46e5'%3E%3Ccircle cx='25' cy='30' r='8'/%3E%3Ccircle cx='75' cy='30' r='8'/%3E%3Ccircle cx='50' cy='25' r='12'/%3E%3Cpath d='M15 50c0-5 5-10 15-8 5 1 10-2 20 0s15-1 20 0 15-5 20 0c3 3 2 8-2 10-8 4-16 2-25 2s-17 2-25-2c-4-2-5-7-2-10z'/%3E%3C/g%3E%3Cg fill='%23f59e0b'%3E%3Cellipse cx='30' cy='70' rx='15' ry='8'/%3E%3Ccircle cx='25' cy='75' r='3'/%3E%3Ccircle cx='35' cy='75' r='3'/%3E%3Cpath d='M20 80c2 3 6 5 10 5s8-2 10-5'/%3E%3C/g%3E%3C/svg%3E";
-                  }}
-                />
-                <span className="text-xl font-bold text-foreground">Wolkenkrümel</span>
-              </Link>
-              <nav className="flex space-x-6">
-                <Link href="/" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('nav.home')}
-                </Link>
-                <Link href="/activities" className="text-primary font-medium">
-                  {t('nav.activities')}
-                </Link>
-                <Link href="/community" className="text-muted-foreground hover:text-primary transition-colors">
-                  {t('nav.community')}
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              <LanguageToggle />
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background">{/* Navigation is now handled by Layout component */}
 
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">

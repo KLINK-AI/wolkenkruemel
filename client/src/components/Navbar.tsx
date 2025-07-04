@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Heart, User, Settings, Moon, Sun } from "lucide-react";
+import { Home, User, Settings, Moon, Sun, Users, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,11 +23,17 @@ export function Navbar() {
   const { theme, setTheme } = useTheme();
   const { t } = useLanguage();
 
+  // Mock user for demo - In production, get this from auth context
+  const currentUser = { role: "admin", username: "Steve" };
+  
   const navItems = [
-    { path: "/activities", label: "Aktivitäten" },
-    { path: "/favoriten", label: "Favoriten", icon: Heart },
-    { path: "/admin", label: "Admin", icon: Settings },
+    { path: "/", label: "Home", icon: Home },
+    { path: "/activities", label: "Aktivitäten", icon: Calendar },
+    { path: "/community", label: "Community", icon: Users },
   ];
+  
+  // Admin nav item - only show for admin role
+  const adminNavItem = { path: "/admin", label: "Admin", icon: Settings };
 
   return (
     <header className="app-header sticky top-0 z-50">
@@ -36,7 +42,11 @@ export function Navbar() {
           {/* Logo and Brand */}
           <Link href="/" className="flex items-center space-x-3">
             <div className="logo-round w-10 h-10 flex-shrink-0">
-              <LogoFallback />
+              <img 
+                src="/attached_assets/Wolkenkrümel_v3_1751623513854.png" 
+                alt="Wolkenkrümel Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="text-xl font-semibold hidden sm:block">
               Wolkenkrümel
@@ -58,6 +68,17 @@ export function Navbar() {
                 </Link>
               );
             })}
+            
+            {/* Admin Link - only visible for admin users */}
+            {currentUser.role === "admin" && (
+              <Link 
+                href={adminNavItem.path}
+                className={location === adminNavItem.path ? 'nav-link-active px-3 py-2 rounded-md flex items-center space-x-2' : 'nav-link px-3 py-2 rounded-md flex items-center space-x-2'}
+              >
+                <Settings className="w-4 h-4" />
+                <span>{adminNavItem.label}</span>
+              </Link>
+            )}
           </nav>
 
           {/* Right Side Controls */}
@@ -83,13 +104,21 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center space-x-2">
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:block">Steve</span>
+                  <span className="hidden sm:block">{currentUser.username}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Profil</DropdownMenuItem>
-                <DropdownMenuItem>Einstellungen</DropdownMenuItem>
-                <DropdownMenuItem>Abmelden</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  Profil
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Einstellungen
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Abmelden
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
