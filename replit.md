@@ -123,6 +123,7 @@ Changelog:
 - July 04, 2025. Updated homepage content: changed title to "Warum die Wolkenkrümel Platform?" and removed "Bewährte Methoden" section per user request
 - July 04, 2025. Switched from MemStorage to DatabaseStorage for permanent data persistence - all activities, users, and progress now survive server restarts
 - July 04, 2025. Added comprehensive ProfilePage with user management functionality, mint background color (#eff8f3) for light mode, and custom SVG logo featuring clouds and dog in navigation
+- July 04, 2025. FIXED: Resolved double navbar issue by implementing global useAuth hook and removing redundant navigation components from individual pages - authentication state now centrally managed across all components
 
 ## User Preferences
 
