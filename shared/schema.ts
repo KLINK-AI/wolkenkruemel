@@ -21,8 +21,11 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   displayName: text("display_name"),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   bio: text("bio"),
   avatarUrl: text("avatar_url"),
+  location: text("location"),
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationToken: text("email_verification_token"),
   role: text("role").default("user"), // user, admin, moderator

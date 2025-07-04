@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,16 +8,21 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Mail, MapPin, Calendar, Edit3 } from "lucide-react";
+import { Save, Mail, MapPin, Calendar, Edit3, Upload, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     displayName: "",
+    firstName: "",
+    lastName: "",
     bio: "",
     location: "",
-    email: ""
+    email: "",
+    avatarUrl: ""
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -28,10 +33,14 @@ export default function ProfilePage() {
     if (currentUser) {
       setFormData({
         displayName: currentUser.displayName || currentUser.username || "",
+        firstName: currentUser.firstName || "",
+        lastName: currentUser.lastName || "",
         bio: currentUser.bio || "",
         location: currentUser.location || "",
-        email: currentUser.email || ""
+        email: currentUser.email || "",
+        avatarUrl: currentUser.avatarUrl || ""
       });
+      setImagePreview(currentUser.avatarUrl || null);
     }
   }, [currentUser]);
 
@@ -70,6 +79,42 @@ export default function ProfilePage() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Datei zu groß",
+          description: "Das Bild darf maximal 5MB groß sein.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        setFormData(prev => ({
+          ...prev,
+          avatarUrl: result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    setFormData(prev => ({
+      ...prev,
+      avatarUrl: ""
+    }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -154,6 +199,50 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Profile Image Upload */}
+                <div>
+                  <Label>Profilbild</Label>
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="relative">
+                      <Avatar className="w-20 h-20">
+                        <AvatarImage src={imagePreview || currentUser.avatarUrl} alt="Profile" />
+                        <AvatarFallback>
+                          {(currentUser.displayName || currentUser.username || "U").charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      {imagePreview && (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={removeImage}
+                          className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex items-center gap-2"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Bild wählen
+                      </Button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="displayName">Anzeigename</Label>
@@ -171,6 +260,27 @@ export default function ProfilePage() {
                       value={formData.location}
                       onChange={(e) => handleInputChange("location", e.target.value)}
                       placeholder="Stadt, Land"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">Vorname</Label>
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      placeholder="Ihr Vorname"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Nachname</Label>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      placeholder="Ihr Nachname"
                     />
                   </div>
                 </div>
