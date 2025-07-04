@@ -302,7 +302,6 @@ export default function ActivityDetailPage() {
                     }}
                     disabled={updateProgressMutation.isPending}
                   >
-                    <Star className="w-4 h-4 mr-2" />
                     {progress?.tried ? "Aktivität durchgeführt" : "Aktivität starten"}
                   </Button>
                   <Button 
@@ -314,8 +313,8 @@ export default function ActivityDetailPage() {
                     }}
                     disabled={updateProgressMutation.isPending}
                   >
-                    <Heart className={`w-4 h-4 mr-2 ${progress?.favorite ? 'fill-red-500 text-red-500' : ''}`} />
-                    {progress?.favorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
+                    <Star className={`w-4 h-4 mr-2 ${progress?.favorite ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                    Aktivität durchgeführt
                   </Button>
                   <Button variant="outline" className="w-full">
                     <Share2 className="w-4 h-4 mr-2" />
