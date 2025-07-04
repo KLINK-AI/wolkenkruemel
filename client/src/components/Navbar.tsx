@@ -42,33 +42,16 @@ export function Navbar() {
           {/* Logo and Brand */}
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-10 h-10 flex-shrink-0">
-              <svg 
-                viewBox="0 0 100 100" 
-                className="w-full h-full"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Wolken (Clouds) */}
-                <g fill="#60a5fa" opacity="0.8">
-                  <circle cx="25" cy="30" r="8"/>
-                  <circle cx="75" cy="30" r="8"/>
-                  <circle cx="50" cy="25" r="12"/>
-                  <path d="M15 50c0-5 5-10 15-8 5 1 10-2 20 0s15-1 20 0 15-5 20 0c3 3 2 8-2 10-8 4-16 2-25 2s-17 2-25-2c-4-2-5-7-2-10z"/>
-                </g>
-                
-                {/* Hund (Dog) */}
-                <g fill="#f59e0b">
-                  <ellipse cx="50" cy="70" rx="18" ry="10"/>
-                  <circle cx="42" cy="75" r="3"/>
-                  <circle cx="58" cy="75" r="3"/>
-                  <path d="M35 80c3 4 8 6 15 6s12-2 15-6" stroke="#d97706" strokeWidth="2" fill="none"/>
-                  {/* Ohren */}
-                  <ellipse cx="35" cy="65" rx="4" ry="8" transform="rotate(-20 35 65)"/>
-                  <ellipse cx="65" cy="65" rx="4" ry="8" transform="rotate(20 65 65)"/>
-                </g>
-                
-                {/* Schwanz */}
-                <path d="M68 75 Q80 70 75 60" stroke="#f59e0b" strokeWidth="3" fill="none" strokeLinecap="round"/>
-              </svg>
+              <img 
+                src="/Wolkenkruemel.png" 
+                alt="Wolkenkrümel Logo" 
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  console.error('Logo konnte nicht geladen werden:', e);
+                  // Fallback SVG wenn das originale Logo nicht lädt
+                  e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%2360a5fa'%3E%3Ccircle cx='25' cy='30' r='8'/%3E%3Ccircle cx='75' cy='30' r='8'/%3E%3Ccircle cx='50' cy='25' r='12'/%3E%3C/g%3E%3Cg fill='%23f59e0b'%3E%3Cellipse cx='50' cy='70' rx='18' ry='10'/%3E%3C/g%3E%3C/svg%3E";
+                }}
+              />
             </div>
             <span className="text-xl font-semibold hidden sm:block">
               Wolkenkrümel
