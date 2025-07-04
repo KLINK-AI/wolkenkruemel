@@ -78,6 +78,45 @@ const translations = {
     'common.comment': 'Kommentar',
     'common.share': 'Teilen',
     'common.follow': 'Folgen',
+    
+    // Activities Page
+    'activities.title': 'Trainingsaktivitäten',
+    'activities.subtitle': 'Entdecke und teile Trainingsaktivitäten für deinen Hund',
+    'activities.create': 'Neue Aktivität',
+    'activities.createFirst': 'Erste Aktivität erstellen',
+    'activities.noActivities': 'Keine Aktivitäten gefunden',
+    'activities.noActivitiesDesc': 'Sei der erste, der eine Trainingsaktivität teilt!',
+    'activities.minutes': 'Min',
+    'activities.by': 'von',
+    'activities.view': 'Ansehen',
+    
+    // Difficulty levels
+    'difficulty.beginner': 'Anfänger',
+    'difficulty.intermediate': 'Fortgeschritten',
+    'difficulty.advanced': 'Experte',
+    
+    // Footer links
+    'footer.feed': 'Feed',
+    'footer.forum': 'Q&A Forum',
+    'footer.connect': 'Verbinden',
+    
+    // Home Page
+    'home.hero.title': 'Bessere Beziehungen zwischen dir und deinem Hund',
+    'home.hero.subtitle': 'Entdecke gemeinschaftsbasierte Trainingsaktivitäten, teile deine Erfahrungen und baue eine stärkere Bindung zu deinem Hund auf.',
+    'home.hero.exploreActivities': 'Aktivitäten entdecken',
+    'home.hero.joinCommunity': 'Community beitreten',
+    'home.features.title': 'Warum Wolkenkrümel?',
+    'home.features.training.title': 'Experten-Training',
+    'home.features.training.description': 'Professionelle Trainingsaktivitäten von erfahrenen Hundetrainern und der Community.',
+    'home.features.community.title': 'Community-Power',
+    'home.features.community.description': 'Vernetze dich mit anderen Hundebesitzern und teile deine Erfahrungen.',
+    'home.features.expert.title': 'Bewährte Methoden',
+    'home.features.expert.description': 'Alle Aktivitäten basieren auf wissenschaftlich fundierten Trainingsmethoden.',
+    'home.features.bonding.title': 'Stärkere Bindung',
+    'home.features.bonding.description': 'Baue eine tiefere Verbindung zu deinem Hund durch gemeinsame Aktivitäten auf.',
+    'home.cta.title': 'Bereit, deine erste Aktivität zu teilen?',
+    'home.cta.subtitle': 'Hilf anderen Hundebesitzern mit deinen Erfahrungen und werde Teil unserer Community.',
+    'home.cta.button': 'Erste Aktivität erstellen',
   },
   en: {
     // Navigation
@@ -148,6 +187,45 @@ const translations = {
     'common.comment': 'Comment',
     'common.share': 'Share',
     'common.follow': 'Follow',
+    
+    // Activities Page
+    'activities.title': 'Training Activities',
+    'activities.subtitle': 'Discover and share training activities for your dog',
+    'activities.create': 'New Activity',
+    'activities.createFirst': 'Create First Activity',
+    'activities.noActivities': 'No activities found',
+    'activities.noActivitiesDesc': 'Be the first to share a training activity!',
+    'activities.minutes': 'min',
+    'activities.by': 'by',
+    'activities.view': 'View',
+    
+    // Difficulty levels
+    'difficulty.beginner': 'Beginner',
+    'difficulty.intermediate': 'Intermediate',
+    'difficulty.advanced': 'Advanced',
+    
+    // Footer links
+    'footer.feed': 'Feed',
+    'footer.forum': 'Q&A Forum',
+    'footer.connect': 'Connect',
+    
+    // Home Page
+    'home.hero.title': 'Better relationships between you and your dog',
+    'home.hero.subtitle': 'Discover community-based training activities, share your experiences, and build a stronger bond with your dog.',
+    'home.hero.exploreActivities': 'Explore Activities',
+    'home.hero.joinCommunity': 'Join Community',
+    'home.features.title': 'Why Wolkenkrümel?',
+    'home.features.training.title': 'Expert Training',
+    'home.features.training.description': 'Professional training activities from experienced dog trainers and the community.',
+    'home.features.community.title': 'Community Power',
+    'home.features.community.description': 'Connect with other dog owners and share your experiences.',
+    'home.features.expert.title': 'Proven Methods',
+    'home.features.expert.description': 'All activities are based on scientifically proven training methods.',
+    'home.features.bonding.title': 'Stronger Bond',
+    'home.features.bonding.description': 'Build a deeper connection with your dog through shared activities.',
+    'home.cta.title': 'Ready to share your first activity?',
+    'home.cta.subtitle': 'Help other dog owners with your experiences and become part of our community.',
+    'home.cta.button': 'Create First Activity',
   }
 };
 

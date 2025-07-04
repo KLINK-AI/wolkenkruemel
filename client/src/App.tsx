@@ -6,14 +6,18 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import NotFound from "@/pages/not-found";
+import HomePage from "@/pages/HomePage";
 import CommunityPage from "@/pages/CommunityPage";
+import ActivitiesPage from "@/pages/ActivitiesPage";
 import CreateActivityPage from "@/pages/CreateActivityPage";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={CommunityPage} />
+      <Route path="/" component={HomePage} />
       <Route path="/community" component={CommunityPage} />
+      <Route path="/activities" component={ActivitiesPage} />
+      <Route path="/aktivitäten" component={ActivitiesPage} />
       <Route path="/create-activity" component={CreateActivityPage} />
       <Route component={NotFound} />
     </Switch>

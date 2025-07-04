@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, Users, MessageCircle, Trophy, Calendar } from "lucide-react";
+import { Home, Users, MessageCircle } from "lucide-react";
 
 interface CommunitySidebarProps {
   user: {
@@ -15,8 +15,6 @@ export default function CommunitySidebar({ user }: CommunitySidebarProps) {
     { icon: Home, label: "Feed", active: true },
     { icon: Users, label: "My Network", active: false },
     { icon: MessageCircle, label: "Q&A Forum", active: false },
-    { icon: Trophy, label: "Success Stories", active: false },
-    { icon: Calendar, label: "Events", active: false },
   ];
 
   return (
