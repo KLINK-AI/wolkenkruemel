@@ -66,7 +66,7 @@ export default function ActivitiesPage() {
                            activity.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesDifficulty = difficultyFilter === "all" || activity.difficulty === difficultyFilter;
       const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => activity.tags?.includes(tag));
-      const matchesFavorites = !showFavoritesOnly || userProgress.some((p: any) => p.activityId === activity.id && p.isFavorite);
+      const matchesFavorites = !showFavoritesOnly || userProgress.some((p: any) => p.activityId === activity.id && p.favorite);
       
       return matchesSearch && matchesDifficulty && matchesTags && matchesFavorites;
     });
@@ -215,6 +215,11 @@ export default function ActivitiesPage() {
 
             <div className="text-sm text-muted-foreground">
               {filteredAndSortedActivities.length} von {activities.length} Aktivitäten
+              {showFavoritesOnly && userProgress.length > 0 && (
+                <span className="ml-2">
+                  ({userProgress.filter((p: any) => p.favorite).length} Favoriten)
+                </span>
+              )}
             </div>
           </div>
         </CardContent>
