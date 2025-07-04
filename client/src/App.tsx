@@ -14,6 +14,8 @@ import ActivityDetailPage from "@/pages/ActivityDetailPage";
 import CreateActivityPage from "@/pages/CreateActivityPage";
 import EditActivityPage from "@/pages/EditActivityPage";
 import ProfilePage from "@/pages/ProfilePage";
+import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
 
 function Router() {
   return (
@@ -30,6 +32,9 @@ function Router() {
         <Route path="/create" component={CreateActivityPage} />
         <Route path="/profile" component={ProfilePage} />
         <Route path="/profil" component={ProfilePage} />
+        <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegisterPage} />
+        <Route path="/registrieren" component={RegisterPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

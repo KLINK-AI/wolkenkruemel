@@ -24,6 +24,7 @@ export const users = pgTable("users", {
   bio: text("bio"),
   avatarUrl: text("avatar_url"),
   isEmailVerified: boolean("is_email_verified").default(false),
+  emailVerificationToken: text("email_verification_token"),
   role: text("role").default("user"), // user, admin, moderator
   subscriptionTier: text("subscription_tier").default("free"), // free, premium, pro
   stripeCustomerId: text("stripe_customer_id"),

@@ -4,11 +4,13 @@ import Stripe from "stripe";
 import { storage } from "./storage";
 import { 
   insertActivitySchema, insertPostSchema, insertCommentSchema, 
-  insertEventSchema, activityProgress 
+  insertEventSchema, activityProgress, insertUserSchema 
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { sendEmail, generateEmailVerificationTemplate } from "./sendgrid";
+import crypto from "crypto";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -388,6 +390,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(safeUser);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
+    }
+  });
+
+  // User Registration with Double Opt-In
+  app.post("/api/register", async (req, res) => {
+    try {
+      const { username, email, password, displayName } = req.body;
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "E-Mail bereits registriert" });
+      }
+
+      // Create user with email verification pending
+      const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+      const userData = {
+        username,
+        email,
+        password, // In production, this should be hashed
+        displayName,
+        isEmailVerified: false,
+        emailVerificationToken,
+        role: 'user',
+        subscriptionTier: 'free'
+      };
+      
+      const user = await storage.createUser(userData);
+      
+      // Send verification email
+      const verificationUrl = `${req.protocol}://${req.get('host')}/api/verify-email/${emailVerificationToken}`;
+      const { text, html } = generateEmailVerificationTemplate(displayName || username, verificationUrl);
+      
+      const emailSent = await sendEmail({
+        to: email,
+        from: process.env.SENDGRID_FROM_EMAIL || 'noreply@wolkenkruemel.com',
+        subject: 'E-Mail bestätigen - Wolkenkrümel',
+        text,
+        html
+      });
+
+      if (!emailSent) {
+        console.error('Failed to send verification email');
+      }
+
+      res.status(201).json({ 
+        message: "Registrierung erfolgreich. Bitte bestätigen Sie Ihre E-Mail-Adresse.",
+        userId: user.id 
+      });
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Email Verification
+  app.get("/api/verify-email/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      const user = await storage.getUserByVerificationToken(token);
+      
+      if (!user) {
+        return res.status(400).json({ message: "Ungültiger oder abgelaufener Bestätigungslink" });
+      }
+
+      // Verify email
+      await storage.updateUser(user.id, { 
+        isEmailVerified: true, 
+        emailVerificationToken: null 
+      });
+
+      res.json({ message: "E-Mail erfolgreich bestätigt! Sie können sich jetzt anmelden." });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // User Login
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password) {
+        return res.status(401).json({ message: "Ungültige E-Mail oder Passwort" });
+      }
+
+      if (!user.isEmailVerified) {
+        return res.status(401).json({ message: "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse" });
+      }
+
+      const { password: _, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Check activity creation limit
+  app.get("/api/users/:id/activity-limit", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const activitiesCreated = user.activitiesCreated || 0;
+      const maxActivities = user.subscriptionTier === 'free' ? 5 : Infinity;
+      
+      res.json({
+        activitiesCreated,
+        maxActivities,
+        canCreateMore: activitiesCreated < maxActivities
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 

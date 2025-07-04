@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Home, User, Settings, Moon, Sun, Users, Calendar } from "lucide-react";
+import { Home, User, Settings, Moon, Sun, Users, Calendar, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,8 +24,22 @@ export function Navbar() {
   const { theme, setTheme } = useTheme();
   const { t } = useLanguage();
 
-  // Mock user for demo - In production, get this from auth context
-  const currentUser = { role: "admin", username: "Steve" };
+  // Get current user from localStorage
+  const getCurrentUser = () => {
+    const userStr = localStorage.getItem('currentUser');
+    return userStr ? JSON.parse(userStr) : null;
+  };
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  
+  // Listen for storage changes to update user state
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setCurrentUser(getCurrentUser());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
   
   const navItems = [
     { path: "/", label: "Home", icon: Home },
@@ -75,7 +90,7 @@ export function Navbar() {
             })}
             
             {/* Admin Link - only visible for admin users */}
-            {currentUser.role === "admin" && (
+            {currentUser && currentUser.role === "admin" && (
               <Link 
                 href={adminNavItem.path}
                 className={location === adminNavItem.path ? 'nav-link-active px-3 py-2 rounded-md flex items-center space-x-2' : 'nav-link px-3 py-2 rounded-md flex items-center space-x-2'}
@@ -104,30 +119,53 @@ export function Navbar() {
             {/* Language Toggle */}
             <LanguageToggle />
 
-            {/* User Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2">
-                  <User className="w-4 h-4" />
-                  <span className="hidden sm:block">{currentUser.username}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <Link href="/profile">
+            {/* Authentication */}
+            {currentUser ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2">
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:block">{currentUser.username}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <Link href="/profile">
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      Profil
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    Profil
+                    <Settings className="mr-2 h-4 w-4" />
+                    Einstellungen
                   </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      localStorage.removeItem('currentUser');
+                      setCurrentUser(null);
+                      window.location.href = '/';
+                    }}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Abmelden
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link href="/login">
+                  <Button variant="ghost">
+                    Anmelden
+                  </Button>
                 </Link>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Einstellungen
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Abmelden
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <Link href="/register">
+                  <Button>
+                    Registrieren
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
