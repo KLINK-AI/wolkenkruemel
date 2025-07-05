@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/components/LanguageProvider";
 import { Camera, Link, Activity } from "lucide-react";
 
 const createPostSchema = z.object({
@@ -28,6 +29,7 @@ export default function CreatePostCard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
+  const { t } = useLanguage();
 
   if (!currentUser) {
     return null;
@@ -49,8 +51,8 @@ export default function CreatePostCard() {
     },
     onSuccess: () => {
       toast({
-        title: "Post Shared",
-        description: "Your post has been shared with the community.",
+        title: t('posts.shared'),
+        description: t('posts.sharedDescription'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
       form.reset();
@@ -58,7 +60,7 @@ export default function CreatePostCard() {
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -93,7 +95,7 @@ export default function CreatePostCard() {
                     <FormItem>
                       <FormControl>
                         <Textarea
-                          placeholder="Share your dog training progress, tips, or ask for help..."
+                          placeholder={t('post.placeholder')}
                           rows={3}
                           className="resize-none"
                           onFocus={handleContentFocus}
@@ -121,9 +123,9 @@ export default function CreatePostCard() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="post">General Post</SelectItem>
-                          <SelectItem value="question">Question</SelectItem>
-                          <SelectItem value="success_story">Success Story</SelectItem>
+                          <SelectItem value="post">{t('post.types.general')}</SelectItem>
+                          <SelectItem value="question">{t('post.types.question')}</SelectItem>
+                          <SelectItem value="success_story">{t('post.types.success')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

@@ -2,9 +2,11 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Lock, Plus } from "lucide-react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function AccessGate() {
   const [, setLocation] = useLocation();
+  const { t } = useLanguage();
 
   const handleCreateActivity = () => {
     setLocation("/create-activity");
@@ -19,8 +21,8 @@ export default function AccessGate() {
               <Lock className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-neutral">Unlock Premium Content</h3>
-              <p className="text-sm text-gray-600">Share your own training activity to access the full community</p>
+              <h3 className="text-lg font-semibold text-neutral">{t('premium.unlock')}</h3>
+              <p className="text-sm text-gray-600">{t('premium.unlockDescription')}</p>
             </div>
           </div>
           <Button 
@@ -28,7 +30,7 @@ export default function AccessGate() {
             className="bg-primary hover:bg-primary/90 text-white"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Create Activity
+            {t('activity.create')}
           </Button>
         </div>
       </CardContent>

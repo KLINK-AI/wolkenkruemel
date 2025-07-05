@@ -112,6 +112,57 @@ const translations: Translations = {
     fr: 'commentaires',
     it: 'commenti'
   },
+  'post.types.general': {
+    en: 'General Post',
+    de: 'Allgemeiner Beitrag',
+    es: 'Publicación General',
+    fr: 'Publication Générale',
+    it: 'Post Generale'
+  },
+  'post.types.question': {
+    en: 'Question',
+    de: 'Frage',
+    es: 'Pregunta',
+    fr: 'Question',
+    it: 'Domanda'
+  },
+  'post.types.success': {
+    en: 'Success Story',
+    de: 'Erfolgsgeschichte',
+    es: 'Historia de Éxito',
+    fr: 'Histoire de Succès',
+    it: 'Storia di Successo'
+  },
+  'posts.shared': {
+    en: 'Post Shared',
+    de: 'Beitrag geteilt',
+    es: 'Publicación Compartida',
+    fr: 'Publication Partagée',
+    it: 'Post Condiviso'
+  },
+  'posts.sharedDescription': {
+    en: 'Your post has been shared with the community.',
+    de: 'Ihr Beitrag wurde mit der Community geteilt.',
+    es: 'Su publicación ha sido compartida con la comunidad.',
+    fr: 'Votre publication a été partagée avec la communauté.',
+    it: 'Il tuo post è stato condiviso con la comunità.'
+  },
+  
+  // Premium
+  'premium.unlock': {
+    en: 'Unlock Premium Content',
+    de: 'Premium-Inhalte freischalten',
+    es: 'Desbloquear Contenido Premium',
+    fr: 'Débloquer le Contenu Premium',
+    it: 'Sblocca Contenuti Premium'
+  },
+  'premium.unlockDescription': {
+    en: 'Share your own training activity to access the full community',
+    de: 'Teilen Sie Ihre eigene Trainingsaktivität, um Zugang zur gesamten Community zu erhalten',
+    es: 'Comparte tu propia actividad de entrenamiento para acceder a toda la comunidad',
+    fr: 'Partagez votre propre activité d\'entraînement pour accéder à toute la communauté',
+    it: 'Condividi la tua attività di allenamento per accedere a tutta la comunità'
+  },
   
   // Activities
   'activity.title': {
