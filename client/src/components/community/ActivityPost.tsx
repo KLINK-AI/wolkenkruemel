@@ -43,7 +43,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Check if user has liked this post
   const { data: likeStatus } = useQuery({
@@ -216,12 +216,24 @@ export default function ActivityPost({ post }: ActivityPostProps) {
       const hourText = hours === 1 
         ? t('time.hour') 
         : t('time.hours');
-      return `${hours} ${hourText} ${t('time.ago')}`;
+      
+      // German: "vor X Stunden", English: "X hours ago"
+      if (language === 'de') {
+        return `vor ${hours} ${hourText}`;
+      } else {
+        return `${hours} ${hourText} ago`;
+      }
     } else {
       const dayText = days === 1 
         ? t('time.day') 
         : t('time.days');
-      return `${days} ${dayText} ${t('time.ago')}`;
+      
+      // German: "vor X Tagen", English: "X days ago" 
+      if (language === 'de') {
+        return `vor ${days} ${dayText}`;
+      } else {
+        return `${days} ${dayText} ago`;
+      }
     }
   };
 
