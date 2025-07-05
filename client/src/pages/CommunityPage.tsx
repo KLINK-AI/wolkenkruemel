@@ -2,16 +2,18 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import CommunityFeed from "@/components/community/CommunityFeed";
 import CommunitySidebar from "@/components/community/CommunitySidebar";
-import TrendingTopics from "@/components/community/TrendingTopics";
-import SuggestedUsers from "@/components/community/SuggestedUsers";
+import CommunityRightSidebar from "@/components/community/CommunityRightSidebar";
+import CreatePostCard from "@/components/community/CreatePostCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function CommunityPage() {
   // Check if user is authenticated
   const { currentUser } = useAuth();
+  const { t } = useLanguage();
 
   // If user is not authenticated, show login prompt
   if (!currentUser) {
@@ -58,14 +60,27 @@ export default function CommunityPage() {
           </div>
 
           {/* Main Content Area */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Header */}
+            <div className="bg-card rounded-lg shadow-sm p-6 border">
+              <h1 className="text-2xl font-bold text-foreground mb-2">
+                {t('post.create')}
+              </h1>
+              <p className="text-muted-foreground">
+                {t('community.shareThoughts')}
+              </p>
+            </div>
+
+            {/* Create Post Card */}
+            <CreatePostCard />
+
+            {/* Feed */}
             <CommunityFeed />
           </div>
 
           {/* Right Sidebar */}
           <div className="lg:col-span-1">
-            <TrendingTopics />
-            <SuggestedUsers currentUserId={currentUser.id} />
+            <CommunityRightSidebar currentUserId={currentUser.id} />
           </div>
         </div>
       </main>

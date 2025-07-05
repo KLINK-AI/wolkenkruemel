@@ -129,6 +129,9 @@ const translations = {
     'editActivity.updated': 'Aktivität erfolgreich aktualisiert',
     'editActivity.error': 'Fehler beim Aktualisieren der Aktivität',
     
+    // Community
+    'community.shareThoughts': 'Teile deine Gedanken und vernetze dich mit der Community',
+    
     // Common
     'common.loading': 'Laden...',
     'common.error': 'Fehler',
@@ -193,6 +196,7 @@ const translations = {
     'posts.placeholder': 'Was beschäftigt dich heute mit deinem Hund?',
     'posts.shared': 'Beitrag geteilt',
     'posts.sharedDescription': 'Dein Beitrag wurde erfolgreich geteilt.',
+    'posts.createTitle': 'Post erstellen',
     'post.types.general': 'Allgemein',
     'post.types.question': 'Frage',
     'post.types.success': 'Erfolgsgeschichte',
@@ -203,6 +207,9 @@ const translations = {
     
     // Activity translations
     'activity.create': 'Aktivität erstellen',
+    
+    // Navigation translations
+    'nav.feed': 'Feed',
   },
   en: {
     // Navigation
@@ -215,7 +222,7 @@ const translations = {
     // Community Page
     'community.title': 'Community',
     'community.whatsHappening': 'What\'s happening in the community?',
-    'community.shareThoughts': 'Share your thoughts with the community...',
+    'community.shareThoughts': 'Share your thoughts and connect with the community',
     'community.post': 'Post',
     'community.question': 'Question',
     'community.activity': 'Activity',
@@ -325,6 +332,7 @@ const translations = {
     'posts.placeholder': 'What\'s on your mind about your dog today?',
     'posts.shared': 'Post shared',
     'posts.sharedDescription': 'Your post has been shared successfully.',
+    'posts.createTitle': 'Create Post',
     'post.types.general': 'General',
     'post.types.question': 'Question',
     'post.types.success': 'Success Story',
@@ -335,6 +343,12 @@ const translations = {
     
     // Activity translations
     'activity.create': 'Create Activity',
+    
+    // Navigation translations
+    'nav.feed': 'Feed',
+    
+    // Community translations
+    'community.feed': 'Feed',
   }
 };
 

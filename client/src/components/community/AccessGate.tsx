@@ -21,8 +21,8 @@ export default function AccessGate() {
               <Lock className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-neutral">{t('premium.unlock')}</h3>
-              <p className="text-sm text-gray-600">{t('premium.unlockDescription')}</p>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">{t('premium.unlock')}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('premium.unlockDescription')}</p>
             </div>
           </div>
           <Button 

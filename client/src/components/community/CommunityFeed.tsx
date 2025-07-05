@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import CreatePostCard from "./CreatePostCard";
 import ActivityPost from "./ActivityPost";
 import QAPost from "./QAPost";
-import AccessGate from "./AccessGate";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -34,10 +32,6 @@ export default function CommunityFeed() {
 
   return (
     <div className="space-y-6">
-      <CreatePostCard />
-      
-      <AccessGate />
-      
       {isLoading && (
         <div className="space-y-6">
           {[...Array(3)].map((_, i) => (
