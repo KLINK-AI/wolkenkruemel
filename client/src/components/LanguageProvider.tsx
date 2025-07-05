@@ -180,6 +180,14 @@ const translations = {
     'home.cta.title': 'Bereit, deine erste Aktivität zu teilen?',
     'home.cta.subtitle': 'Hilf anderen Hundebesitzern mit deinen Erfahrungen und werde Teil unserer Community.',
     'home.cta.button': 'Erste Aktivität erstellen',
+    
+    // Time translations
+    'time.now': 'Gerade eben',
+    'time.hour': 'Stunde',
+    'time.hours': 'Stunden',
+    'time.day': 'Tag',
+    'time.days': 'Tage',
+    'time.ago': 'vor',
   },
   en: {
     // Navigation
@@ -289,6 +297,14 @@ const translations = {
     'home.cta.title': 'Ready to share your first activity?',
     'home.cta.subtitle': 'Help other dog owners with your experiences and become part of our community.',
     'home.cta.button': 'Create First Activity',
+    
+    // Time translations
+    'time.now': 'Just now',
+    'time.hour': 'hour',
+    'time.hours': 'hours',
+    'time.day': 'day',
+    'time.days': 'days',
+    'time.ago': 'ago',
   }
 };
 
