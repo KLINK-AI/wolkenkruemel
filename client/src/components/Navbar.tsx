@@ -26,13 +26,13 @@ export function Navbar() {
   const { currentUser, logout } = useAuth();
   
   const navItems = [
-    { path: "/", label: "Home", icon: Home },
-    { path: "/activities", label: "Aktivitäten", icon: Calendar },
-    { path: "/community", label: "Community", icon: Users },
+    { path: "/", label: t('nav.home'), icon: Home },
+    { path: "/activities", label: t('nav.activities'), icon: Calendar },
+    { path: "/community", label: t('nav.community'), icon: Users },
   ];
   
   // Admin nav item - only show for admin role
-  const adminNavItem = { path: "/admin", label: "Admin", icon: Settings };
+  const adminNavItem = { path: "/admin", label: t('nav.admin'), icon: Settings };
 
   return (
     <header className="app-header sticky top-0 z-50">

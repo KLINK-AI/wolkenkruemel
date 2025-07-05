@@ -335,7 +335,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
               className="flex items-center space-x-2 text-muted-foreground hover:text-blue-500"
             >
               <MessageCircle className="w-5 h-5" />
-              <span className="text-sm font-medium">{comments?.length || 0}</span>
+              <span className="text-sm font-medium">{post.comments || 0}</span>
             </Button>
             <Button 
               variant="ghost" 

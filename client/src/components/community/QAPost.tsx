@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/components/LanguageProvider";
 import { HelpCircle, ChevronUp, MessageSquare, Tag } from "lucide-react";
 
 interface QAPostProps {
@@ -33,6 +34,7 @@ export default function QAPost({ post }: QAPostProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
+  const { t } = useLanguage();
 
   // Check if user has upvoted this post
   const { data: likeStatus } = useQuery({
@@ -111,10 +113,11 @@ export default function QAPost({ post }: QAPostProps) {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(hours / 24);
     
-    if (hours < 1) return "Just now";
-    if (hours < 24) return `${hours} hours ago`;
-    return `${Math.floor(hours / 24)} days ago`;
+    if (hours < 1) return "Gerade eben";
+    if (hours < 24) return `vor ${hours} Stunde${hours === 1 ? '' : 'n'}`;
+    return `vor ${days} Tag${days === 1 ? '' : 'en'}`;
   };
 
   return (
@@ -138,7 +141,7 @@ export default function QAPost({ post }: QAPostProps) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-semibold text-foreground">{post.author?.displayName || "Unbekannter Benutzer"}</h3>
+            <h3 className="font-semibold text-foreground">{post.author?.displayName || t('common.unknownUser')}</h3>
             <p className="text-sm text-muted-foreground">{formatTimeAgo(post.createdAt)}</p>
           </div>
         </div>
