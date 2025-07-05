@@ -7,7 +7,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
-import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Activity } from "lucide-react";
+import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Activity, Edit, Trash2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ActivityPostProps {
   post: {
@@ -34,6 +37,8 @@ export default function ActivityPost({ post }: ActivityPostProps) {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [isLiked, setIsLiked] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
@@ -96,6 +101,74 @@ export default function ActivityPost({ post }: ActivityPostProps) {
     },
   });
 
+  const editPostMutation = useMutation({
+    mutationFn: async (content: string) => {
+      await apiRequest("PATCH", `/api/posts/${post.id}`, { content });
+    },
+    onSuccess: () => {
+      setIsEditing(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+      toast({
+        title: "Post bearbeitet",
+        description: "Dein Post wurde erfolgreich aktualisiert.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fehler",
+        description: "Post konnte nicht bearbeitet werden.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("DELETE", `/api/posts/${post.id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+      toast({
+        title: "Post gelöscht",
+        description: "Dein Post wurde erfolgreich gelöscht.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fehler",
+        description: "Post konnte nicht gelöscht werden.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const shareMutation = useMutation({
+    mutationFn: async () => {
+      if (navigator.share) {
+        await navigator.share({
+          title: `${post.author.displayName} - Wolkenkrümel`,
+          text: post.content,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Geteilt",
+        description: "share" in navigator ? "Post wurde geteilt." : "Link wurde in die Zwischenablage kopiert.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fehler",
+        description: "Post konnte nicht geteilt werden.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleLike = () => {
     likeMutation.mutate();
   };
@@ -110,6 +183,22 @@ export default function ActivityPost({ post }: ActivityPostProps) {
     if (e.key === 'Enter') {
       handleComment();
     }
+  };
+
+  const handleEdit = () => {
+    if (editContent.trim()) {
+      editPostMutation.mutate(editContent);
+    }
+  };
+
+  const handleDelete = () => {
+    if (window.confirm("Möchtest du diesen Post wirklich löschen?")) {
+      deletePostMutation.mutate();
+    }
+  };
+
+  const handleShare = () => {
+    shareMutation.mutate();
   };
 
   const formatTimeAgo = (dateString: string) => {
@@ -140,15 +229,61 @@ export default function ActivityPost({ post }: ActivityPostProps) {
               <p className="text-sm text-muted-foreground">{formatTimeAgo(post.createdAt)}</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal className="w-5 h-5" />
-          </Button>
+          {currentUser?.id === post.author?.id && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreHorizontal className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Bearbeiten
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Löschen
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </CardContent>
 
       {/* Post Content */}
       <CardContent className="px-6 pb-4">
-        <p className="text-foreground mb-4">{post.content}</p>
+        {isEditing ? (
+          <div className="mb-4">
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              rows={4}
+              className="mb-3"
+            />
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditContent(post.content);
+                }}
+              >
+                Abbrechen
+              </Button>
+              <Button 
+                size="sm"
+                onClick={handleEdit}
+                disabled={!editContent.trim() || editPostMutation.isPending}
+              >
+                {editPostMutation.isPending ? "Speichern..." : "Speichern"}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-foreground mb-4">{post.content}</p>
+        )}
         
         {/* Linked Activity */}
         {post.linkedActivity && (
@@ -204,10 +339,11 @@ export default function ActivityPost({ post }: ActivityPostProps) {
             <Button 
               variant="ghost" 
               size="sm" 
+              onClick={handleShare}
               className="flex items-center space-x-2 text-gray-600 hover:text-green-500"
             >
               <Share className="w-5 h-5" />
-              <span className="text-sm font-medium">Share</span>
+              <span className="text-sm font-medium">Teilen</span>
             </Button>
           </div>
           <Button 

@@ -100,6 +100,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update post
+  app.put("/api/posts/:id", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const { content } = req.body;
+      const updatedPost = await storage.updatePost(postId, { content });
+      res.json(updatedPost);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Delete post
+  app.delete("/api/posts/:id", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      await storage.deletePost(postId);
+      res.status(200).json({ message: "Post deleted" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Check if user has liked a post
   app.get("/api/posts/:id/like/:userId", async (req, res) => {
     try {
