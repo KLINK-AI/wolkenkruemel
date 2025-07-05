@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function TrendingTopics() {
+  const { t } = useLanguage();
   const { data: tags, isLoading } = useQuery({
     queryKey: ["/api/trending-tags"],
     queryFn: async () => {
@@ -25,7 +27,7 @@ export default function TrendingTopics() {
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle className="text-lg">Beliebte Themen</CardTitle>
+        <CardTitle className="text-lg">{t('community.trending')}</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -42,7 +44,7 @@ export default function TrendingTopics() {
             {displayTags.map((item: any) => (
               <div key={item.tag} className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">#{item.tag}</span>
-                <span className="text-xs text-muted-foreground">{item.count} Posts</span>
+                <span className="text-xs text-muted-foreground">{item.count} {t('community.post')}s</span>
               </div>
             ))}
           </div>

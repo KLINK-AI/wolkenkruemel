@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface SuggestedUsersProps {
   currentUserId: number;
@@ -13,6 +14,7 @@ interface SuggestedUsersProps {
 export default function SuggestedUsers({ currentUserId }: SuggestedUsersProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useLanguage();
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["/api/suggested-users", { userId: currentUserId }],
@@ -70,7 +72,7 @@ export default function SuggestedUsers({ currentUserId }: SuggestedUsersProps) {
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle className="text-lg">Vorgeschlagene Nutzer</CardTitle>
+        <CardTitle className="text-lg">{t('community.suggested')}</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -109,7 +111,7 @@ export default function SuggestedUsers({ currentUserId }: SuggestedUsersProps) {
                   disabled={followMutation.isPending}
                   className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 rounded-full"
                 >
-                  {followMutation.isPending ? "..." : "Folgen"}
+                  {followMutation.isPending ? t('community.following') : t('community.follow')}
                 </Button>
               </div>
             ))}
