@@ -109,7 +109,7 @@ export function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2">
                     <User className="w-4 h-4" />
-                    <span className="hidden sm:block">{currentUser.username}</span>
+                    <span className="hidden sm:block">{currentUser.displayName || currentUser.username}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">

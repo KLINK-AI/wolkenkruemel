@@ -35,6 +35,7 @@ export interface IStorage {
   deletePost(id: number): Promise<void>;
   likePost(userId: number, postId: number): Promise<void>;
   unlikePost(userId: number, postId: number): Promise<void>;
+  isPostLikedByUser(userId: number, postId: number): Promise<boolean>;
   
   // Comment operations
   getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]>;
@@ -351,6 +352,13 @@ export class MemStorage implements IStorage {
         await this.updatePost(postId, { likes: Math.max(0, post.likes - 1) });
       }
     }
+  }
+
+  async isPostLikedByUser(userId: number, postId: number): Promise<boolean> {
+    const likeEntry = Array.from(this.likes.values()).find(
+      like => like.userId === userId && like.postId === postId
+    );
+    return !!likeEntry;
   }
 
   async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {
@@ -806,6 +814,15 @@ export class DatabaseStorage implements IStorage {
 
   async unlikePost(userId: number, postId: number): Promise<void> {
     await db.delete(likes).where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
+  }
+
+  async isPostLikedByUser(userId: number, postId: number): Promise<boolean> {
+    const result = await db
+      .select()
+      .from(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)))
+      .limit(1);
+    return result.length > 0;
   }
 
   async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {

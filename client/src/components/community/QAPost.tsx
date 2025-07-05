@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import { HelpCircle, ChevronUp, MessageSquare, Tag } from "lucide-react";
 
 interface QAPostProps {
@@ -31,6 +32,26 @@ export default function QAPost({ post }: QAPostProps) {
   const [upvoted, setUpvoted] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
+
+  // Check if user has upvoted this post
+  const { data: likeStatus } = useQuery({
+    queryKey: ["/api/posts", post.id, "like", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser) return { isLiked: false };
+      const response = await fetch(`/api/posts/${post.id}/like/${currentUser.id}`);
+      if (!response.ok) throw new Error("Failed to fetch like status");
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
+  // Update local state when like status is fetched
+  useEffect(() => {
+    if (likeStatus) {
+      setUpvoted(likeStatus.isLiked);
+    }
+  }, [likeStatus]);
 
   const { data: comments } = useQuery({
     queryKey: ["/api/posts", post.id, "comments"],
@@ -44,9 +65,9 @@ export default function QAPost({ post }: QAPostProps) {
   const upvoteMutation = useMutation({
     mutationFn: async () => {
       if (upvoted) {
-        await apiRequest("DELETE", `/api/posts/${post.id}/like`, { userId: 1 });
+        await apiRequest("DELETE", `/api/posts/${post.id}/like`, { userId: currentUser?.id });
       } else {
-        await apiRequest("POST", `/api/posts/${post.id}/like`, { userId: 1 });
+        await apiRequest("POST", `/api/posts/${post.id}/like`, { userId: currentUser?.id });
       }
     },
     onSuccess: () => {
@@ -60,7 +81,7 @@ export default function QAPost({ post }: QAPostProps) {
       await apiRequest("POST", "/api/comments", {
         content,
         postId: post.id,
-        authorId: 1,
+        authorId: currentUser?.id,
       });
     },
     onSuccess: () => {

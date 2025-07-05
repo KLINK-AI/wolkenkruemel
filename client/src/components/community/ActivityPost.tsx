@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Activity } from "lucide-react";
 
 interface ActivityPostProps {
@@ -35,6 +36,26 @@ export default function ActivityPost({ post }: ActivityPostProps) {
   const [isLiked, setIsLiked] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
+
+  // Check if user has liked this post
+  const { data: likeStatus } = useQuery({
+    queryKey: ["/api/posts", post.id, "like", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser) return { isLiked: false };
+      const response = await fetch(`/api/posts/${post.id}/like/${currentUser.id}`);
+      if (!response.ok) throw new Error("Failed to fetch like status");
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
+  // Update local state when like status is fetched
+  useEffect(() => {
+    if (likeStatus) {
+      setIsLiked(likeStatus.isLiked);
+    }
+  }, [likeStatus]);
 
   const { data: comments } = useQuery({
     queryKey: ["/api/posts", post.id, "comments"],
@@ -49,9 +70,9 @@ export default function ActivityPost({ post }: ActivityPostProps) {
   const likeMutation = useMutation({
     mutationFn: async () => {
       if (isLiked) {
-        await apiRequest("DELETE", `/api/posts/${post.id}/like`, { userId: 1 });
+        await apiRequest("DELETE", `/api/posts/${post.id}/like`, { userId: currentUser?.id });
       } else {
-        await apiRequest("POST", `/api/posts/${post.id}/like`, { userId: 1 });
+        await apiRequest("POST", `/api/posts/${post.id}/like`, { userId: currentUser?.id });
       }
     },
     onSuccess: () => {
@@ -65,7 +86,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
       await apiRequest("POST", "/api/comments", {
         content,
         postId: post.id,
-        authorId: 1,
+        authorId: currentUser?.id,
       });
     },
     onSuccess: () => {

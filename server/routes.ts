@@ -100,6 +100,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check if user has liked a post
+  app.get("/api/posts/:id/like/:userId", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const userId = parseInt(req.params.userId);
+      const isLiked = await storage.isPostLikedByUser(userId, postId);
+      res.json({ isLiked });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Comments
   app.get("/api/posts/:id/comments", async (req, res) => {
     try {
