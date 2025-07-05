@@ -95,7 +95,7 @@ export default function CreatePostCard() {
                     <FormItem>
                       <FormControl>
                         <Textarea
-                          placeholder={t('post.placeholder')}
+                          placeholder={t('posts.placeholder')}
                           rows={3}
                           className="resize-none"
                           onFocus={handleContentFocus}

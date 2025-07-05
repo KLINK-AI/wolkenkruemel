@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/components/LanguageProvider";
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Activity, Edit, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -42,6 +43,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
+  const { t } = useLanguage();
 
   // Check if user has liked this post
   const { data: likeStatus } = useQuery({
@@ -208,10 +210,22 @@ export default function ActivityPost({ post }: ActivityPostProps) {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
     
-    if (hours < 1) return "Gerade eben";
-    if (hours < 24) return `vor ${hours} Stunde${hours === 1 ? '' : 'n'}`;
-    return `vor ${days} Tag${days === 1 ? '' : 'en'}`;
+    if (hours < 1) {
+      return t('time.now');
+    } else if (hours < 24) {
+      const hourText = hours === 1 
+        ? t('time.hour') 
+        : t('time.hours');
+      return `${hours} ${hourText} ${t('time.ago')}`;
+    } else {
+      const dayText = days === 1 
+        ? t('time.day') 
+        : t('time.days');
+      return `${days} ${dayText} ${t('time.ago')}`;
+    }
   };
+
+
 
   return (
     <Card className="shadow-sm">

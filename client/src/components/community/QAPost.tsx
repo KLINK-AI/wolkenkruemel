@@ -115,9 +115,19 @@ export default function QAPost({ post }: QAPostProps) {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
     
-    if (hours < 1) return "Gerade eben";
-    if (hours < 24) return `vor ${hours} Stunde${hours === 1 ? '' : 'n'}`;
-    return `vor ${days} Tag${days === 1 ? '' : 'en'}`;
+    if (hours < 1) {
+      return t('time.now');
+    } else if (hours < 24) {
+      const hourText = hours === 1 
+        ? t('time.hour') 
+        : t('time.hours');
+      return `${hours} ${hourText} ${t('time.ago')}`;
+    } else {
+      const dayText = days === 1 
+        ? t('time.day') 
+        : t('time.days');
+      return `${days} ${dayText} ${t('time.ago')}`;
+    }
   };
 
   return (
