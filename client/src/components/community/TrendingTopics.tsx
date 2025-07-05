@@ -25,7 +25,7 @@ export default function TrendingTopics() {
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle className="text-lg">Trending Topics</CardTitle>
+        <CardTitle className="text-lg">Beliebte Themen</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -41,8 +41,8 @@ export default function TrendingTopics() {
           <div className="space-y-3">
             {displayTags.map((item: any) => (
               <div key={item.tag} className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">#{item.tag}</span>
-                <span className="text-xs text-gray-500">{item.count} posts</span>
+                <span className="text-sm text-muted-foreground">#{item.tag}</span>
+                <span className="text-xs text-muted-foreground">{item.count} Posts</span>
               </div>
             ))}
           </div>

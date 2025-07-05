@@ -31,14 +31,14 @@ export default function SuggestedUsers({ currentUserId }: SuggestedUsersProps) {
     },
     onSuccess: () => {
       toast({
-        title: "User Followed",
-        description: "You are now following this user.",
+        title: "Nutzer gefolgt",
+        description: "Du folgst diesem Nutzer jetzt.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/suggested-users"] });
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: "Fehler",
         description: error.message,
         variant: "destructive",
       });
@@ -70,7 +70,7 @@ export default function SuggestedUsers({ currentUserId }: SuggestedUsersProps) {
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle className="text-lg">Suggested Connections</CardTitle>
+        <CardTitle className="text-lg">Vorgeschlagene Nutzer</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -99,8 +99,8 @@ export default function SuggestedUsers({ currentUserId }: SuggestedUsersProps) {
                     alt="User Avatar" 
                   />
                   <div>
-                    <p className="text-sm font-medium text-neutral">{user.displayName || "Anonymous User"}</p>
-                    <p className="text-xs text-gray-600">{user.bio || "Dog Training Enthusiast"}</p>
+                    <p className="text-sm font-medium text-foreground">{user.displayName || "Anonymer Nutzer"}</p>
+                    <p className="text-xs text-muted-foreground">{user.bio || "Hundetraining Enthusiast"}</p>
                   </div>
                 </div>
                 <Button 
@@ -109,7 +109,7 @@ export default function SuggestedUsers({ currentUserId }: SuggestedUsersProps) {
                   disabled={followMutation.isPending}
                   className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 rounded-full"
                 >
-                  {followMutation.isPending ? "..." : "Follow"}
+                  {followMutation.isPending ? "..." : "Folgen"}
                 </Button>
               </div>
             ))}

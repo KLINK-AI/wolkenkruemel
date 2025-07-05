@@ -206,10 +206,11 @@ export default function ActivityPost({ post }: ActivityPostProps) {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(hours / 24);
     
-    if (hours < 1) return "Just now";
-    if (hours < 24) return `${hours} hours ago`;
-    return `${Math.floor(hours / 24)} days ago`;
+    if (hours < 1) return "Gerade eben";
+    if (hours < 24) return `vor ${hours} Stunde${hours === 1 ? '' : 'n'}`;
+    return `vor ${days} Tag${days === 1 ? '' : 'en'}`;
   };
 
   return (
@@ -321,7 +322,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
               size="sm" 
               onClick={handleLike}
               className={`flex items-center space-x-2 ${
-                isLiked ? 'text-red-500' : 'text-gray-600 hover:text-red-500'
+                isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
               }`}
             >
               <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
@@ -331,7 +332,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
               variant="ghost" 
               size="sm" 
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center space-x-2 text-gray-600 hover:text-blue-500"
+              className="flex items-center space-x-2 text-muted-foreground hover:text-blue-500"
             >
               <MessageCircle className="w-5 h-5" />
               <span className="text-sm font-medium">{comments?.length || 0}</span>
@@ -340,7 +341,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
               variant="ghost" 
               size="sm" 
               onClick={handleShare}
-              className="flex items-center space-x-2 text-gray-600 hover:text-green-500"
+              className="flex items-center space-x-2 text-muted-foreground hover:text-green-500"
             >
               <Share className="w-5 h-5" />
               <span className="text-sm font-medium">Teilen</span>

@@ -101,7 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update post
-  app.put("/api/posts/:id", async (req, res) => {
+  app.patch("/api/posts/:id", async (req, res) => {
     try {
       const postId = parseInt(req.params.id);
       const { content } = req.body;

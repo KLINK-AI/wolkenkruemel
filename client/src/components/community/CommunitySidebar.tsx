@@ -52,20 +52,20 @@ export default function CommunitySidebar({ user }: CommunitySidebarProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-md">Your Progress</CardTitle>
+          <CardTitle className="text-md">Dein Fortschritt</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Activities Completed</span>
+              <span className="text-sm text-muted-foreground">Aktivitäten abgeschlossen</span>
               <span className="text-sm font-medium text-primary">{user.activitiesCompleted}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Posts Created</span>
+              <span className="text-sm text-muted-foreground">Posts erstellt</span>
               <span className="text-sm font-medium text-secondary">{user.postsCreated}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Likes Received</span>
+              <span className="text-sm text-muted-foreground">Likes erhalten</span>
               <span className="text-sm font-medium text-accent">{user.likesReceived}</span>
             </div>
           </div>
