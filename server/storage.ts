@@ -5,7 +5,7 @@ import {
   type Event, type InsertEvent, type Notification, type ActivityProgress, type InsertActivityProgress
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, ne, sql } from "drizzle-orm";
+import { eq, desc, and, ne, sql, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -711,8 +711,30 @@ export class DatabaseStorage implements IStorage {
       .offset(offset)
       .orderBy(desc(posts.createdAt));
     
+    // Get comment counts for all posts
+    const postIds = results.map(result => result.posts.id);
+    let commentCounts: Array<{ postId: number | null; count: number }> = [];
+    
+    if (postIds.length > 0) {
+      commentCounts = await db
+        .select({
+          postId: comments.postId,
+          count: sql<number>`count(*)`.as('count')
+        })
+        .from(comments)
+        .where(inArray(comments.postId, postIds))
+        .groupBy(comments.postId);
+    }
+    
+    const commentCountMap = new Map(
+      commentCounts
+        .filter(cc => cc.postId !== null)
+        .map(cc => [cc.postId!, Number(cc.count)])
+    );
+    
     return results.map(result => ({
       ...result.posts,
+      comments: commentCountMap.get(result.posts.id) || 0,
       author: result.users || {
         id: 0,
         username: "unknown",
