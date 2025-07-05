@@ -188,6 +188,21 @@ const translations = {
     'time.day': 'Tag',
     'time.days': 'Tage',
     'time.ago': 'vor',
+    
+    // Post translations
+    'posts.placeholder': 'Was beschäftigt dich heute mit deinem Hund?',
+    'posts.shared': 'Beitrag geteilt',
+    'posts.sharedDescription': 'Dein Beitrag wurde erfolgreich geteilt.',
+    'post.types.general': 'Allgemein',
+    'post.types.question': 'Frage',
+    'post.types.success': 'Erfolgsgeschichte',
+    
+    // Premium translations
+    'premium.unlock': 'Premium freischalten',
+    'premium.unlockDescription': 'Erstelle unbegrenzt Aktivitäten und erhalte Zugang zu exklusiven Inhalten.',
+    
+    // Activity translations
+    'activity.create': 'Aktivität erstellen',
   },
   en: {
     // Navigation
@@ -305,6 +320,21 @@ const translations = {
     'time.day': 'day',
     'time.days': 'days',
     'time.ago': 'ago',
+    
+    // Post translations
+    'posts.placeholder': 'What\'s on your mind about your dog today?',
+    'posts.shared': 'Post shared',
+    'posts.sharedDescription': 'Your post has been shared successfully.',
+    'post.types.general': 'General',
+    'post.types.question': 'Question',
+    'post.types.success': 'Success Story',
+    
+    // Premium translations
+    'premium.unlock': 'Unlock Premium',
+    'premium.unlockDescription': 'Create unlimited activities and get access to exclusive content.',
+    
+    // Activity translations
+    'activity.create': 'Create Activity',
   }
 };
 
