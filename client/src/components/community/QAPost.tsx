@@ -179,7 +179,7 @@ export default function QAPost({ post }: QAPostProps) {
               className="flex items-center space-x-2 text-muted-foreground hover:text-blue-500"
             >
               <MessageSquare className="w-5 h-5" />
-              <span className="text-sm font-medium">{post.comments} answers</span>
+              <span className="text-sm font-medium">{comments?.length || 0} answers</span>
             </Button>
           </div>
           <Button 
@@ -194,13 +194,21 @@ export default function QAPost({ post }: QAPostProps) {
         {/* Answer Form */}
         {showAnswerForm && (
           <div className="mt-4 p-4 bg-muted rounded-lg">
-            <Textarea
-              placeholder="Share your knowledge and help this person..."
-              value={answerContent}
-              onChange={(e) => setAnswerContent(e.target.value)}
-              rows={4}
-              className="mb-3"
-            />
+            <div className="flex items-start space-x-3 mb-3">
+              <Avatar className="w-8 h-8">
+                <AvatarImage src={currentUser?.avatarUrl} alt={currentUser?.displayName || "User"} />
+                <AvatarFallback>
+                  {(currentUser?.displayName || "U").charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <Textarea
+                placeholder="Share your knowledge and help this person..."
+                value={answerContent}
+                onChange={(e) => setAnswerContent(e.target.value)}
+                rows={4}
+                className="flex-1"
+              />
+            </div>
             <div className="flex justify-end space-x-2">
               <Button 
                 variant="outline" 

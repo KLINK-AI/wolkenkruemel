@@ -199,7 +199,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
               className="flex items-center space-x-2 text-gray-600 hover:text-blue-500"
             >
               <MessageCircle className="w-5 h-5" />
-              <span className="text-sm font-medium">{post.comments || 0}</span>
+              <span className="text-sm font-medium">{comments?.length || 0}</span>
             </Button>
             <Button 
               variant="ghost" 
@@ -249,11 +249,12 @@ export default function ActivityPost({ post }: ActivityPostProps) {
 
           {/* Add Comment */}
           <div className="flex items-center space-x-3 mt-4">
-            <img 
-              className="w-8 h-8 rounded-full" 
-              src="https://images.unsplash.com/photo-1494790108755-2616c6d5e37c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"
-              alt="User Avatar" 
-            />
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={currentUser?.avatarUrl} alt={currentUser?.displayName || "User"} />
+              <AvatarFallback>
+                {(currentUser?.displayName || "U").charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <div className="flex-1">
               <Input
                 type="text"
