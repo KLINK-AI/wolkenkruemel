@@ -218,7 +218,7 @@ export default function CreateActivityPage() {
                               <ImageIcon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                               <div className="space-y-2">
                                 <p className="text-sm text-muted-foreground">
-                                  Upload an image to make your activity more engaging
+                                  {t('createActivity.imageUpload')}
                                 </p>
                                 <label className="cursor-pointer">
                                   <input
@@ -230,7 +230,7 @@ export default function CreateActivityPage() {
                                   <Button type="button" variant="outline" asChild>
                                     <span>
                                       <Upload className="w-4 h-4 mr-2" />
-                                      Choose Image
+                                      {t('createActivity.chooseImage')}
                                     </span>
                                   </Button>
                                 </label>
@@ -240,7 +240,7 @@ export default function CreateActivityPage() {
                         </div>
                       </FormControl>
                       <FormDescription>
-                        Supported formats: JPG, PNG, GIF. Max size: 5MB
+                        {t('createActivity.imageFormats')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -253,17 +253,17 @@ export default function CreateActivityPage() {
                     name="difficulty"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Difficulty Level</FormLabel>
+                        <FormLabel>{t('createActivity.difficultyLevel')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select difficulty" />
+                              <SelectValue placeholder={t('createActivity.selectDifficulty')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="beginner">Beginner</SelectItem>
-                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                            <SelectItem value="advanced">Advanced</SelectItem>
+                            <SelectItem value="beginner">{t('createActivity.beginner')}</SelectItem>
+                            <SelectItem value="intermediate">{t('createActivity.intermediate')}</SelectItem>
+                            <SelectItem value="advanced">{t('createActivity.advanced')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -276,7 +276,7 @@ export default function CreateActivityPage() {
                     name="duration"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Duration (minutes)</FormLabel>
+                        <FormLabel>{t('createActivity.duration')}</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
@@ -293,7 +293,7 @@ export default function CreateActivityPage() {
                 </div>
 
                 <div>
-                  <FormLabel>Tags</FormLabel>
+                  <FormLabel>{t('createActivity.tags')}</FormLabel>
                   <div className="flex flex-wrap gap-2 mb-3">
                     {tags.map((tag) => (
                       <Badge key={tag} variant="secondary" className="flex items-center gap-1">
@@ -312,7 +312,7 @@ export default function CreateActivityPage() {
                   </div>
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Add a tag..."
+                      placeholder={t('createActivity.tagsPlaceholder')}
                       value={newTag}
                       onChange={(e) => setNewTag(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
@@ -322,7 +322,7 @@ export default function CreateActivityPage() {
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Tags help users find your activity. Press Enter or click + to add.
+                    {t('createActivity.tagsHelp')}
                   </p>
                 </div>
 
@@ -331,16 +331,16 @@ export default function CreateActivityPage() {
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Activity Content</FormLabel>
+                      <FormLabel>{t('createActivity.content')}</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Provide detailed instructions for your training activity..."
+                          placeholder={t('createActivity.contentPlaceholder')}
                           rows={10}
                           {...field} 
                         />
                       </FormControl>
                       <FormDescription>
-                        Include step-by-step instructions, tips, and any important notes.
+                        {t('createActivity.contentHelp')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

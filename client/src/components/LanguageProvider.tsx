@@ -48,7 +48,7 @@ const translations = {
     'createActivity.descriptionHelp': 'Dies wird in Aktivitätsvorschauen und Suchergebnissen angezeigt.',
     'createActivity.descriptionHelper': 'Dies wird in Aktivitätsvorschauen und Suchergebnissen angezeigt.',
     'createActivity.imageLabel': 'Aktivitätsbild (Optional)',
-    'createActivity.imageUpload': 'Lade ein Bild hoch, um deine Aktivität ansprechender zu gestalten',
+    'createActivity.imageUpload': 'Lade ein Bild hoch, um deine Aktivität darzustellen',
     'createActivity.chooseImage': 'Bild auswählen',
     'createActivity.imageFormats': 'Unterstützte Formate: JPG, PNG, GIF. Max. Größe: 5MB',
     'createActivity.imageError': 'Bildgröße muss unter 5MB liegen',
