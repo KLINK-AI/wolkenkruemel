@@ -81,7 +81,7 @@ export default function CreateActivityPage() {
         description: t('createActivity.successMessage'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/activities"] });
-      setLocation("/community");
+      setLocation("/activities");
     },
     onError: (error) => {
       toast({
