@@ -43,7 +43,9 @@ export default function ActivityDetailPage() {
   const updateProgressMutation = useMutation({
     mutationFn: async (progressUpdate: { tried?: boolean; mastered?: boolean; favorite?: boolean }) => {
       if (!userId) throw new Error("User not authenticated");
-      await apiRequest("POST", `/api/activity-progress/${userId}/${id}`, progressUpdate);
+      if (!id) throw new Error("Activity ID not found");
+      const response = await apiRequest("POST", `/api/activity-progress/${userId}/${id}`, progressUpdate);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/activity-progress", userId, id] });
@@ -51,6 +53,8 @@ export default function ActivityDetailPage() {
     },
     onError: (error) => {
       console.error("Failed to update progress:", error);
+      // Show error message to user
+      alert("Fehler beim Speichern des Fortschritts. Bitte versuchen Sie es erneut.");
     },
   });
 
@@ -132,7 +136,7 @@ export default function ActivityDetailPage() {
                     <p className="text-muted-foreground">{activity.description}</p>
                   </div>
                   <div className="flex gap-2">
-                    {activity.authorId === 1 && ( // TODO: Replace with actual user check
+                    {currentUser && activity.author && activity.author.id === currentUser.id && (
                       <Link href={`/activities/${id}/edit`}>
                         <Button variant="outline" size="sm">
                           <Edit className="w-4 h-4 mr-1" />
