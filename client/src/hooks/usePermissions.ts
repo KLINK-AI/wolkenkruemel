@@ -18,15 +18,23 @@ export function usePermissions(user: User | null) {
         canSeeProgress: false,
         canCreateActivity: false,
         activityLimitMessage: "Nicht angemeldet",
+        needsEmailVerification: false,
+        needsPremiumUpgrade: false,
+        denialReason: "not_logged_in",
       };
     }
 
     const permissions = getUserPermissions(user);
+    const isEmailVerified = user.status === "verified" || user.status === "active" || user.status === "premium";
+    const isPremium = user.subscriptionTier === "premium" || user.subscriptionTier === "pro";
     
     return {
       ...permissions,
       canCreateActivity: canUserCreateActivity(user),
       activityLimitMessage: getActivityLimitMessage(user),
+      needsEmailVerification: !isEmailVerified,
+      needsPremiumUpgrade: isEmailVerified && !isPremium,
+      denialReason: !isEmailVerified ? "email_verification" : !isPremium ? "premium_upgrade" : "none",
     };
   }, [user]);
 }

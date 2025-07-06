@@ -220,7 +220,12 @@ export default function QAPost({ post }: QAPostProps) {
           ) : (
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <AlertTriangle className="w-4 h-4" />
-              <span>E-Mail bestätigen für Antworten</span>
+              <span>
+                {permissions.needsEmailVerification 
+                  ? "E-Mail bestätigen für Antworten"
+                  : "Premium-Mitgliedschaft für Kommentare erforderlich"
+                }
+              </span>
             </div>
           )}
         </div>

@@ -9,12 +9,14 @@ import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function ActivityDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useLanguage();
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
+  const permissions = usePermissions(currentUser);
 
   const userId = currentUser?.id;
 
@@ -214,64 +216,83 @@ export default function ActivityDetailPage() {
                 <CardTitle className="text-xl font-bold">Mein Fortschritt</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      id="tried"
-                      checked={progress?.tried || false}
-                      onCheckedChange={(checked) => {
-                        updateProgressMutation.mutate({ tried: !!checked });
-                      }}
-                      disabled={updateProgressMutation.isPending}
-                    />
-                    <label
-                      htmlFor="tried"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      Ich habe diese Aktivität ausprobiert
-                    </label>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      id="mastered"
-                      checked={progress?.mastered || false}
-                      onCheckedChange={(checked) => {
-                        updateProgressMutation.mutate({ mastered: !!checked });
-                      }}
-                      disabled={updateProgressMutation.isPending}
-                    />
-                    <label
-                      htmlFor="mastered"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      Mein Hund beherrscht diese Übung
-                    </label>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      id="favorite"
-                      checked={progress?.favorite || false}
-                      onCheckedChange={(checked) => {
-                        updateProgressMutation.mutate({ favorite: !!checked });
-                      }}
-                      disabled={updateProgressMutation.isPending}
-                    />
-                    <label
-                      htmlFor="favorite"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      Diese Aktivität ist ein Favorit unserer Routine
-                    </label>
-                  </div>
-
-                  {updateProgressMutation.isPending && (
-                    <div className="text-sm text-muted-foreground">
-                      Fortschritt wird gespeichert...
+                {permissions.canSeeProgress && permissions.canSaveFavorites ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="tried"
+                        checked={progress?.tried || false}
+                        onCheckedChange={(checked) => {
+                          updateProgressMutation.mutate({ tried: !!checked });
+                        }}
+                        disabled={updateProgressMutation.isPending}
+                      />
+                      <label
+                        htmlFor="tried"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        Ich habe diese Aktivität ausprobiert
+                      </label>
                     </div>
-                  )}
-                </div>
+
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="mastered"
+                        checked={progress?.mastered || false}
+                        onCheckedChange={(checked) => {
+                          updateProgressMutation.mutate({ mastered: !!checked });
+                        }}
+                        disabled={updateProgressMutation.isPending}
+                      />
+                      <label
+                        htmlFor="mastered"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        Mein Hund beherrscht diese Übung
+                      </label>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="favorite"
+                        checked={progress?.favorite || false}
+                        onCheckedChange={(checked) => {
+                          updateProgressMutation.mutate({ favorite: !!checked });
+                        }}
+                        disabled={updateProgressMutation.isPending}
+                      />
+                      <label
+                        htmlFor="favorite"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        Diese Aktivität ist ein Favorit unserer Routine
+                      </label>
+                    </div>
+
+                    {updateProgressMutation.isPending && (
+                      <div className="text-sm text-muted-foreground">
+                        Fortschritt wird gespeichert...
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <div className="mb-2">
+                      <Star className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">
+                        {permissions.needsEmailVerification 
+                          ? "E-Mail bestätigen, um Fortschritt zu speichern"
+                          : "Premium-Mitgliedschaft erforderlich für Fortschrittsverfolgung und Favoriten"
+                        }
+                      </p>
+                    </div>
+                    {permissions.needsPremiumUpgrade && (
+                      <Button className="mt-3" variant="outline" size="sm">
+                        Premium freischalten
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

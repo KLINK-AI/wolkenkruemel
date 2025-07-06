@@ -52,7 +52,12 @@ export default function CreatePostCard() {
             <div className="flex-1">
               <div className="flex items-center gap-2 text-muted-foreground text-sm p-3 bg-muted rounded-lg">
                 <AlertTriangle className="w-4 h-4" />
-                <span>Du musst deine E-Mail bestätigen, um Posts zu erstellen.</span>
+                <span>
+                  {permissions.needsEmailVerification 
+                    ? "Du musst deine E-Mail bestätigen, um Posts zu erstellen."
+                    : "Premium-Mitgliedschaft erforderlich für Posts und Kommentare."
+                  }
+                </span>
               </div>
             </div>
           </div>
