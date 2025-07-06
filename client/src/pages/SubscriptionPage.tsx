@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/components/LanguageProvider";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { queryClient } from "@/lib/queryClient";
 import SubscriptionCheckout from "../components/subscription/SubscriptionCheckout";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
@@ -115,7 +116,12 @@ export default function SubscriptionPage() {
                     plan={plan}
                     onSuccess={() => {
                       setSelectedPlan(null);
-                      window.location.reload();
+                      // Invalidate cache and reload
+                      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+                      queryClient.invalidateQueries({ queryKey: ['/api/users', currentUser?.id, 'subscription'] });
+                      setTimeout(() => {
+                        window.location.href = '/community';
+                      }, 1000);
                     }}
                     onCancel={() => setSelectedPlan(null)}
                   />

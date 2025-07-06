@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { queryClient } from "@/lib/queryClient";
 
 interface SubscriptionCheckoutProps {
   plan: {
@@ -62,6 +63,10 @@ export default function SubscriptionCheckout({ plan, onSuccess, onCancel }: Subs
     if (clientSecret?.startsWith('demo_client_secret_')) {
       // Simulate processing time
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Invalidate cache to force refresh
+      await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/users', currentUser?.id, 'subscription'] });
       
       toast({
         title: "Demo-Zahlung erfolgreich",
