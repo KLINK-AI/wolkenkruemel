@@ -25,7 +25,7 @@ const editActivitySchema = z.object({
   difficulty: z.enum(["beginner", "intermediate", "advanced"]),
   duration: z.number().min(1, "Dauer muss mindestens 1 Minute betragen").max(1440, "Dauer darf maximal 1440 Minuten betragen"),
   tags: z.array(z.string()).default([]),
-  imageUrl: z.string().optional(),
+  images: z.array(z.string()).default([]),
 });
 
 type EditActivityFormData = z.infer<typeof editActivitySchema>;
@@ -36,7 +36,7 @@ export default function EditActivityPage() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { currentUser } = useAuth();
 
@@ -56,9 +56,16 @@ export default function EditActivityPage() {
       difficulty: activity.difficulty as "beginner" | "intermediate" | "advanced",
       duration: activity.duration || 30,
       tags: activity.tags || [],
-      imageUrl: activity.imageUrl || undefined,
+      images: activity.images || [],
     } : undefined,
   });
+
+  // Load existing images when activity is loaded
+  useEffect(() => {
+    if (activity && activity.images) {
+      setSelectedImages(activity.images);
+    }
+  }, [activity]);
 
   const updateActivityMutation = useMutation({
     mutationFn: async (data: EditActivityFormData) => {
@@ -90,21 +97,35 @@ export default function EditActivityPage() {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Fehler",
+          description: "Datei ist zu groß. Maximale Größe: 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        setSelectedImage(result);
+        const newImages = [...selectedImages, result];
+        setSelectedImages(newImages);
+        form.setValue("images", newImages);
       };
       reader.readAsDataURL(file);
     }
+    
+    // Reset input to allow same file upload again
+    if (event.target) {
+      event.target.value = '';
+    }
   };
 
-  const removeImage = () => {
-    setSelectedImage(null);
-    form.setValue("imageUrl", undefined);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  const removeImage = (index: number) => {
+    const newImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(newImages);
+    form.setValue("images", newImages);
   };
 
   const onSubmit = (data: EditActivityFormData) => {
@@ -281,7 +302,7 @@ export default function EditActivityPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <FormLabel>Foto</FormLabel>
+                    <FormLabel>Fotos</FormLabel>
                     <div className="flex items-center gap-4">
                       <Button
                         type="button"
@@ -290,7 +311,7 @@ export default function EditActivityPage() {
                         className="flex items-center gap-2"
                       >
                         <Upload className="h-4 w-4" />
-                        Foto auswählen
+                        Foto hinzufügen
                       </Button>
                       <input
                         ref={fileInputRef}
@@ -301,22 +322,26 @@ export default function EditActivityPage() {
                       />
                     </div>
                     
-                    {(selectedImage || activity.imageUrl) && (
-                      <div className="relative inline-block">
-                        <img
-                          src={selectedImage || activity.imageUrl || ""}
-                          alt="Aktivität"
-                          className="w-32 h-32 object-cover rounded-lg border"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute -top-2 -right-2 h-6 w-6"
-                          onClick={removeImage}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                    {selectedImages.length > 0 && (
+                      <div className="grid grid-cols-2 gap-4">
+                        {selectedImages.map((image, index) => (
+                          <div key={index} className="relative inline-block">
+                            <img
+                              src={image}
+                              alt={`Aktivität Foto ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute -top-2 -right-2 h-6 w-6"
+                              onClick={() => removeImage(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
