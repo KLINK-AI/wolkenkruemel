@@ -34,6 +34,22 @@ export function getUserPermissions(user: User): UserPermissions {
     canSeeProgress: false,
   };
 
+  // Priority: if user has premium subscription, give premium permissions regardless of status
+  if (tier === "premium" || tier === "professional") {
+    return {
+      canCreateActivities: true,
+      canCreatePosts: true,
+      canComment: true,
+      canLike: true,
+      canShare: true,
+      canSaveFavorites: true,
+      maxActivities: 0,
+      hasUnlimitedActivities: true,
+      canAccessCommunity: true,
+      canSeeProgress: true,
+    };
+  }
+
   switch (status) {
     case "unverified":
       return basePermissions;
