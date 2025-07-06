@@ -71,7 +71,7 @@ export default function EditActivityPage() {
     mutationFn: async (data: EditActivityFormData) => {
       const finalData = {
         ...data,
-        imageUrl: selectedImage || data.imageUrl,
+        images: selectedImages.length > 0 ? selectedImages : data.images,
       };
       
       await apiRequest("PATCH", `/api/activities/${activityId}`, finalData);
