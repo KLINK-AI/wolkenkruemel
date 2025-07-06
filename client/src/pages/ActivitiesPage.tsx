@@ -231,6 +231,15 @@ export default function ActivitiesPage() {
             {currentUser ? (
               <Link href={`/activities/${activity.id}`}>
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  {activity.images && activity.images.length > 0 && (
+                    <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                      <img 
+                        src={activity.images[0]} 
+                        alt={activity.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -274,6 +283,15 @@ export default function ActivitiesPage() {
               </Link>
             ) : (
               <Card className="opacity-75">
+                {activity.images && activity.images.length > 0 && (
+                  <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                    <img 
+                      src={activity.images[0]} 
+                      alt={activity.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">

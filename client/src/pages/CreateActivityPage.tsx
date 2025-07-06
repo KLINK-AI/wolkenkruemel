@@ -23,7 +23,7 @@ const createActivitySchema = z.object({
   difficulty: z.enum(["beginner", "intermediate", "advanced"]),
   duration: z.number().min(1, "Dauer muss mindestens 1 Minute betragen").max(300, "Dauer muss unter 5 Stunden liegen"),
   authorId: z.number(),
-  imageUrl: z.string().optional(),
+  images: z.array(z.string()).optional(),
   isOfficial: z.boolean().default(false),
   isApproved: z.boolean().default(false),
 });
@@ -34,7 +34,7 @@ export default function CreateActivityPage() {
   const [, setLocation] = useLocation();
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<string[]>([]);
   const [isImageUploading, setIsImageUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -49,7 +49,7 @@ export default function CreateActivityPage() {
       difficulty: "beginner",
       duration: 15,
       authorId: 1, // Mock user ID
-      imageUrl: "",
+      images: [],
       isOfficial: false,
       isApproved: false,
     },
@@ -107,16 +107,18 @@ export default function CreateActivityPage() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        setImagePreview(result);
-        form.setValue("imageUrl", result);
+        const newImages = [...images, result];
+        setImages(newImages);
+        form.setValue("images", newImages);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const removeImage = () => {
-    setImagePreview(null);
-    form.setValue("imageUrl", "");
+  const removeImage = (index: number) => {
+    const newImages = images.filter((_, i) => i !== index);
+    setImages(newImages);
+    form.setValue("images", newImages);
   };
 
   return (
@@ -190,53 +192,59 @@ export default function CreateActivityPage() {
                 {/* Image Upload Section */}
                 <FormField
                   control={form.control}
-                  name="imageUrl"
+                  name="images"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('createActivity.imageLabel')}</FormLabel>
                       <FormControl>
                         <div className="space-y-4">
-                          {imagePreview ? (
-                            <div className="relative">
-                              <img
-                                src={imagePreview}
-                                alt="Activity preview"
-                                className="w-full h-48 object-cover rounded-lg border border-border"
-                              />
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                onClick={removeImage}
-                                className="absolute top-2 right-2"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          ) : (
-                            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                              <ImageIcon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                              <div className="space-y-2">
-                                <p className="text-sm text-muted-foreground">
-                                  {t('createActivity.imageUpload')}
-                                </p>
-                                <label className="cursor-pointer">
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageUpload}
-                                    className="hidden"
+                          {/* Display existing images */}
+                          {images.length > 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {images.map((image, index) => (
+                                <div key={index} className="relative">
+                                  <img
+                                    src={image}
+                                    alt={`Activity preview ${index + 1}`}
+                                    className="w-full h-48 object-cover rounded-lg border border-border"
                                   />
-                                  <Button type="button" variant="outline" asChild>
-                                    <span>
-                                      <Upload className="w-4 h-4 mr-2" />
-                                      {t('createActivity.chooseImage')}
-                                    </span>
+                                  <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => removeImage(index)}
+                                    className="absolute top-2 right-2"
+                                  >
+                                    <X className="w-4 h-4" />
                                   </Button>
-                                </label>
-                              </div>
+                                </div>
+                              ))}
                             </div>
                           )}
+                          
+                          {/* Add new image */}
+                          <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                            <ImageIcon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                            <div className="space-y-2">
+                              <p className="text-sm text-muted-foreground">
+                                {images.length === 0 ? t('createActivity.imageUpload') : 'Weitere Bilder hinzufügen'}
+                              </p>
+                              <label className="cursor-pointer">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleImageUpload}
+                                  className="hidden"
+                                />
+                                <Button type="button" variant="outline" asChild>
+                                  <span>
+                                    <Upload className="w-4 h-4 mr-2" />
+                                    {images.length === 0 ? t('createActivity.chooseImage') : 'Bild hinzufügen'}
+                                  </span>
+                                </Button>
+                              </label>
+                            </div>
+                          </div>
                         </div>
                       </FormControl>
                       <FormDescription>

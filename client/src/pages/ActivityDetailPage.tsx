@@ -178,13 +178,26 @@ export default function ActivityDetailPage() {
               </CardHeader>
 
               <CardContent>
-                {activity.imageUrl && (
+                {activity.images && activity.images.length > 0 && (
                   <div className="mb-6">
-                    <img 
-                      src={activity.imageUrl} 
-                      alt={activity.title}
-                      className="w-full h-64 object-cover rounded-lg"
-                    />
+                    {activity.images.length === 1 ? (
+                      <img 
+                        src={activity.images[0]} 
+                        alt={activity.title}
+                        className="w-full h-64 object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {activity.images.map((image, index) => (
+                          <img 
+                            key={index}
+                            src={image} 
+                            alt={`${activity.title} - Bild ${index + 1}`}
+                            className="w-full h-48 object-cover rounded-lg"
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 

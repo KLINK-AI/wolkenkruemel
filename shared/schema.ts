@@ -48,7 +48,7 @@ export const activities = pgTable("activities", {
   difficulty: text("difficulty").notNull(), // beginner, intermediate, advanced
   duration: integer("duration"), // in minutes
   tags: text("tags").array(),
-  imageUrl: text("image_url"),
+  images: text("images").array(), // Array of image URLs - first image is primary
   videoUrl: text("video_url"),
   authorId: integer("author_id").references(() => users.id),
   isOfficial: boolean("is_official").default(false),
