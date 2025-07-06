@@ -49,7 +49,7 @@ export default function CreatePostCard() {
                 {(currentUser.displayName || currentUser.username || "U").charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1">
+            <div className="flex-1 space-y-3">
               <div className="flex items-center gap-2 text-muted-foreground text-sm p-3 bg-muted rounded-lg">
                 <AlertTriangle className="w-4 h-4" />
                 <span>
@@ -59,6 +59,15 @@ export default function CreatePostCard() {
                   }
                 </span>
               </div>
+              {permissions.needsPremiumUpgrade && (
+                <div className="text-center">
+                  <Link href="/premium">
+                    <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+                      Premium freischalten
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>

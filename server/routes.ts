@@ -629,47 +629,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Subscription routes
-  app.post("/api/get-or-create-subscription", async (req, res) => {
+  app.post("/api/create-subscription", async (req, res) => {
     try {
       const { userId, priceId } = req.body;
+      
+      if (!userId || !priceId) {
+        return res.status(400).json({ message: "userId and priceId are required" });
+      }
+      
       const user = await storage.getUser(userId);
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Check if user already has an active subscription
       if (user.stripeSubscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-        res.json({
-          subscriptionId: subscription.id,
-          clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
-        });
-        return;
+        
+        // If subscription is active, return existing client secret
+        if (subscription.status === 'active' || subscription.status === 'trialing') {
+          return res.json({
+            subscriptionId: subscription.id,
+            clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+            status: 'existing'
+          });
+        }
       }
 
       if (!user.email) {
-        return res.status(400).json({ message: "User email required" });
+        return res.status(400).json({ message: "User email required for subscription" });
       }
 
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.displayName || user.username,
-      });
+      // Create or find customer
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.displayName || user.username,
+        });
+        customerId = customer.id;
+      }
 
       const subscription = await stripe.subscriptions.create({
-        customer: customer.id,
+        customer: customerId,
         items: [{ price: priceId }],
         payment_behavior: 'default_incomplete',
         expand: ['latest_invoice.payment_intent'],
       });
 
-      await storage.updateUserSubscription(userId, customer.id, subscription.id);
+      await storage.updateUserSubscription(userId, customerId, subscription.id);
 
       res.json({
         subscriptionId: subscription.id,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
+        status: 'created'
       });
     } catch (error: any) {
+      console.error('Subscription creation error:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Stripe webhook handler
+  app.post('/api/stripe-webhook', async (req, res) => {
+    try {
+      const sig = req.headers['stripe-signature'];
+      
+      // For now, we'll handle basic webhook events
+      const event = req.body;
+      
+      console.log('Stripe webhook received:', event.type);
+      
+      switch (event.type) {
+        case 'invoice.payment_succeeded':
+          const invoice = event.data.object;
+          const subscriptionId = invoice.subscription;
+          
+          // Find user by subscription ID and update tier
+          const users = await storage.getPosts(); // Temporary way to get all data
+          // In production, you'd have a proper method to find by subscription ID
+          
+          console.log('Payment succeeded for subscription:', subscriptionId);
+          break;
+          
+        case 'customer.subscription.updated':
+          const subscription = event.data.object;
+          console.log('Subscription updated:', subscription.id, subscription.status);
+          break;
+          
+        default:
+          console.log('Unhandled webhook event:', event.type);
+      }
+      
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error('Webhook error:', error);
       res.status(400).json({ message: error.message });
     }
   });
