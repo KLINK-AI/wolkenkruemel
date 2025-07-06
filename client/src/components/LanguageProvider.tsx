@@ -178,7 +178,7 @@ const translations = {
     'home.hero.subtitle': 'Entdecke gemeinschaftsbasierte Trainingsaktivitäten, teile deine Erfahrungen und baue eine stärkere Bindung zu deinem Hund auf.',
     'home.hero.exploreActivities': 'Aktivitäten entdecken',
     'home.hero.joinCommunity': 'Community beitreten',
-    'home.features.title': 'Warum die Wolkenkrümel Platform?',
+    'home.features.title': 'Warum die Wolkenkrümel Plattform?',
     'home.features.training.title': 'Experten-Training',
     'home.features.training.description': 'Professionelle Trainingsaktivitäten von erfahrenen Hundetrainern und der Community.',
     'home.features.community.title': 'Community-Power',

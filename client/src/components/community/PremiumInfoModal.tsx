@@ -21,7 +21,7 @@ export default function PremiumInfoModal({ isOpen, onClose }: PremiumInfoModalPr
   const premiumFeatures = [
     "Fortschritte speichern",
     "Posts schreiben und kommentieren", 
-    "Mehr als 5 Aktivitäten anlegen",
+    "Unendlich viele Aktivitäten anlegen",
     "Aktivitäten teilen",
     "Favoriten bei Aktivitäten speichern",
     "Unbegrenzte Community-Interaktionen"

@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
-import { Plus, Crown } from "lucide-react";
+import { Plus, Crown, AlertTriangle } from "lucide-react";
 import SuggestedUsers from "./SuggestedUsers";
 import TrendingTopics from "./TrendingTopics";
 import PremiumInfoModal from "./PremiumInfoModal";
+import { usePermissions, useUserStatus } from "@/hooks/usePermissions";
 import { useLanguage } from "@/components/LanguageProvider";
 
 interface CommunityRightSidebarProps {
@@ -15,6 +16,35 @@ interface CommunityRightSidebarProps {
 export default function CommunityRightSidebar({ currentUserId }: CommunityRightSidebarProps) {
   const { t } = useLanguage();
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  
+  // Mock user for demonstration - in real app this would come from useAuth
+  const mockUser = {
+    id: currentUserId,
+    username: "testuser",
+    email: "test@example.com",
+    password: "",
+    displayName: "Test User",
+    firstName: null,
+    lastName: null,
+    bio: null,
+    avatarUrl: null,
+    location: null,
+    isEmailVerified: true,
+    emailVerificationToken: null,
+    role: "user",
+    status: "active",
+    subscriptionTier: "free",
+    stripeCustomerId: null,
+    stripeSubscriptionId: null,
+    activitiesCreated: 5,
+    postsCreated: 0,
+    likesReceived: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  
+  const permissions = usePermissions(mockUser);
+  const userStatus = useUserStatus(mockUser);
 
   return (
     <div className="space-y-6">
@@ -27,13 +57,39 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            {t('activity.createLimits')}
+            {permissions.activityLimitMessage}
           </p>
-          <Link href="/activities/create">
-            <Button className="w-full" size="sm">
-              {t('activity.create')}
-            </Button>
-          </Link>
+          
+          {permissions.canCreateActivity ? (
+            <Link href="/activities/create">
+              <Button className="w-full" size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                {t('activity.create')}
+              </Button>
+            </Link>
+          ) : (
+            <div className="space-y-2">
+              <Button 
+                className="w-full" 
+                size="sm" 
+                disabled
+                variant="outline"
+              >
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                {permissions.hasUnlimitedActivities ? "Aktivitätslimit erreicht" : "Keine Berechtigung"}
+              </Button>
+              {!permissions.hasUnlimitedActivities && (
+                <Button 
+                  className="w-full" 
+                  size="sm"
+                  onClick={() => setIsPremiumModalOpen(true)}
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Premium für mehr Aktivitäten
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

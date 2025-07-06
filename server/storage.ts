@@ -4,6 +4,7 @@ import {
   type Post, type InsertPost, type Comment, type InsertComment,
   type Event, type InsertEvent, type Notification, type ActivityProgress, type InsertActivityProgress
 } from "@shared/schema";
+import { getUserPermissions, canUserCreateActivity } from "@shared/permissions";
 import { db } from "./db";
 import { eq, desc, and, ne, sql, inArray } from "drizzle-orm";
 

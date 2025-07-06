@@ -195,7 +195,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/activities", async (req, res) => {
     try {
       const validatedData = insertActivitySchema.parse(req.body);
+      
+      // Get user to check permissions
+      const user = await storage.getUser(validatedData.authorId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user can create activities
+      if (!canUserCreateActivity(user)) {
+        const permissions = getUserPermissions(user);
+        if (!permissions.canCreateActivities) {
+          return res.status(403).json({ 
+            message: "Du musst dich registrieren und deine E-Mail bestätigen, um Aktivitäten zu erstellen.",
+            code: "EMAIL_NOT_VERIFIED"
+          });
+        } else {
+          return res.status(403).json({ 
+            message: `Du hast das Maximum von ${permissions.maxActivities} Aktivitäten erreicht. Upgrade auf Premium für unbegrenzte Aktivitäten.`,
+            code: "ACTIVITY_LIMIT_REACHED",
+            maxActivities: permissions.maxActivities,
+            currentCount: user.activitiesCreated || 0
+          });
+        }
+      }
+      
       const activity = await storage.createActivity(validatedData);
+      
+      // Update user's activity count
+      await storage.updateUser(user.id, { 
+        activitiesCreated: (user.activitiesCreated || 0) + 1 
+      });
+      
       res.status(201).json(activity);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
