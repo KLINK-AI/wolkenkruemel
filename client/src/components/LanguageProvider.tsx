@@ -66,6 +66,7 @@ const translations = {
     'createActivity.contentHelp': 'Füge Schritt-für-Schritt-Anweisungen, Tipps und wichtige Hinweise hinzu.',
     'createActivity.cancel': 'Abbrechen',
     'createActivity.submit': 'Aktivität erstellen',
+    'createActivity.createButton': 'Aktivität erstellen',
     'createActivity.creating': 'Erstelle...',
     'createActivity.successTitle': 'Aktivität erstellt',
     'createActivity.successMessage': 'Deine Trainingsaktivität wurde zur Überprüfung eingereicht.',

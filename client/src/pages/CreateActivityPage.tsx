@@ -15,6 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from "lucide-react";
 import { useLanguage } from "@/components/LanguageProvider";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const createActivitySchema = z.object({
   title: z.string().min(1, "Titel ist erforderlich").max(100, "Titel muss unter 100 Zeichen sein"),
@@ -39,6 +41,19 @@ export default function CreateActivityPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { t } = useLanguage();
+  const { currentUser } = useAuth();
+  const permissions = usePermissions(currentUser);
+
+  // Redirect if not authenticated or not premium
+  if (!currentUser) {
+    setLocation("/login");
+    return null;
+  }
+
+  if (!permissions.canCreateActivity) {
+    setLocation("/community");
+    return null;
+  }
 
   const form = useForm<CreateActivityForm>({
     resolver: zodResolver(createActivitySchema),
@@ -48,7 +63,7 @@ export default function CreateActivityPage() {
       content: "",
       difficulty: "beginner",
       duration: 15,
-      authorId: 1, // Mock user ID
+      authorId: currentUser?.id || 1,
       images: [],
       isOfficial: false,
       isApproved: false,
