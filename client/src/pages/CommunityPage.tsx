@@ -64,7 +64,7 @@ export default function CommunityPage() {
             {/* Header */}
             <div className="bg-card rounded-lg shadow-sm p-6 border">
               <h1 className="text-2xl font-bold text-foreground mb-2">
-                {t('post.create')}
+                {t('createPost.title')}
               </h1>
               <p className="text-muted-foreground">
                 {t('community.shareThoughts')}

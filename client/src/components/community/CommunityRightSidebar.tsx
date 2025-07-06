@@ -1,10 +1,11 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { Plus, Crown } from "lucide-react";
-import AccessGate from "./AccessGate";
 import SuggestedUsers from "./SuggestedUsers";
 import TrendingTopics from "./TrendingTopics";
+import PremiumInfoModal from "./PremiumInfoModal";
 import { useLanguage } from "@/components/LanguageProvider";
 
 interface CommunityRightSidebarProps {
@@ -13,24 +14,23 @@ interface CommunityRightSidebarProps {
 
 export default function CommunityRightSidebar({ currentUserId }: CommunityRightSidebarProps) {
   const { t } = useLanguage();
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
 
   return (
     <div className="space-y-6">
       {/* Create Activity Card */}
       <Card className="bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Plus className="w-5 h-5" />
+          <CardTitle className="text-lg">
             {t('activity.create')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            {t('premium.unlockDescription')}
+            {t('activity.createLimits')}
           </p>
           <Link href="/activities/create">
             <Button className="w-full" size="sm">
-              <Plus className="w-4 h-4 mr-2" />
               {t('activity.create')}
             </Button>
           </Link>
@@ -49,21 +49,29 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
           <p className="text-sm text-amber-600 dark:text-amber-200 mb-4">
             {t('premium.unlockDescription')}
           </p>
-          <Button variant="outline" className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-950/30" size="sm">
+          <Button 
+            variant="outline" 
+            className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-950/30" 
+            size="sm"
+            onClick={() => setIsPremiumModalOpen(true)}
+          >
             <Crown className="w-4 h-4 mr-2" />
             {t('premium.unlock')}
           </Button>
         </CardContent>
       </Card>
 
-      {/* Access Gate */}
-      <AccessGate />
-
       {/* Trending Topics */}
       <TrendingTopics />
 
       {/* Suggested Users */}
       <SuggestedUsers currentUserId={currentUserId} />
+
+      {/* Premium Info Modal */}
+      <PremiumInfoModal 
+        isOpen={isPremiumModalOpen} 
+        onClose={() => setIsPremiumModalOpen(false)}
+      />
     </div>
   );
 }

@@ -1,0 +1,51 @@
+Community Seite:
+Die Trennung ist so besser.
+In der Mitte steht aber jetzt ganz oben nicht der Titel sondern die Variable post.create 
+
+Auf der rechte Seite steht 2 x Premium freischalten. 
+Hier sollte ganz oben stehen: Aktivität erstellen (ohne das + davor)
+Dann der Text: erstelle mind. 1 Aktivität. Max. 5 in der kostenlosen Version.
+
+Darunter die Box mit der Krone, farblich hervorgehoben, Premium freischalten, wie jetzt zu sehen.
+
+Das zweite mal "Premium freischalten" kann weg.
+
+Es muss ein Info Fenster geben, über das man informiert wird, was alles in der Premium Version möglich ist, siehe folgende Beschreibung)
+
+
+Hier noch mal meine komplette Beschreibung zu Anmeldeprozess für User und Unterschied zwischen Kostenlos und Premium.
+
+Eine Bedingung für neue User:
+
+Ein User muss eine erste Aktivität anlegen, damit sein Konto voll freigeschaltet wird. 
+Das muss auf der Startseite noch beschrieben und erklärt werden.
+Dass es darum geht, das jeder hier einen Teil beiträgt: Aufnahme erfolgt nur, wenn man auch mind. eine Aktivität beisteuert, im kostenlosen Account kann man aber nur max. 5 Aktivitäten eintragen!
+
+Ablauf:
+- Registrierung mit Angabe Vorname, Name, Email und Passwort 
+- muss damit auch die Datenschutzbestimmungen und Nutzungsbedingungen der Plattform erklären und meldet sich u.a. zum Newsletter an.
+- er bekommt Email zur Verifizierung der Email Adresse
+Wenn er sich danach zum ersten mal anmeldet, kann er in der Community noch nichts machen, er kann die Details der Aktivitäten sehen und die Community Posts der anderen.
+Aber er kann nicht selbst Posten oder Kommentieren.
+Jetzt muss er erst eine Aktivität anlegen, wo er eine Übung mit seinem Hund beisteuert.
+Nach dem Motto: um Teil der Community zu werden, musst Du eine Aktivität erstellen.
+
+
+Wenn ein User einen kostenlosen Account UND auch eine Aktivität erstellt hat, kann er alle Inhalte sehen, er kann alle Aktivitäten öffnen und sich die genaue Beschreibung ansehen, er kann Posts in der Community lesen. 
+
+Aber er kann keine Favoriten bei den Aktivitäten oder Fortschritte speichern 
+(Mein Fortschritt:
+Ich habe diese Aktivität ausprobiert
+Mein Hund beherrscht diese Übung
+Diese Aktivität ist ein Favorit unserer Routine). 
+Keine Posts schreiben oder Kommentieren.
+
+Das geht nur in der Premium Version!
+Fortschritte speichern,
+Post schreiben und kommentieren
+Mehr als 5 Aktivitäten anlegen.
+
+Die "Teilen" Funktion einer Aktivität geht auch nur in der Premium Version.
+
+Der Preis für Premium: 
+2,99 € monatlich, oder 29,90 im Jahr (man spart zwei Monate)

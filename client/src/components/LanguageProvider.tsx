@@ -132,6 +132,12 @@ const translations = {
     // Community
     'community.shareThoughts': 'Teile deine Gedanken und vernetze dich mit der Community',
     
+    // Create Post
+    'createPost.title': 'Post erstellen',
+    
+    // Activity Creation Limits
+    'activity.createLimits': 'Erstelle mind. 1 Aktivität. Max. 5 in der kostenlosen Version.',
+    
     // Common
     'common.loading': 'Laden...',
     'common.error': 'Fehler',
@@ -233,6 +239,12 @@ const translations = {
     'community.activitiesCompleted': 'Activities Completed',
     'community.postsCreated': 'Posts Created',
     'community.likesReceived': 'Likes Received',
+    
+    // Create Post
+    'createPost.title': 'Create Post',
+    
+    // Activity Creation Limits
+    'activity.createLimits': 'Create at least 1 activity. Max. 5 in the free version.',
     
     // Create Activity Page
     'createActivity.title': 'Create New Activity',
