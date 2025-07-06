@@ -127,6 +127,7 @@ Changelog:
 - July 04, 2025. FIXED: Favoriten-Filter functionality - corrected User ID mismatch between authentication (User ID 3) and activity progress storage (hardcoded User ID 1), now using authenticated user's actual ID for all favorite operations
 - July 05, 2025. Profile editing enhanced: Added firstName, lastName, and location fields to user schema and profile editing form. Users can now edit complete name information and upload profile images with preview functionality.
 - July 06, 2025. FIXED: Time localization completed - implemented proper German time format "vor X Stunden/Tagen" vs English "X hours/days ago" with language-specific formatting logic in ActivityPost and QAPost components.
+- July 06, 2025. ENHANCED: Comprehensive permission system for posts and comments implemented. Users now need email verification to create posts and comments. Free tier users have clear activity limits (0-5 activities) with Premium upgrade prompts. Fixed "Trending Topics" German translation to "Beliebte Themen" and corrected Premium button display in activity creation sidebar.
 
 ## User Preferences
 

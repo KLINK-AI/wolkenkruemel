@@ -9,7 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/components/LanguageProvider";
-import { HelpCircle, ChevronUp, MessageSquare, Tag } from "lucide-react";
+import { usePermissions } from "@/hooks/usePermissions";
+import { HelpCircle, ChevronUp, MessageSquare, Tag, AlertTriangle } from "lucide-react";
 
 interface QAPostProps {
   post: {
@@ -35,6 +36,7 @@ export default function QAPost({ post }: QAPostProps) {
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
   const { t, language } = useLanguage();
+  const permissions = usePermissions(currentUser);
 
   // Check if user has upvoted this post
   const { data: likeStatus } = useQuery({
@@ -207,13 +209,20 @@ export default function QAPost({ post }: QAPostProps) {
               <span className="text-sm font-medium">{comments?.length || 0} answers</span>
             </Button>
           </div>
-          <Button 
-            onClick={() => setShowAnswerForm(!showAnswerForm)}
-            className="border border-primary text-primary hover:bg-primary hover:text-white"
-            variant="outline"
-          >
-            Answer
-          </Button>
+          {permissions.canComment ? (
+            <Button 
+              onClick={() => setShowAnswerForm(!showAnswerForm)}
+              className="border border-primary text-primary hover:bg-primary hover:text-white"
+              variant="outline"
+            >
+              Answer
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <AlertTriangle className="w-4 h-4" />
+              <span>E-Mail bestätigen für Antworten</span>
+            </div>
+          )}
         </div>
 
         {/* Answer Form */}

@@ -129,8 +129,9 @@ const translations = {
     'editActivity.updated': 'Aktivität erfolgreich aktualisiert',
     'editActivity.error': 'Fehler beim Aktualisieren der Aktivität',
     
-    // Community
-    'community.shareThoughts': 'Teile deine Gedanken und vernetze dich mit der Community',
+    // Community Additional
+    'community.trendingTopics': 'Beliebte Themen',
+    'community.suggestedUsers': 'Vorgeschlagene Nutzer',
     
     // Create Post
     'createPost.title': 'Post erstellen',

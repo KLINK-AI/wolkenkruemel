@@ -27,7 +27,7 @@ export default function TrendingTopics() {
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle className="text-lg">{t('community.trending')}</CardTitle>
+        <CardTitle className="text-lg">{t('community.trendingTopics')}</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (

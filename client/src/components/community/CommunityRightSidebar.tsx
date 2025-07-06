@@ -36,7 +36,7 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
     subscriptionTier: "free",
     stripeCustomerId: null,
     stripeSubscriptionId: null,
-    activitiesCreated: 5,
+    activitiesCreated: 0,
     postsCreated: 0,
     likesReceived: 0,
     createdAt: new Date(),

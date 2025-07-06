@@ -6,6 +6,7 @@ import {
   insertActivitySchema, insertPostSchema, insertCommentSchema, 
   insertEventSchema, activityProgress, insertUserSchema 
 } from "@shared/schema";
+import { getUserPermissions, canUserCreateActivity } from "../shared/permissions";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -50,7 +51,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/posts", async (req, res) => {
     try {
       const validatedData = insertPostSchema.parse(req.body);
+      
+      // Get user to check permissions
+      const user = await storage.getUser(validatedData.authorId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user can create posts
+      const permissions = getUserPermissions(user);
+      if (!permissions.canCreatePosts) {
+        return res.status(403).json({ 
+          message: "Du musst dich registrieren und deine E-Mail bestätigen, um Posts zu erstellen.",
+          code: "EMAIL_NOT_VERIFIED"
+        });
+      }
+      
       const post = await storage.createPost(validatedData);
+      
+      // Update user's post count
+      await storage.updateUser(user.id, { 
+        postsCreated: (user.postsCreated || 0) + 1 
+      });
+      
       res.status(201).json(post);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -149,6 +172,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/comments", async (req, res) => {
     try {
       const validatedData = insertCommentSchema.parse(req.body);
+      
+      // Get user to check permissions
+      const user = await storage.getUser(validatedData.authorId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user can comment
+      const permissions = getUserPermissions(user);
+      if (!permissions.canComment) {
+        return res.status(403).json({ 
+          message: "Du musst dich registrieren und deine E-Mail bestätigen, um Kommentare zu schreiben.",
+          code: "EMAIL_NOT_VERIFIED"
+        });
+      }
+      
       const comment = await storage.createComment(validatedData);
       res.status(201).json(comment);
     } catch (error: any) {

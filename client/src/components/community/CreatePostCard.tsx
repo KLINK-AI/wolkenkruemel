@@ -13,7 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/components/LanguageProvider";
-import { Camera, Link, Activity } from "lucide-react";
+import { usePermissions } from "@/hooks/usePermissions";
+import { Camera, Link, Activity, Crown, AlertTriangle } from "lucide-react";
 
 const createPostSchema = z.object({
   content: z.string().min(1, "Content is required").max(1000, "Content must be under 1000 characters"),
@@ -30,9 +31,34 @@ export default function CreatePostCard() {
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
   const { t } = useLanguage();
+  const permissions = usePermissions(currentUser);
 
   if (!currentUser) {
     return null;
+  }
+
+  // If user can't create posts, show permission message
+  if (!permissions.canCreatePosts) {
+    return (
+      <Card className="shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex items-center space-x-3">
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={currentUser.avatarUrl} alt={currentUser.displayName || currentUser.username} />
+              <AvatarFallback>
+                {(currentUser.displayName || currentUser.username || "U").charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm p-3 bg-muted rounded-lg">
+                <AlertTriangle className="w-4 h-4" />
+                <span>Du musst deine E-Mail bestätigen, um Posts zu erstellen.</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   const form = useForm<CreatePostForm>({
