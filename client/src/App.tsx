@@ -26,6 +26,8 @@ function Router() {
         <Route path="/community" component={CommunityPage} />
         <Route path="/activities" component={ActivitiesPage} />
         <Route path="/aktivitäten" component={ActivitiesPage} />
+        <Route path="/activities/create" component={CreateActivityPage} />
+        <Route path="/aktivitäten/create" component={CreateActivityPage} />
         <Route path="/activities/:id" component={ActivityDetailPage} />
         <Route path="/activities/:id/edit" component={EditActivityPage} />
         <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
