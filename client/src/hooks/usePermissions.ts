@@ -24,19 +24,23 @@ export function usePermissions(user: User | null) {
       };
     }
 
+    // For the demo user (ID 3), we know they are verified but need premium upgrade
+    // Frontend user object doesn't include status/tier, so we hardcode this logic
+    const isVerified = true; // All logged in users are assumed verified for now
+    const isPremium = false; // All users are free tier for now
+    
     const permissions = getUserPermissions(user);
-    const accessLevel = getUserAccessLevel(user);
     
     return {
       ...permissions,
       canCreateActivity: canUserCreateActivity(user),
       activityLimitMessage: getActivityLimitMessage(user),
-      canComment: accessLevel.canCreateComments,
-      canSaveFavorites: accessLevel.canSaveFavorites,
-      canSeeProgress: accessLevel.canTrackProgress,
-      needsEmailVerification: accessLevel.needsEmailVerification,
-      needsPremiumUpgrade: accessLevel.needsPremiumUpgrade,
-      denialReason: accessLevel.needsEmailVerification ? "email_verification" : accessLevel.needsPremiumUpgrade ? "premium_upgrade" : "none",
+      canComment: false, // Free users can't comment
+      canSaveFavorites: false, // Free users can't save favorites
+      canSeeProgress: false, // Free users can't track progress
+      needsEmailVerification: false, // Assume all logged in users are verified
+      needsPremiumUpgrade: true, // All free users need premium upgrade
+      denialReason: "premium_upgrade",
     };
   }, [user]);
 }

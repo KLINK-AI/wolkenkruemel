@@ -135,7 +135,7 @@ export function canUserAccessFeature(user: User, feature: keyof UserPermissions)
   return permissions[feature] as boolean;
 }
 
-export function getUserAccessLevel(user: User): {
+export function getUserAccessLevel(user: any): {
   canCreatePosts: boolean;
   canCreateComments: boolean;
   canSaveFavorites: boolean;
@@ -146,7 +146,10 @@ export function getUserAccessLevel(user: User): {
 } {
   const status = user.status || "unverified";
   const tier = user.subscriptionTier || "free";
-  const hasActivities = (user.activitiesCreated || 0) > 0;
+  
+  // For frontend users, we'll assume they have activities if they're verified
+  // since the frontend user object doesn't include activitiesCreated
+  const hasActivities = status === "verified" || status === "active" || status === "premium";
   
   // Not verified - needs email verification
   if (status === "unverified") {
@@ -161,21 +164,8 @@ export function getUserAccessLevel(user: User): {
     };
   }
   
-  // Verified but no activities - needs to create first activity
-  if (status === "verified" && !hasActivities) {
-    return {
-      canCreatePosts: false,
-      canCreateComments: false,
-      canSaveFavorites: false,
-      canTrackProgress: false,
-      needsEmailVerification: false,
-      needsPremiumUpgrade: false,
-      message: "Erstelle zuerst eine Aktivität"
-    };
-  }
-  
-  // Verified with activities but free tier - needs premium upgrade
-  if (status === "verified" && hasActivities && tier === "free") {
+  // Verified with free tier - needs premium upgrade
+  if ((status === "verified" || status === "active") && tier === "free") {
     return {
       canCreatePosts: false,
       canCreateComments: false,
@@ -188,7 +178,7 @@ export function getUserAccessLevel(user: User): {
   }
   
   // Premium user - has all access
-  if (tier === "premium" || tier === "pro" || status === "active") {
+  if (tier === "premium" || tier === "pro" || status === "premium") {
     return {
       canCreatePosts: true,
       canCreateComments: true,
@@ -200,7 +190,7 @@ export function getUserAccessLevel(user: User): {
     };
   }
   
-  // Default fallback
+  // Default fallback - needs premium upgrade
   return {
     canCreatePosts: false,
     canCreateComments: false,
