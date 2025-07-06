@@ -20,7 +20,7 @@ export interface IStorage {
   
   // Activity operations
   getActivities(limit?: number, offset?: number): Promise<(Activity & { author: User })[]>;
-  getActivity(id: number): Promise<Activity | undefined>;
+  getActivity(id: number): Promise<(Activity & { author: User }) | undefined>;
   getActivitiesByAuthor(authorId: number): Promise<Activity[]>;
   createActivity(activity: InsertActivity): Promise<Activity>;
   updateActivity(id: number, updates: Partial<Activity>): Promise<Activity>;
@@ -659,9 +659,41 @@ export class DatabaseStorage implements IStorage {
       );
   }
 
-  async getActivity(id: number): Promise<Activity | undefined> {
-    const [activity] = await db.select().from(activities).where(eq(activities.id, id));
-    return activity || undefined;
+  async getActivity(id: number): Promise<(Activity & { author: User }) | undefined> {
+    const [result] = await db
+      .select()
+      .from(activities)
+      .leftJoin(users, eq(activities.authorId, users.id))
+      .where(eq(activities.id, id));
+    
+    if (!result) return undefined;
+    
+    return {
+      ...result.activities,
+      author: result.users || {
+        id: 0,
+        username: 'Unknown',
+        displayName: 'Unbekannter Autor',
+        email: '',
+        password: '',
+        bio: null,
+        avatarUrl: null,
+        role: 'user',
+        subscriptionTier: 'free',
+        activitiesCreated: 0,
+        postsCreated: 0,
+        likesReceived: 0,
+        isEmailVerified: false,
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        firstName: null,
+        lastName: null,
+        location: null,
+        status: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    };
   }
 
   async getActivitiesByAuthor(authorId: number): Promise<Activity[]> {
