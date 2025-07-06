@@ -341,11 +341,11 @@ export default function ActivityDetailPage() {
                   ) : (
                     <Button 
                       variant="outline" 
-                      className="w-full"
+                      className="w-full text-xs"
                       disabled
                     >
                       <Heart className="w-4 h-4 mr-2" />
-                      Premium-Mitgliedschaft erforderlich für Favoriten
+                      Premium erforderlich für Favoriten
                     </Button>
                   )}
                   <Button variant="outline" className="w-full">
