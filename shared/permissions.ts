@@ -134,3 +134,80 @@ export function canUserAccessFeature(user: User, feature: keyof UserPermissions)
   const permissions = getUserPermissions(user);
   return permissions[feature] as boolean;
 }
+
+export function getUserAccessLevel(user: User): {
+  canCreatePosts: boolean;
+  canCreateComments: boolean;
+  canSaveFavorites: boolean;
+  canTrackProgress: boolean;
+  needsEmailVerification: boolean;
+  needsPremiumUpgrade: boolean;
+  message: string;
+} {
+  const status = user.status || "unverified";
+  const tier = user.subscriptionTier || "free";
+  const hasActivities = (user.activitiesCreated || 0) > 0;
+  
+  // Not verified - needs email verification
+  if (status === "unverified") {
+    return {
+      canCreatePosts: false,
+      canCreateComments: false,
+      canSaveFavorites: false,
+      canTrackProgress: false,
+      needsEmailVerification: true,
+      needsPremiumUpgrade: false,
+      message: "Du musst deine E-Mail bestätigen"
+    };
+  }
+  
+  // Verified but no activities - needs to create first activity
+  if (status === "verified" && !hasActivities) {
+    return {
+      canCreatePosts: false,
+      canCreateComments: false,
+      canSaveFavorites: false,
+      canTrackProgress: false,
+      needsEmailVerification: false,
+      needsPremiumUpgrade: false,
+      message: "Erstelle zuerst eine Aktivität"
+    };
+  }
+  
+  // Verified with activities but free tier - needs premium upgrade
+  if (status === "verified" && hasActivities && tier === "free") {
+    return {
+      canCreatePosts: false,
+      canCreateComments: false,
+      canSaveFavorites: false,
+      canTrackProgress: false,
+      needsEmailVerification: false,
+      needsPremiumUpgrade: true,
+      message: "Premium-Mitgliedschaft erforderlich"
+    };
+  }
+  
+  // Premium user - has all access
+  if (tier === "premium" || tier === "pro" || status === "active") {
+    return {
+      canCreatePosts: true,
+      canCreateComments: true,
+      canSaveFavorites: true,
+      canTrackProgress: true,
+      needsEmailVerification: false,
+      needsPremiumUpgrade: false,
+      message: "Alle Features verfügbar"
+    };
+  }
+  
+  // Default fallback
+  return {
+    canCreatePosts: false,
+    canCreateComments: false,
+    canSaveFavorites: false,
+    canTrackProgress: false,
+    needsEmailVerification: false,
+    needsPremiumUpgrade: true,
+    message: "Premium-Mitgliedschaft erforderlich"
+  };
+}

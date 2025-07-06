@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { User } from "@shared/schema";
-import { getUserPermissions, canUserCreateActivity, getActivityLimitMessage } from "@shared/permissions";
+import { getUserPermissions, canUserCreateActivity, getActivityLimitMessage, getUserAccessLevel } from "@shared/permissions";
 
 export function usePermissions(user: User | null) {
   return useMemo(() => {
@@ -25,16 +25,18 @@ export function usePermissions(user: User | null) {
     }
 
     const permissions = getUserPermissions(user);
-    const isEmailVerified = user.status === "verified" || user.status === "active" || user.status === "premium";
-    const isPremium = user.subscriptionTier === "premium" || user.subscriptionTier === "pro";
+    const accessLevel = getUserAccessLevel(user);
     
     return {
       ...permissions,
       canCreateActivity: canUserCreateActivity(user),
       activityLimitMessage: getActivityLimitMessage(user),
-      needsEmailVerification: !isEmailVerified,
-      needsPremiumUpgrade: isEmailVerified && !isPremium,
-      denialReason: !isEmailVerified ? "email_verification" : !isPremium ? "premium_upgrade" : "none",
+      canComment: accessLevel.canCreateComments,
+      canSaveFavorites: accessLevel.canSaveFavorites,
+      canSeeProgress: accessLevel.canTrackProgress,
+      needsEmailVerification: accessLevel.needsEmailVerification,
+      needsPremiumUpgrade: accessLevel.needsPremiumUpgrade,
+      denialReason: accessLevel.needsEmailVerification ? "email_verification" : accessLevel.needsPremiumUpgrade ? "premium_upgrade" : "none",
     };
   }, [user]);
 }
