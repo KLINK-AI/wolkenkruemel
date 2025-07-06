@@ -17,11 +17,11 @@ import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from "lucide-react";
 import { useLanguage } from "@/components/LanguageProvider";
 
 const createActivitySchema = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title must be under 100 characters"),
-  description: z.string().min(1, "Description is required").max(500, "Description must be under 500 characters"),
-  content: z.string().min(1, "Content is required").min(100, "Content must be at least 100 characters"),
+  title: z.string().min(1, "Titel ist erforderlich").max(100, "Titel muss unter 100 Zeichen sein"),
+  description: z.string().min(1, "Beschreibung ist erforderlich").max(500, "Beschreibung muss unter 500 Zeichen sein"),
+  content: z.string().min(1, "Inhalt ist erforderlich").min(100, "Inhalt muss mindestens 100 Zeichen lang sein"),
   difficulty: z.enum(["beginner", "intermediate", "advanced"]),
-  duration: z.number().min(1, "Duration must be at least 1 minute").max(300, "Duration must be under 5 hours"),
+  duration: z.number().min(1, "Dauer muss mindestens 1 Minute betragen").max(300, "Dauer muss unter 5 Stunden liegen"),
   authorId: z.number(),
   imageUrl: z.string().optional(),
   isOfficial: z.boolean().default(false),

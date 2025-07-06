@@ -242,21 +242,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user can create activities
-      if (!canUserCreateActivity(user)) {
-        const permissions = getUserPermissions(user);
-        if (!permissions.canCreateActivities) {
-          return res.status(403).json({ 
-            message: "Du musst dich registrieren und deine E-Mail bestätigen, um Aktivitäten zu erstellen.",
-            code: "EMAIL_NOT_VERIFIED"
-          });
-        } else {
-          return res.status(403).json({ 
-            message: `Du hast das Maximum von ${permissions.maxActivities} Aktivitäten erreicht. Upgrade auf Premium für unbegrenzte Aktivitäten.`,
-            code: "ACTIVITY_LIMIT_REACHED",
-            maxActivities: permissions.maxActivities,
-            currentCount: user.activitiesCreated || 0
-          });
-        }
+      const permissions = getUserPermissions(user);
+      if (!permissions.canCreateActivities) {
+        return res.status(403).json({ 
+          message: "Premium-Mitgliedschaft erforderlich um Aktivitäten zu erstellen.",
+          code: "PREMIUM_REQUIRED"
+        });
       }
       
       const activity = await storage.createActivity(validatedData);
