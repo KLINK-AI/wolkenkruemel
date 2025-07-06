@@ -15,6 +15,7 @@ import { Link } from "wouter";
 import { ArrowLeft, Upload, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import type { Activity } from "@shared/schema";
 
 const editActivitySchema = z.object({
@@ -37,6 +38,7 @@ export default function EditActivityPage() {
   const queryClient = useQueryClient();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { currentUser } = useAuth();
 
   const activityId = parseInt(id || "0", 10);
 
@@ -135,8 +137,8 @@ export default function EditActivityPage() {
     );
   }
 
-  // Check if user is the author (simplified check for now)
-  const isAuthor = activity.authorId === 1; // TODO: Replace with actual user check
+  // Check if user is the author
+  const isAuthor = currentUser && activity.author && activity.author.id === currentUser.id;
 
   if (!isAuthor) {
     return (
