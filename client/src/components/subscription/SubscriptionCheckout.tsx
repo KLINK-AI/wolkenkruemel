@@ -56,11 +56,25 @@ export default function SubscriptionCheckout({ plan, onSuccess, onCancel }: Subs
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!stripe || !elements || !clientSecret) {
+    setIsLoading(true);
+
+    // Demo mode - simulate successful payment
+    if (clientSecret?.startsWith('demo_client_secret_')) {
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Demo-Zahlung erfolgreich",
+        description: `Willkommen bei ${plan.name}! (Demo-Modus)`,
+      });
+      onSuccess();
       return;
     }
 
-    setIsLoading(true);
+    if (!stripe || !elements || !clientSecret) {
+      setIsLoading(false);
+      return;
+    }
 
     const { error } = await stripe.confirmPayment({
       elements,

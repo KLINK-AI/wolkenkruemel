@@ -643,6 +643,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
+      // Demo mode for development - simulate subscription creation
+      if (priceId === 'price_premium_monthly' || priceId === 'price_premium_yearly') {
+        console.log(`Demo subscription created for user ${userId} with plan ${priceId}`);
+        
+        // Update user to premium status  
+        const updatedUser = await storage.updateUser(userId, { 
+          subscriptionTier: 'premium'
+        });
+        
+        console.log('User updated to premium:', updatedUser.subscriptionTier);
+        
+        // Return demo success response
+        return res.json({
+          subscriptionId: 'demo_sub_' + Date.now(),
+          clientSecret: 'demo_client_secret_' + Date.now(),
+          status: 'demo_success'
+        });
+      }
+
       // Check if user already has an active subscription
       if (user.stripeSubscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);

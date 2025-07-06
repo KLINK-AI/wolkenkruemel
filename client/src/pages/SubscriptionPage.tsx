@@ -35,46 +35,43 @@ const subscriptionPlans: SubscriptionPlan[] = [
     interval: 'kostenlos',
     icon: Star,
     features: [
-      'Zugang zum Community-Feed',
-      'Aktivitäten ansehen',
-      'Grundlegende Profilfunktionen',
-      'Bis zu 5 eigene Aktivitäten'
+      'Alle Aktivitäten ansehen',
+      'Community Posts lesen',
+      'Bis zu 5 eigene Aktivitäten erstellen',
+      'Aktivitäten-Details einsehen'
     ]
   },
   {
-    id: 'premium',
-    name: 'Pro Trainer',
-    price: 9.99,
+    id: 'premium_monthly',
+    name: 'Premium (Monatlich)',
+    price: 2.99,
     interval: 'Monat',
     popular: true,
     icon: Crown,
-    stripePriceId: 'price_premium_monthly', // This would be replaced with actual price ID
+    stripePriceId: 'price_premium_monthly', // Demo Price ID
     features: [
-      'Alles aus Community',
-      'Unbegrenzte Aktivitätserstellung',
-      'Posts und Kommentare erstellen',
+      'Alle Community-Features',
+      'Unbegrenzte Aktivitäten erstellen',
+      'Fortschritte speichern',
+      'Posts schreiben und kommentieren',
       'Favoriten speichern',
-      'Fortschritt verfolgen',
-      'Prioritäts-Support',
-      'Zugang zu Premium-Aktivitäten',
-      'Erweiterte Profilfunktionen'
+      'Aktivitäten teilen',
+      'Unbegrenzte Community-Interaktionen'
     ]
   },
   {
-    id: 'professional',
-    name: 'Expert',
-    price: 29.99,
-    interval: 'Monat',
+    id: 'premium_yearly',
+    name: 'Premium (Jährlich)',
+    price: 29.90,
+    interval: 'Jahr',
     icon: Zap,
-    stripePriceId: 'price_professional_monthly', // This would be replaced with actual price ID
+    stripePriceId: 'price_premium_yearly', // Demo Price ID
     features: [
-      'Alles aus Pro Trainer',
-      'Verifiziertes Trainer-Abzeichen',
-      'Direkte Nachrichten',
-      'Erweiterte Moderations-Tools',
-      'API-Zugang für Integrationen',
-      'Priorität bei Feature-Anfragen',
-      'Umsatzbeteiligung'
+      'Alle Premium-Features',
+      'Beste Preis-Leistung',
+      '2 Monate kostenlos',
+      'Jährliche Abrechnung',
+      'Prioritäts-Support'
     ]
   }
 ];

@@ -115,7 +115,13 @@ export default function PremiumInfoModal({ isOpen, onClose }: PremiumInfoModalPr
           <Button variant="outline" onClick={onClose} className="flex-1">
             Später
           </Button>
-          <Button className="flex-1 bg-amber-600 hover:bg-amber-700 text-white">
+          <Button 
+            className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
+            onClick={() => {
+              onClose();
+              window.location.href = '/premium';
+            }}
+          >
             <Crown className="w-4 h-4 mr-2" />
             Premium freischalten
           </Button>
