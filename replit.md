@@ -130,6 +130,7 @@ Changelog:
 - July 06, 2025. ENHANCED: Comprehensive permission system for posts and comments implemented. Users now need email verification to create posts and comments. Free tier users have clear activity limits (0-5 activities) with Premium upgrade prompts. Fixed "Trending Topics" German translation to "Beliebte Themen" and corrected Premium button display in activity creation sidebar.
 - July 06, 2025. FIXED: Freemium model completely overhauled - all logged-in users now treated as verified, eliminating email verification prompts. Free tier users see consistent "Premium-Mitgliedschaft erforderlich" messages across all restricted features (posts, comments, favorites, progress tracking). Favoriten button on activity detail page now properly disabled with shortened text "Premium erforderlich für Favoriten" to fit within UI boundaries.
 - July 06, 2025. COMPLETED: Premium subscription system fully functional - users can upgrade to Premium (€2.99/month) via demo checkout, status updates immediately across all components. Premium users have full access to posts, comments, unlimited activities, and favorites. Backend permission system prioritizes subscription tier over email verification status. Community features work seamlessly for Premium members.
+- July 06, 2025. FIXED: Activity creation navigation issue - added missing frontend route for /activities/create to resolve 500 error when clicking "Aktivität erstellen" button. Activity creation form now loads properly for Premium users.
 
 ## User Preferences
 
