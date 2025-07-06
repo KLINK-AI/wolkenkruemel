@@ -80,6 +80,16 @@ export function useAuth() {
     notifySubscribers();
   };
 
+  const updateUser = (updatedUser: Partial<User>) => {
+    if (globalCurrentUser) {
+      const newUser = { ...globalCurrentUser, ...updatedUser };
+      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      globalCurrentUser = newUser;
+      window.dispatchEvent(new CustomEvent('userChanged'));
+      notifySubscribers();
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('currentUser');
     globalCurrentUser = null;
@@ -92,6 +102,7 @@ export function useAuth() {
     isAuthenticated: !!currentUser,
     isLoading,
     login,
-    logout
+    logout,
+    updateUser
   };
 }

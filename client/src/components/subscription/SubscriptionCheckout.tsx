@@ -22,7 +22,7 @@ export default function SubscriptionCheckout({ plan, onSuccess, onCancel }: Subs
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
-  const { currentUser } = useAuth();
+  const { currentUser, updateUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
@@ -63,6 +63,9 @@ export default function SubscriptionCheckout({ plan, onSuccess, onCancel }: Subs
     if (clientSecret?.startsWith('demo_client_secret_')) {
       // Simulate processing time
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Update user subscription tier in local state
+      updateUser({ subscriptionTier: 'premium' });
       
       // Invalidate cache to force refresh
       await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
