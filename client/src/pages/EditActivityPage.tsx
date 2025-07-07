@@ -96,25 +96,37 @@ export default function EditActivityPage() {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Fehler",
-          description: "Datei ist zu groß. Maximale Größe: 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Fehler",
+        description: "Datei ist zu groß. Maximale Größe: 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      if (result) {
         const newImages = [...selectedImages, result];
         setSelectedImages(newImages);
         form.setValue("images", newImages);
-      };
-      reader.readAsDataURL(file);
-    }
+      }
+    };
+    
+    reader.onerror = () => {
+      toast({
+        title: "Fehler",
+        description: "Fehler beim Laden der Datei",
+        variant: "destructive",
+      });
+    };
+    
+    reader.readAsDataURL(file);
     
     // Reset input to allow same file upload again
     if (event.target) {

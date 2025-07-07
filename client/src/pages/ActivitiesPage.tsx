@@ -8,6 +8,8 @@ import { Clock, Users, Star, Plus, Search, Filter, Heart } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useAuth } from "@/hooks/useAuth";
+import { LazyImage } from "@/components/ui/lazy-image";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useState, useMemo } from "react";
 import type { Activity } from "@shared/schema";
 

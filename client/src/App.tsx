@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { Layout } from "@/components/Layout";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import CommunityPage from "@/pages/CommunityPage";

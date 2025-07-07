@@ -109,24 +109,44 @@ export default function CreateActivityPage() {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: t('createActivity.errorTitle'),
-          description: t('createActivity.imageError'),
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: t('createActivity.errorTitle'),
+        description: t('createActivity.imageError'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImageUploading(true);
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      if (result) {
         const newImages = [...images, result];
         setImages(newImages);
         form.setValue("images", newImages);
-      };
-      reader.readAsDataURL(file);
+      }
+      setIsImageUploading(false);
+    };
+    
+    reader.onerror = () => {
+      toast({
+        title: t('createActivity.errorTitle'),
+        description: "Fehler beim Laden der Datei",
+        variant: "destructive",
+      });
+      setIsImageUploading(false);
+    };
+    
+    reader.readAsDataURL(file);
+    
+    // Reset input to allow same file upload again
+    if (event.target) {
+      event.target.value = '';
     }
   };
 
