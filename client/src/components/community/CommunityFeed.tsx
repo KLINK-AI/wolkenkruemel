@@ -102,8 +102,15 @@ export function CommunityFeed() {
         authorId: currentUser?.id,
       });
     },
-    onSuccess: () => {
+    onSuccess: (_, { postId }) => {
+      // Invalidate both posts and comments queries
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
+      
+      toast({
+        title: "Kommentar gesendet",
+        description: "Dein Kommentar wurde erfolgreich hinzugefügt.",
+      });
     },
   });
 
@@ -215,7 +222,7 @@ function PostCard({
   });
 
   // Get comments for this post
-  const { data: comments } = useQuery({
+  const { data: comments, refetch: refetchComments } = useQuery({
     queryKey: ["post-comments", post.id],
     queryFn: () => fetchApi(`/api/posts/${post.id}/comments`),
     enabled: showComments,
@@ -365,7 +372,13 @@ function PostCard({
                 variant="ghost" 
                 size="sm" 
                 className="text-muted-foreground"
-                onClick={() => setShowComments(!showComments)}
+                onClick={() => {
+                  setShowComments(!showComments);
+                  if (!showComments) {
+                    // Force refetch comments when opening comment section
+                    refetchComments();
+                  }
+                }}
               >
                 <MessageCircle className="w-4 h-4 mr-1" />
                 {post.comments}
