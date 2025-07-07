@@ -939,11 +939,53 @@ export class DatabaseStorage implements IStorage {
   }
 
   async likePost(userId: number, postId: number): Promise<void> {
+    // Check if already liked
+    const existingLike = await db
+      .select()
+      .from(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)))
+      .limit(1);
+    
+    if (existingLike.length > 0) {
+      console.log(`User ${userId} already liked post ${postId}`);
+      return;
+    }
+    
+    // Add like
     await db.insert(likes).values({ userId, postId });
+    
+    // Update post like count
+    await db
+      .update(posts)
+      .set({ likes: sql`likes + 1` })
+      .where(eq(posts.id, postId));
+    
+    console.log(`Liked post ${postId} for user ${userId}`);
   }
 
   async unlikePost(userId: number, postId: number): Promise<void> {
+    // Check if like exists
+    const existingLike = await db
+      .select()
+      .from(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)))
+      .limit(1);
+    
+    if (existingLike.length === 0) {
+      console.log(`No like found for user ${userId}, post ${postId}`);
+      return;
+    }
+    
+    // Remove like
     await db.delete(likes).where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
+    
+    // Update post like count
+    await db
+      .update(posts)
+      .set({ likes: sql`GREATEST(0, likes - 1)` })
+      .where(eq(posts.id, postId));
+    
+    console.log(`Unliked post ${postId} for user ${userId}`);
   }
 
   async isPostLikedByUser(userId: number, postId: number): Promise<boolean> {
