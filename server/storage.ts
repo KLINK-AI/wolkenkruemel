@@ -112,6 +112,11 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id,
+      status: 'unverified',
+      firstName: null,
+      lastName: null,
+      location: null,
+      emailVerificationToken: null,
       isEmailVerified: false,
       role: 'user',
       subscriptionTier: 'free',
@@ -248,7 +253,7 @@ export class MemStorage implements IStorage {
 
   async getPosts(limit = 20, offset = 0): Promise<(Post & { author: User, linkedActivity?: Activity })[]> {
     const allPosts = Array.from(this.posts.values())
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
       .slice(offset, offset + limit);
     
     const postsWithAuthors = await Promise.all(
@@ -365,7 +370,7 @@ export class MemStorage implements IStorage {
   async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {
     const postComments = Array.from(this.comments.values())
       .filter(comment => comment.postId === postId)
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      .sort((a, b) => (a.createdAt?.getTime() || 0) - (b.createdAt?.getTime() || 0));
     
     const commentsWithAuthors = await Promise.all(
       postComments.map(async (comment) => {
@@ -489,7 +494,7 @@ export class MemStorage implements IStorage {
   async getNotifications(userId: number): Promise<Notification[]> {
     return Array.from(this.notifications.values())
       .filter(notification => notification.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
   async createNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification> {

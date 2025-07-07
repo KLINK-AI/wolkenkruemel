@@ -661,7 +661,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (subscription.status === 'active' || subscription.status === 'trialing') {
           return res.json({
             subscriptionId: subscription.id,
-            clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+            clientSecret: typeof subscription.latest_invoice === 'object' && subscription.latest_invoice?.payment_intent ? 
+              (typeof subscription.latest_invoice.payment_intent === 'object' ? 
+                subscription.latest_invoice.payment_intent.client_secret : null) : null,
             status: 'existing'
           });
         }
@@ -778,11 +780,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       
       const activitiesThisMonth = activities.filter(a => 
-        new Date(a.createdAt) >= startOfMonth
+        a.createdAt && new Date(a.createdAt) >= startOfMonth
       ).length;
       
       const postsToday = posts.filter(p => 
-        new Date(p.createdAt) >= startOfDay
+        p.createdAt && new Date(p.createdAt) >= startOfDay
       ).length;
 
       res.json({
