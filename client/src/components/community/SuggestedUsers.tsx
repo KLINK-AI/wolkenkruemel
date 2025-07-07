@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { fetchApi, postApi } from "@/lib/api";
 import { useLanguage } from "@/components/LanguageProvider";
 
 interface SuggestedUsersProps {
@@ -17,17 +17,13 @@ export default function SuggestedUsers({ currentUserId }: SuggestedUsersProps) {
   const { t } = useLanguage();
 
   const { data: users, isLoading } = useQuery({
-    queryKey: ["/api/suggested-users", { userId: currentUserId }],
-    queryFn: async () => {
-      const response = await fetch(`/api/suggested-users?userId=${currentUserId}`);
-      if (!response.ok) throw new Error("Failed to fetch suggested users");
-      return response.json();
-    },
+    queryKey: ["suggested-users", currentUserId],
+    queryFn: () => fetchApi(`/api/suggested-users?userId=${currentUserId}`),
   });
 
   const followMutation = useMutation({
     mutationFn: async (followingId: number) => {
-      await apiRequest("POST", `/api/users/${followingId}/follow`, {
+      await postApi(`/api/users/${followingId}/follow`, {
         followerId: currentUserId,
       });
     },

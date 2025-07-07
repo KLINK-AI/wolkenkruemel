@@ -1,15 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchApi } from "@/lib/api";
 
 export default function UpcomingEvents() {
   const { data: events, isLoading } = useQuery({
-    queryKey: ["/api/events"],
-    queryFn: async () => {
-      const response = await fetch("/api/events");
-      if (!response.ok) throw new Error("Failed to fetch events");
-      return response.json();
-    },
+    queryKey: ["events"],
+    queryFn: () => fetchApi("/api/events"),
   });
 
   // Mock data as fallback

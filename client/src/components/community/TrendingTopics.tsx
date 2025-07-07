@@ -2,16 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/components/LanguageProvider";
+import { fetchApi } from "@/lib/api";
 
 export default function TrendingTopics() {
   const { t } = useLanguage();
   const { data: tags, isLoading } = useQuery({
-    queryKey: ["/api/trending-tags"],
-    queryFn: async () => {
-      const response = await fetch("/api/trending-tags");
-      if (!response.ok) throw new Error("Failed to fetch trending tags");
-      return response.json();
-    },
+    queryKey: ["trending-tags"],
+    queryFn: () => fetchApi("/api/trending-tags"),
   });
 
   // Mock data as fallback

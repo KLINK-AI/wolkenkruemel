@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { apiRequest } from "@/lib/queryClient";
+import { postApi } from "@/lib/api";
 
 const createPostSchema = z.object({
   content: z.string().min(10, "Beitrag muss mindestens 10 Zeichen haben"),
@@ -51,17 +51,14 @@ export default function CreatePostPage() {
         imageUrl: data.imageUrl || undefined,
       };
       
-      return apiRequest("/api/posts", {
-        method: "POST",
-        body: JSON.stringify(postData),
-      });
+      return postApi("/api/posts", postData);
     },
     onSuccess: () => {
       toast({
         title: "Beitrag erstellt!",
         description: "Dein Beitrag wurde erfolgreich veröffentlicht.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
       setLocation("/community");
     },
     onError: (error: any) => {
