@@ -91,9 +91,6 @@ export default function HomePage() {
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                 <strong className="text-foreground">Erstelle einen kostenlosen Account</strong>, um die Details der Aktivitäten sehen zu können und was andere in der Community schreiben.
               </p>
-              <p className="text-lg font-medium text-primary mb-6">
-                Beteilige Dich an Aktivitäten und werde Teil der Community.
-              </p>
               
               <div className="grid md:grid-cols-2 gap-6 mb-8 text-left">
                 <div className="space-y-4">
