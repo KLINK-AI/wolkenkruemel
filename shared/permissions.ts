@@ -35,7 +35,7 @@ export function getUserPermissions(user: User): UserPermissions {
   };
 
   // Priority: if user has premium subscription, give premium permissions regardless of status
-  if (tier === "premium" || tier === "professional") {
+  if (tier === "premium" || tier === "pro") {
     return {
       canCreateActivities: true,
       canCreatePosts: true,

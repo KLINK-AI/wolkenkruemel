@@ -192,7 +192,7 @@ export default function ActivityDetailPage() {
                       />
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {activity.images.map((image, index) => (
+                        {activity.images.map((image: string, index: number) => (
                           <img 
                             key={index}
                             src={image} 

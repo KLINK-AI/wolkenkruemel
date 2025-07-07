@@ -80,7 +80,7 @@ export const comments = pgTable("comments", {
   content: text("content").notNull(),
   postId: integer("post_id").references(() => posts.id),
   authorId: integer("author_id").references(() => users.id),
-  parentId: integer("parent_id").references(() => comments.id),
+  parentId: integer("parent_id").references((): any => comments.id),
   likes: integer("likes").default(0),
   isApproved: boolean("is_approved").default(true),
   createdAt: timestamp("created_at").defaultNow(),
