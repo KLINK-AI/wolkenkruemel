@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
-import { Home, User, Settings, Moon, Sun, Users, Calendar, LogOut } from "lucide-react";
+import { Home, User, Settings, Moon, Sun, Users, Calendar, LogOut, Menu, X } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,6 +25,7 @@ export function Navbar() {
   const { theme, setTheme } = useTheme();
   const { t } = useLanguage();
   const { currentUser, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const navItems = [
     { path: "/", label: t('nav.home'), icon: Home },
@@ -85,8 +87,19 @@ export function Navbar() {
             )}
           </nav>
 
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+
           {/* Right Side Controls */}
-          <div className="flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-2">
             {/* Theme Toggle */}
             <Button
               variant="ghost"
@@ -152,6 +165,102 @@ export function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-background/95 backdrop-blur-sm border-t">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.path} 
+                  href={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`${
+                    location === item.path 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  } block px-3 py-2 rounded-md text-base font-medium flex items-center space-x-3`}
+                >
+                  {Icon && <Icon className="w-5 h-5" />}
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+            
+            {/* Admin Link for mobile */}
+            {currentUser && currentUser.role === "admin" && (
+              <Link 
+                href={adminNavItem.path}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`${
+                  location === adminNavItem.path 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                } block px-3 py-2 rounded-md text-base font-medium flex items-center space-x-3`}
+              >
+                <Settings className="w-5 h-5" />
+                <span>{adminNavItem.label}</span>
+              </Link>
+            )}
+
+            {/* Mobile Controls */}
+            <div className="border-t pt-4 mt-4">
+              <div className="flex items-center justify-between px-3 py-2">
+                <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                >
+                  {theme === "light" ? (
+                    <Moon className="h-4 w-4" />
+                  ) : (
+                    <Sun className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              
+              <div className="px-3 py-2">
+                <LanguageToggle />
+              </div>
+
+              {/* Mobile User Menu */}
+              {currentUser ? (
+                <div className="px-3 py-2 space-y-2">
+                  <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                    <div className="flex items-center space-x-3 text-muted-foreground hover:text-foreground p-2 rounded-md hover:bg-muted">
+                      <User className="w-5 h-5" />
+                      <span>Profil</span>
+                    </div>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                      window.location.href = '/';
+                    }}
+                    className="flex items-center space-x-3 text-red-600 hover:text-red-700 p-2 rounded-md hover:bg-muted w-full text-left"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>Abmelden</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="px-3 py-2">
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full">
+                      <User className="mr-2 h-4 w-4" />
+                      Anmelden
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
