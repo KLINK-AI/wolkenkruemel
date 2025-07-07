@@ -22,6 +22,17 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
   const { data: stats, isLoading, error } = useQuery<UserStats>({
     queryKey: [`/api/user-stats/${userId}`],
     enabled: !!userId,
+    queryFn: async () => {
+      const response = await fetch(`/api/user-stats/${userId}`, {
+        method: "GET",
+        headers: { "Accept": "application/json" },
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    },
   });
 
   if (isLoading) {
