@@ -20,18 +20,33 @@ interface UserStatsProps {
 
 export function UserStats({ userId, compact = false, className = "" }: UserStatsProps) {
   const { data: stats, isLoading, error } = useQuery<UserStats>({
-    queryKey: [`/api/user-stats/${userId}`],
+    queryKey: ["user-stats", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const response = await fetch(`/api/user-stats/${userId}`, {
-        method: "GET",
-        headers: { "Accept": "application/json" },
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      try {
+        const url = `/api/user-stats/${userId}`;
+        const init: RequestInit = {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        };
+        
+        const response = await fetch(url, init);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to fetch user stats: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+        
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching user stats:", error);
+        throw error;
       }
-      return response.json();
     },
   });
 

@@ -30,21 +30,32 @@ export function CommunityFeed() {
   const { currentUser } = useAuth();
   
   const { data: posts, isLoading, error } = useQuery<Post[]>({
-    queryKey: ["/api/posts?limit=20"],
+    queryKey: ["posts"],
     queryFn: async () => {
-      const response = await fetch("/api/posts?limit=20", {
-        method: "GET",
-        headers: {
-          "Accept": "application/json",
-        },
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      try {
+        const url = "/api/posts?limit=20";
+        const init: RequestInit = {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        };
+        
+        const response = await fetch(url, init);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText} - ${errorText}`);
+        }
+        
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+        throw error;
       }
-      
-      return response.json();
     },
   });
 
