@@ -108,10 +108,18 @@ export function CommunityFeed() {
             <div className="flex items-start justify-between">
               <div className="flex items-center space-x-3">
                 {/* User Avatar */}
-                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-primary-foreground font-semibold text-sm">
-                    {(post.author.displayName || post.author.username).charAt(0).toUpperCase()}
-                  </span>
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center">
+                  {post.author.avatarUrl ? (
+                    <img 
+                      src={post.author.avatarUrl} 
+                      alt={post.author.displayName || post.author.username}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-primary-foreground font-semibold text-sm">
+                      {(post.author.displayName || post.author.username).charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 
                 {/* User Info */}
@@ -120,12 +128,11 @@ export function CommunityFeed() {
                     <p className="font-medium text-sm">
                       {post.author.displayName || post.author.username}
                     </p>
-                    <Badge 
-                      variant={post.author.subscriptionTier === 'premium' ? 'default' : 'secondary'}
-                      className="text-xs"
-                    >
-                      {post.author.subscriptionTier === 'premium' ? 'Premium' : 'Kostenlos'}
-                    </Badge>
+                    {post.author.subscriptionTier === 'premium' && (
+                      <Badge variant="default" className="text-xs px-1.5 py-0.5">
+                        Premium
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(post.createdAt), { 

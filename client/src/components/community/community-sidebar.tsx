@@ -32,7 +32,7 @@ export function CommunitySidebar() {
   ];
 
   return (
-    <div className="w-64 space-y-4">
+    <div className="space-y-4">
       {/* Navigation */}
       <Card>
         <CardContent className="p-4">
@@ -60,26 +60,7 @@ export function CommunitySidebar() {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardContent className="p-4">
-          <h3 className="font-semibold mb-3">Schnelle Aktionen</h3>
-          <div className="space-y-2">
-            <Link href="/community/create-post">
-              <Button variant="outline" size="sm" className="w-full justify-start">
-                <Plus className="w-4 h-4 mr-2" />
-                Beitrag erstellen
-              </Button>
-            </Link>
-            <Link href="/activities/create">
-              <Button variant="outline" size="sm" className="w-full justify-start">
-                <Plus className="w-4 h-4 mr-2" />
-                Aktivität erstellen
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* Trending Topics */}
       <Card>
@@ -113,18 +94,25 @@ export function CommunitySidebar() {
         <Card>
           <CardContent className="p-4">
             <div className="text-center">
-              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
-                <span className="text-primary-foreground font-semibold">
-                  {currentUser.username.charAt(0).toUpperCase()}
-                </span>
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-primary flex items-center justify-center mx-auto mb-2">
+                {currentUser.avatarUrl ? (
+                  <img 
+                    src={currentUser.avatarUrl} 
+                    alt={currentUser.displayName || currentUser.username}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-primary-foreground font-semibold">
+                    {(currentUser.displayName || currentUser.username).charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
-              <p className="text-sm font-medium">{currentUser.username}</p>
-              <Badge 
-                variant={currentUser.subscriptionTier === 'premium' ? 'default' : 'secondary'}
-                className="text-xs mt-1"
-              >
-                {currentUser.subscriptionTier === 'premium' ? 'Premium' : 'Kostenlos'}
-              </Badge>
+              <p className="text-sm font-medium">{currentUser.displayName || currentUser.username}</p>
+              {currentUser.subscriptionTier === 'premium' && (
+                <Badge variant="default" className="text-xs mt-1 px-1.5 py-0.5">
+                  Premium
+                </Badge>
+              )}
             </div>
           </CardContent>
         </Card>

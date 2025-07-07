@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { UserStats } from "@/components/ui/user-stats";
 import { Link } from "wouter";
+import { Plus } from "lucide-react";
 
 export default function CommunityPage() {
   const { currentUser } = useAuth();
@@ -13,8 +14,22 @@ export default function CommunityPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
-          {/* Sidebar */}
-          <CommunitySidebar />
+          {/* Left Sidebar with Stats */}
+          <div className="w-64 space-y-4">
+            <CommunitySidebar />
+            
+            {/* User Stats - moved to left sidebar */}
+            {currentUser && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Deine Statistiken</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <UserStats userId={currentUser.id} compact />
+                </CardContent>
+              </Card>
+            )}
+          </div>
           
           {/* Main Content */}
           <div className="flex-1 space-y-6">
@@ -25,14 +40,24 @@ export default function CommunityPage() {
               </p>
             </div>
 
-            {/* User Stats - only for authenticated users */}
+            {/* Quick Actions - centered at top */}
             {currentUser && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Deine Statistiken</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <UserStats userId={currentUser.id} />
+                <CardContent className="p-4">
+                  <div className="flex justify-center gap-3">
+                    <Link href="/community/create-post">
+                      <Button className="flex items-center gap-2">
+                        <Plus className="w-4 h-4" />
+                        Beitrag erstellen
+                      </Button>
+                    </Link>
+                    <Link href="/activities/create">
+                      <Button variant="outline" className="flex items-center gap-2">
+                        <Plus className="w-4 h-4" />
+                        Aktivität erstellen
+                      </Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             )}
