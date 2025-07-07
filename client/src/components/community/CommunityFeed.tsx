@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
 import { MessageCircle, Heart, Trophy, HelpCircle, FileText, Edit, Trash2, MoreHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -221,6 +221,13 @@ function PostCard({
     enabled: !!currentUser,
   });
 
+  // Update isLiked state when likeStatus changes
+  useEffect(() => {
+    if (likeStatus?.isLiked !== undefined) {
+      setIsLiked(likeStatus.isLiked);
+    }
+  }, [likeStatus]);
+
   // Get comments for this post
   const { data: comments, refetch: refetchComments } = useQuery({
     queryKey: ["post-comments", post.id],
@@ -237,8 +244,9 @@ function PostCard({
       });
       return;
     }
-    onLike(post.id, isLiked);
+    // Optimistically update the UI
     setIsLiked(!isLiked);
+    onLike(post.id, isLiked);
   };
 
   const handleComment = () => {
