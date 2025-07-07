@@ -955,11 +955,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const progressData = await storage.getUserProgress(userId);
       const activitiesCompleted = progressData.filter(p => p.mastered).length;
 
+      // Calculate actual likes received from posts
+      const userPosts = await storage.getPostsByAuthor(userId);
+      const likesReceived = userPosts.reduce((total, post) => total + (post.likes || 0), 0);
+      
+      console.log(`User ${userId} posts and likes:`, userPosts.map(p => ({id: p.id, likes: p.likes})));
+      console.log(`Total likes received: ${likesReceived}`);
+
       res.json({
         activitiesCreated: user.activitiesCreated || 0,
         activitiesCompleted,
         postsCreated: user.postsCreated || 0,
-        likesReceived: user.likesReceived || 0,
+        likesReceived,
         tier: user.subscriptionTier || 'free'
       });
     } catch (error: any) {
