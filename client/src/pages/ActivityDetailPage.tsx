@@ -369,40 +369,7 @@ export default function ActivityDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Action Buttons */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="space-y-3">
-                  {permissions.canSaveFavorites ? (
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => {
-                        const newFavoriteState = !progress?.favorite;
-                        updateProgressMutation.mutate({ favorite: newFavoriteState });
-                      }}
-                      disabled={updateProgressMutation.isPending}
-                    >
-                      <Heart className={`w-4 h-4 mr-2 ${progress?.favorite ? 'fill-red-500 text-red-500' : ''}`} />
-                      {progress?.favorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      className="w-full text-xs"
-                      disabled
-                    >
-                      <Heart className="w-4 h-4 mr-2" />
-                      Premium erforderlich für Favoriten
-                    </Button>
-                  )}
-                  <Button variant="outline" className="w-full">
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Teilen
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+
 
             {/* Stats */}
             <Card>
