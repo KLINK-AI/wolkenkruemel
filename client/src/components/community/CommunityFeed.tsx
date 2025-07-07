@@ -31,6 +31,21 @@ export function CommunityFeed() {
   
   const { data: posts, isLoading, error } = useQuery<Post[]>({
     queryKey: ["/api/posts?limit=20"],
+    queryFn: async () => {
+      const response = await fetch("/api/posts?limit=20", {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+        },
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response.json();
+    },
   });
 
   const getPostTypeIcon = (type: string) => {
