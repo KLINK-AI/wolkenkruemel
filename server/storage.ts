@@ -338,12 +338,23 @@ export class MemStorage implements IStorage {
   }
 
   async likePost(userId: number, postId: number): Promise<void> {
+    // Check if already liked
+    const existingLike = Array.from(this.likes.values()).find(
+      like => like.userId === userId && like.postId === postId
+    );
+    
+    if (existingLike) {
+      console.log(`User ${userId} already liked post ${postId}`);
+      return;
+    }
+    
     const likeId = this.currentLikeId++;
     this.likes.set(likeId, { userId, postId });
     
     const post = this.posts.get(postId);
     if (post) {
       await this.updatePost(postId, { likes: post.likes + 1 });
+      console.log(`Liked post ${postId}, new count: ${post.likes + 1}`);
     }
   }
 
@@ -354,11 +365,16 @@ export class MemStorage implements IStorage {
     
     if (likeEntry) {
       this.likes.delete(likeEntry[0]);
+      console.log(`Deleted like entry ${likeEntry[0]} for user ${userId}, post ${postId}`);
       
       const post = this.posts.get(postId);
       if (post && post.likes > 0) {
         await this.updatePost(postId, { likes: post.likes - 1 });
+        console.log(`Unliked post ${postId}, new count: ${post.likes - 1}`);
       }
+    } else {
+      console.log(`No like entry found for user ${userId}, post ${postId}`);
+      console.log(`Current likes:`, Array.from(this.likes.entries()).map(([id, like]) => ({ id, like })));
     }
   }
 
@@ -399,6 +415,8 @@ export class MemStorage implements IStorage {
     const likeEntry = Array.from(this.likes.values()).find(
       like => like.userId === userId && like.postId === postId
     );
+    console.log(`Checking like status for user ${userId}, post ${postId}:`, !!likeEntry);
+    console.log(`All likes for this post:`, Array.from(this.likes.values()).filter(like => like.postId === postId));
     return !!likeEntry;
   }
 

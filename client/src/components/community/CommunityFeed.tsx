@@ -76,22 +76,11 @@ export function CommunityFeed() {
       }
     },
     onSuccess: (_, { postId, isLiked }) => {
-      // Immediately update the cache with optimistic data
-      queryClient.setQueryData(["posts"], (oldPosts: Post[] | undefined) => {
-        if (!oldPosts) return oldPosts;
-        return oldPosts.map(post => 
-          post.id === postId 
-            ? { 
-                ...post, 
-                likes: isLiked ? Math.max(0, post.likes - 1) : post.likes + 1 
-              }
-            : post
-        );
-      });
-      
-      // Also invalidate to refetch from server
+      // Force a complete refresh from server to get correct data
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["post-like", postId, currentUser?.id] });
+      
+      console.log(`Like/Unlike success for post ${postId}, was liked: ${isLiked}`);
     },
   });
 
@@ -239,6 +228,7 @@ function PostCard({
   // Update isLiked state when likeStatus changes
   useEffect(() => {
     if (likeStatus?.isLiked !== undefined) {
+      console.log(`Setting like status for post ${post.id}:`, likeStatus.isLiked);
       setIsLiked(likeStatus.isLiked);
     }
   }, [likeStatus]);
@@ -259,6 +249,7 @@ function PostCard({
       });
       return;
     }
+    console.log(`Handling like for post ${post.id}, current isLiked:`, isLiked);
     onLike(post.id, isLiked);
   };
 
