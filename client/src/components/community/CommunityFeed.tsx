@@ -80,6 +80,9 @@ export function CommunityFeed() {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["post-like", postId, currentUser?.id] });
       
+      // IMPORTANT: Invalidate user stats to update sidebar like counter
+      queryClient.invalidateQueries({ queryKey: ["user-stats", currentUser?.id] });
+      
       console.log(`Like/Unlike success for post ${postId}, was liked: ${isLiked}`);
     },
   });
