@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { Save, Mail, MapPin, Calendar, Edit3, Upload, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { UserStats } from "@/components/ui/user-stats";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -399,6 +400,18 @@ export default function ProfilePage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* User Statistics */}
+        {currentUser && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Deine Statistiken</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UserStats userId={currentUser.id} />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

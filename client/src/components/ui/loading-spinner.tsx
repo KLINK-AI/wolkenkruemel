@@ -8,31 +8,21 @@ interface LoadingSpinnerProps {
 export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) {
   const sizeClasses = {
     sm: "w-4 h-4",
-    md: "w-8 h-8",
-    lg: "w-12 h-12"
+    md: "w-6 h-6",
+    lg: "w-8 h-8"
   };
 
   return (
-    <div className={cn("animate-spin border-4 border-primary border-t-transparent rounded-full", sizeClasses[size], className)} />
-  );
-}
-
-export function LoadingPage({ message = "Laden..." }: { message?: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-      <LoadingSpinner size="lg" />
-      <p className="text-muted-foreground">{message}</p>
-    </div>
-  );
-}
-
-export function LoadingOverlay({ message = "Laden..." }: { message?: string }) {
-  return (
-    <div className="fixed inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-background p-6 rounded-lg shadow-lg flex flex-col items-center space-y-4">
-        <LoadingSpinner size="lg" />
-        <p className="text-muted-foreground">{message}</p>
-      </div>
+    <div 
+      className={cn(
+        "animate-spin rounded-full border-2 border-gray-300 border-t-blue-600",
+        sizeClasses[size],
+        className
+      )}
+      role="status"
+      aria-label="Loading"
+    >
+      <span className="sr-only">Loading...</span>
     </div>
   );
 }

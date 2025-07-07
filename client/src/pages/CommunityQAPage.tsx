@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { UserStats } from "@/components/ui/user-stats";
 
-export default function CommunityPage() {
+export default function CommunityQAPage() {
   const { currentUser } = useAuth();
 
   return (
@@ -16,9 +16,9 @@ export default function CommunityPage() {
           {/* Main Content */}
           <div className="flex-1 space-y-6">
             <div className="text-center">
-              <h1 className="text-3xl font-bold mb-2">Community Feed</h1>
+              <h1 className="text-3xl font-bold mb-2">Q&A Forum</h1>
               <p className="text-muted-foreground">
-                Entdecke was andere Hundebesitzer in der Community teilen
+                Stelle Fragen und bekomme Antworten von der Community
               </p>
             </div>
 
@@ -34,16 +34,16 @@ export default function CommunityPage() {
               </Card>
             )}
 
-            {/* Feed Content */}
+            {/* Q&A Content */}
             <Card>
               <CardHeader>
-                <CardTitle>Neueste Beiträge</CardTitle>
+                <CardTitle>Fragen & Antworten</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center text-muted-foreground py-8">
-                  <p className="text-lg">Der Community-Feed wird bald verfügbar sein!</p>
+                  <p className="text-lg">Das Q&A-Forum wird bald verfügbar sein!</p>
                   <p className="text-sm mt-2">
-                    Hier werden die neuesten Beiträge, Erfolgsgeschichten und Fragen der Community erscheinen.
+                    Hier kannst du Fragen zum Hundetraining stellen und anderen bei ihren Fragen helfen.
                   </p>
                 </div>
               </CardContent>

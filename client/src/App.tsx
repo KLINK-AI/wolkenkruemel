@@ -10,6 +10,8 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import CommunityPage from "@/pages/CommunityPage";
+import CommunityNetworkPage from "@/pages/CommunityNetworkPage";
+import CommunityQAPage from "@/pages/CommunityQAPage";
 import ActivitiesPage from "@/pages/ActivitiesPage";
 import ActivityDetailPage from "@/pages/ActivityDetailPage";
 import CreateActivityPage from "@/pages/CreateActivityPage";
@@ -25,6 +27,8 @@ function Router() {
       <Switch>
         <Route path="/" component={HomePage} />
         <Route path="/community" component={CommunityPage} />
+        <Route path="/community/network" component={CommunityNetworkPage} />
+        <Route path="/community/qa" component={CommunityQAPage} />
         <Route path="/activities" component={ActivitiesPage} />
         <Route path="/aktivitäten" component={ActivitiesPage} />
         <Route path="/activities/create" component={CreateActivityPage} />

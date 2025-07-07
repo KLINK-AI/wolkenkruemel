@@ -889,6 +889,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User stats endpoint
+  app.get("/api/user-stats/:userId", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const activities = await storage.getActivitiesByAuthor(userId);
+      const posts = await storage.getPostsByAuthor(userId);
+      const userProgress = await storage.getUserProgress(userId);
+      const activitiesCompleted = userProgress.filter(p => p.completed).length;
+
+      res.json({
+        activitiesCreated: activities.length,
+        activitiesCompleted,
+        postsCreated: posts.length,
+        likesReceived: user.likesReceived || 0,
+        tier: user.subscriptionTier
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

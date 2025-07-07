@@ -64,6 +64,7 @@ export interface IStorage {
   // Activity Progress operations
   getActivityProgress(userId: number, activityId: number): Promise<ActivityProgress | undefined>;
   updateActivityProgress(userId: number, activityId: number, progress: Partial<ActivityProgress>): Promise<ActivityProgress>;
+  getUserProgress(userId: number): Promise<ActivityProgress[]>;
   
   // Analytics
   getTrendingTags(): Promise<{ tag: string; count: number }[]>;
@@ -578,6 +579,11 @@ export class MemStorage implements IStorage {
     this.activityProgress.set(key, updatedProgress);
     return updatedProgress;
   }
+
+  async getUserProgress(userId: number): Promise<ActivityProgress[]> {
+    return Array.from(this.activityProgress.values())
+      .filter(progress => progress.userId === userId);
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1063,6 +1069,14 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return created;
     }
+  }
+
+  async getUserProgress(userId: number): Promise<ActivityProgress[]> {
+    return await db
+      .select()
+      .from(activityProgress)
+      .where(eq(activityProgress.userId, userId))
+      .orderBy(desc(activityProgress.updatedAt));
   }
 }
 
