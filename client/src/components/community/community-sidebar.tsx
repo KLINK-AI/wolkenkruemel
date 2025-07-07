@@ -88,20 +88,20 @@ export function CommunitySidebar() {
             <TrendingUp className="w-4 h-4" />
             <h3 className="font-semibold">Beliebte Themen</h3>
           </div>
-          <div className="space-y-2">
-            <Badge variant="secondary" className="text-xs">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="text-xs font-medium">
               #Welpentraining
             </Badge>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="outline" className="text-xs font-medium">
               #Agility
             </Badge>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="outline" className="text-xs font-medium">
               #Hundespiele
             </Badge>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="outline" className="text-xs font-medium">
               #Leinenführigkeit
             </Badge>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="outline" className="text-xs font-medium">
               #Rückruf
             </Badge>
           </div>

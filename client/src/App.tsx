@@ -12,6 +12,7 @@ import HomePage from "@/pages/HomePage";
 import CommunityPage from "@/pages/CommunityPage";
 import CommunityNetworkPage from "@/pages/CommunityNetworkPage";
 import CommunityQAPage from "@/pages/CommunityQAPage";
+import CreatePostPage from "@/pages/CreatePostPage";
 import ActivitiesPage from "@/pages/ActivitiesPage";
 import ActivityDetailPage from "@/pages/ActivityDetailPage";
 import CreateActivityPage from "@/pages/CreateActivityPage";
@@ -29,6 +30,7 @@ function Router() {
         <Route path="/community" component={CommunityPage} />
         <Route path="/community/network" component={CommunityNetworkPage} />
         <Route path="/community/qa" component={CommunityQAPage} />
+        <Route path="/community/create-post" component={CreatePostPage} />
         <Route path="/activities" component={ActivitiesPage} />
         <Route path="/aktivitäten" component={ActivitiesPage} />
         <Route path="/activities/create" component={CreateActivityPage} />

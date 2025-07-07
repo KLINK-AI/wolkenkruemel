@@ -1,7 +1,10 @@
 import { CommunitySidebar } from "@/components/community/community-sidebar";
+import { CommunityFeed } from "@/components/community/CommunityFeed";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { UserStats } from "@/components/ui/user-stats";
+import { Link } from "wouter";
 
 export default function CommunityPage() {
   const { currentUser } = useAuth();
@@ -34,20 +37,8 @@ export default function CommunityPage() {
               </Card>
             )}
 
-            {/* Feed Content */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Neueste Beiträge</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center text-muted-foreground py-8">
-                  <p className="text-lg">Der Community-Feed wird bald verfügbar sein!</p>
-                  <p className="text-sm mt-2">
-                    Hier werden die neuesten Beiträge, Erfolgsgeschichten und Fragen der Community erscheinen.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Community Feed */}
+            <CommunityFeed />
           </div>
         </div>
       </div>
