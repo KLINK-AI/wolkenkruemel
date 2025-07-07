@@ -359,22 +359,25 @@ export class MemStorage implements IStorage {
   }
 
   async unlikePost(userId: number, postId: number): Promise<void> {
+    console.log(`Attempting to unlike post ${postId} for user ${userId}`);
+    
     const likeEntry = Array.from(this.likes.entries()).find(
       ([_, like]) => like.userId === userId && like.postId === postId
     );
     
     if (likeEntry) {
       this.likes.delete(likeEntry[0]);
-      console.log(`Deleted like entry ${likeEntry[0]} for user ${userId}, post ${postId}`);
+      console.log(`Successfully deleted like entry ${likeEntry[0]} for user ${userId}, post ${postId}`);
       
       const post = this.posts.get(postId);
-      if (post && post.likes > 0) {
-        await this.updatePost(postId, { likes: post.likes - 1 });
-        console.log(`Unliked post ${postId}, new count: ${post.likes - 1}`);
+      if (post) {
+        const newLikeCount = Math.max(0, post.likes - 1);
+        await this.updatePost(postId, { likes: newLikeCount });
+        console.log(`Unliked post ${postId}, old count: ${post.likes}, new count: ${newLikeCount}`);
       }
     } else {
-      console.log(`No like entry found for user ${userId}, post ${postId}`);
-      console.log(`Current likes:`, Array.from(this.likes.entries()).map(([id, like]) => ({ id, like })));
+      console.log(`ERROR: No like entry found for user ${userId}, post ${postId}`);
+      console.log(`All current likes:`, Array.from(this.likes.entries()).map(([id, like]) => ({ id, userId: like.userId, postId: like.postId })));
     }
   }
 
@@ -415,9 +418,16 @@ export class MemStorage implements IStorage {
     const likeEntry = Array.from(this.likes.values()).find(
       like => like.userId === userId && like.postId === postId
     );
-    console.log(`Checking like status for user ${userId}, post ${postId}:`, !!likeEntry);
-    console.log(`All likes for this post:`, Array.from(this.likes.values()).filter(like => like.postId === postId));
-    return !!likeEntry;
+    const isLiked = !!likeEntry;
+    console.log(`Like status check: user ${userId}, post ${postId} = ${isLiked}`);
+    
+    if (isLiked) {
+      console.log(`Found like entry:`, likeEntry);
+    } else {
+      console.log(`No like found. All likes for post ${postId}:`, Array.from(this.likes.values()).filter(like => like.postId === postId));
+    }
+    
+    return isLiked;
   }
 
   async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {
