@@ -81,6 +81,61 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Community Call-to-Action Section */}
+      <section className="py-16 px-4 bg-muted/30">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-6">Werde Teil unserer wachsenden Community!</h2>
+            
+            <div className="bg-background rounded-xl p-8 shadow-sm border">
+              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                <strong className="text-foreground">Erstelle einen kostenlosen Account</strong>, um die Details der Aktivitäten sehen zu können und was andere in der Community schreiben.
+              </p>
+              <p className="text-lg font-medium text-primary mb-6">
+                Beteilige Dich an Aktivitäten und werde Teil der Community.
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-6 mb-8 text-left">
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-primary">🚀 Warum kostenlos?</h3>
+                  <p className="text-muted-foreground">
+                    Wir wollen, dass die Plattform schnell wächst, deshalb sind die Grundfunktionen kostenlos: 
+                    eine Sammlung von Tipps von anderen Hundebesitzern zu Aktivitäten, die Du mit deinem Hund tun kannst.
+                  </p>
+                  <p className="text-sm font-medium text-primary">
+                    Das einzige was Du hierfür tun musst, ist eine eigene Aktivität beizusteuern!
+                  </p>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-primary">💬 Community-Austausch</h3>
+                  <p className="text-muted-foreground">
+                    Zudem möchten wir eine Community aufbauen, wo man sich über die Erfahrungen zu den 
+                    Aktivitäten austauschen kann.
+                  </p>
+                  <p className="text-sm font-medium text-primary">
+                    Teile deine Erfolge und lerne von anderen!
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/register">
+                  <Button size="lg" className="w-full sm:w-auto">
+                    Kostenlos registrieren
+                  </Button>
+                </Link>
+                <Link href="/activities">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                    Aktivitäten entdecken
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
