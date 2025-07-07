@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Badge } from './badge';
 import { CheckCircle, FileText, Heart, TrendingUp } from 'lucide-react';
 import { LoadingSpinner } from './loading-spinner';
+import { fetchApi } from '@/lib/api';
 
 interface UserStats {
   activitiesCreated: number;
@@ -22,32 +23,7 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
   const { data: stats, isLoading, error } = useQuery<UserStats>({
     queryKey: ["user-stats", userId],
     enabled: !!userId,
-    queryFn: async () => {
-      try {
-        const url = `/api/user-stats/${userId}`;
-        const init: RequestInit = {
-          method: "GET",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        };
-        
-        const response = await fetch(url, init);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to fetch user stats: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error("Error fetching user stats:", error);
-        throw error;
-      }
-    },
+    queryFn: () => fetchApi<UserStats>(`/api/user-stats/${userId}`),
   });
 
   if (isLoading) {

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useAuth } from "@/hooks/useAuth";
+import { fetchApi } from "@/lib/api";
 
 interface Post {
   id: number;
@@ -31,32 +32,7 @@ export function CommunityFeed() {
   
   const { data: posts, isLoading, error } = useQuery<Post[]>({
     queryKey: ["posts"],
-    queryFn: async () => {
-      try {
-        const url = "/api/posts?limit=20";
-        const init: RequestInit = {
-          method: "GET",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        };
-        
-        const response = await fetch(url, init);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to fetch posts: ${response.status} ${response.statusText} - ${errorText}`);
-        }
-        
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-        throw error;
-      }
-    },
+    queryFn: () => fetchApi<Post[]>("/api/posts?limit=20"),
   });
 
   const getPostTypeIcon = (type: string) => {
