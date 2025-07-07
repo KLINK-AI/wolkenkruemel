@@ -9,22 +9,7 @@ import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useMemo } from "react";
-
-interface Activity {
-  id: number;
-  title: string;
-  description: string;
-  difficulty: string;
-  duration: number;
-  likes: number;
-  completions: number;
-  tags?: string[];
-  createdAt?: string;
-  author: {
-    displayName: string;
-    username: string;
-  };
-}
+import type { Activity } from "@shared/schema";
 
 export default function ActivitiesPage() {
   const { t } = useLanguage();
