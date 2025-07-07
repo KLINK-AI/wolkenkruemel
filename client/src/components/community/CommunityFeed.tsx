@@ -75,8 +75,23 @@ export function CommunityFeed() {
         return postApi(`/api/posts/${postId}/like`, { userId: currentUser?.id });
       }
     },
-    onSuccess: () => {
+    onSuccess: (_, { postId, isLiked }) => {
+      // Immediately update the cache with optimistic data
+      queryClient.setQueryData(["posts"], (oldPosts: Post[] | undefined) => {
+        if (!oldPosts) return oldPosts;
+        return oldPosts.map(post => 
+          post.id === postId 
+            ? { 
+                ...post, 
+                likes: isLiked ? Math.max(0, post.likes - 1) : post.likes + 1 
+              }
+            : post
+        );
+      });
+      
+      // Also invalidate to refetch from server
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post-like", postId, currentUser?.id] });
     },
   });
 
@@ -244,8 +259,6 @@ function PostCard({
       });
       return;
     }
-    // Optimistically update the UI
-    setIsLiked(!isLiked);
     onLike(post.id, isLiked);
   };
 
