@@ -891,10 +891,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // User stats endpoint
   app.get("/api/user-stats/:userId", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
-    }
-
     try {
       const userId = parseInt(req.params.userId);
       if (isNaN(userId)) {
@@ -906,17 +902,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const activities = await storage.getActivitiesByAuthor(userId);
-      const posts = await storage.getPostsByAuthor(userId);
-      const userProgress = await storage.getUserProgress(userId);
-      const activitiesCompleted = userProgress.filter(p => p.completed).length;
+      // Get activity progress count
+      const progressData = await storage.getUserProgress(userId);
+      const activitiesCompleted = progressData.filter(p => p.mastered).length;
 
       res.json({
-        activitiesCreated: activities.length,
+        activitiesCreated: user.activitiesCreated || 0,
         activitiesCompleted,
-        postsCreated: posts.length,
+        postsCreated: user.postsCreated || 0,
         likesReceived: user.likesReceived || 0,
-        tier: user.subscriptionTier
+        tier: user.subscriptionTier || 'free'
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
