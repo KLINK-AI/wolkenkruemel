@@ -330,6 +330,7 @@ export class MemStorage implements IStorage {
     
     const updatedPost = { ...post, ...updates, updatedAt: new Date() };
     this.posts.set(id, updatedPost);
+    console.log(`Updated post ${id} with:`, updates, `Result:`, updatedPost.likes);
     return updatedPost;
   }
 
@@ -354,9 +355,8 @@ export class MemStorage implements IStorage {
     const post = this.posts.get(postId);
     if (post) {
       const newLikeCount = post.likes + 1;
-      post.likes = newLikeCount;
-      this.posts.set(postId, post);
-      console.log(`Liked post ${postId}, old count: ${post.likes - 1}, new count: ${newLikeCount}`);
+      await this.updatePost(postId, { likes: newLikeCount });
+      console.log(`Liked post ${postId}, old count: ${post.likes}, new count: ${newLikeCount}`);
     }
   }
 
@@ -374,9 +374,8 @@ export class MemStorage implements IStorage {
       const post = this.posts.get(postId);
       if (post) {
         const newLikeCount = Math.max(0, post.likes - 1);
-        post.likes = newLikeCount;
-        this.posts.set(postId, post);
-        console.log(`Unliked post ${postId}, old count: ${post.likes + 1}, new count: ${newLikeCount}`);
+        await this.updatePost(postId, { likes: newLikeCount });
+        console.log(`Unliked post ${postId}, old count: ${post.likes}, new count: ${newLikeCount}`);
       }
     } else {
       console.log(`ERROR: No like entry found for user ${userId}, post ${postId}`);
