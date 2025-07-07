@@ -354,6 +354,40 @@ export class MemStorage implements IStorage {
     
     if (likeEntry) {
       this.likes.delete(likeEntry[0]);
+      
+      const post = this.posts.get(postId);
+      if (post && post.likes > 0) {
+        await this.updatePost(postId, { likes: post.likes - 1 });
+      }
+    }
+  }
+
+  async getPost(id: number): Promise<Post | null> {
+    const post = this.posts.get(id);
+    if (!post) return null;
+
+    const author = await this.getUser(post.authorId);
+    if (!author) return null;
+
+    return {
+      ...post,
+      author: {
+        id: author.id,
+        username: author.username,
+        displayName: author.displayName || author.username,
+        avatarUrl: author.avatarUrl || '',
+        subscriptionTier: author.subscriptionTier,
+      }
+    };
+  }
+
+  async unlikePost(userId: number, postId: number): Promise<void> {
+    const likeEntry = Array.from(this.likes.entries()).find(
+      ([_, like]) => like.userId === userId && like.postId === postId
+    );
+    
+    if (likeEntry) {
+      this.likes.delete(likeEntry[0]);
       const post = this.posts.get(postId);
       if (post) {
         await this.updatePost(postId, { likes: Math.max(0, post.likes - 1) });

@@ -158,6 +158,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Unlike post
+  app.post("/api/posts/:id/unlike", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const { userId } = req.body;
+      await storage.unlikePost(postId, userId);
+      res.json({ message: "Post unliked" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Delete post
+  app.post("/api/posts/:id/delete", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const { userId } = req.body;
+      
+      // Check if user is the author
+      const post = await storage.getPost(postId);
+      if (!post || post.authorId !== userId) {
+        return res.status(403).json({ message: "Not authorized to delete this post" });
+      }
+      
+      await storage.deletePost(postId);
+      res.json({ message: "Post deleted" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Comments
   app.get("/api/posts/:id/comments", async (req, res) => {
     try {
@@ -166,6 +197,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(comments);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/posts/:id/comments", async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id);
+      const { content, authorId } = req.body;
+      
+      const commentData = {
+        content,
+        authorId,
+        postId,
+      };
+      
+      const comment = await storage.createComment(commentData);
+      res.status(201).json(comment);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
