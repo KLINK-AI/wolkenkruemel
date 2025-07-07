@@ -43,19 +43,19 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
   const statItems = [
     {
       icon: CheckCircle,
-      label: "Aktivitäten abgeschlossen",
+      label: compact ? "Abgeschlossen" : "Aktivitäten abgeschlossen",
       value: stats.activitiesCompleted,
       color: "text-green-600"
     },
     {
       icon: FileText,
-      label: "Beiträge erstellt",
+      label: compact ? "Posts" : "Beiträge erstellt",
       value: stats.postsCreated,
       color: "text-blue-600"
     },
     {
       icon: Heart,
-      label: "Likes erhalten",
+      label: compact ? "Likes" : "Likes erhalten",
       value: stats.likesReceived,
       color: "text-red-600"
     }
@@ -63,16 +63,16 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
 
   if (compact) {
     return (
-      <div className={`grid grid-cols-3 gap-4 ${className}`}>
+      <div className={`grid grid-cols-3 gap-3 ${className}`}>
         {statItems.map((item) => {
           const Icon = item.icon;
           return (
             <div key={item.label} className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Icon className={`w-5 h-5 ${item.color}`} />
+              <div className="flex items-center justify-center mb-1">
+                <Icon className={`w-4 h-4 ${item.color}`} />
               </div>
-              <div className="text-2xl font-bold">{item.value}</div>
-              <div className="text-xs text-muted-foreground">{item.label}</div>
+              <div className="text-xl font-bold">{item.value}</div>
+              <div className="text-xs text-muted-foreground leading-tight">{item.label}</div>
             </div>
           );
         })}
