@@ -38,6 +38,11 @@ export interface IStorage {
   unlikePost(userId: number, postId: number): Promise<void>;
   isPostLikedByUser(userId: number, postId: number): Promise<boolean>;
   
+  // Activity Like operations
+  likeActivity(userId: number, activityId: number): Promise<void>;
+  unlikeActivity(userId: number, activityId: number): Promise<void>;
+  isActivityLikedByUser(userId: number, activityId: number): Promise<boolean>;
+  
   // Comment operations
   getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]>;
   createComment(comment: InsertComment): Promise<Comment>;
@@ -997,6 +1002,65 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
+  async likeActivity(userId: number, activityId: number): Promise<void> {
+    // Check if already liked
+    const existingLike = await db
+      .select()
+      .from(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)))
+      .limit(1);
+    
+    if (existingLike.length > 0) {
+      console.log(`User ${userId} already liked activity ${activityId}`);
+      return;
+    }
+    
+    // Add like
+    await db.insert(likes).values({ userId, activityId });
+    
+    // Update activity like count
+    await db
+      .update(activities)
+      .set({ likes: sql`likes + 1` })
+      .where(eq(activities.id, activityId));
+    
+    console.log(`Liked activity ${activityId} for user ${userId}`);
+  }
+
+  async unlikeActivity(userId: number, activityId: number): Promise<void> {
+    // Check if like exists
+    const existingLike = await db
+      .select()
+      .from(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)))
+      .limit(1);
+    
+    if (existingLike.length === 0) {
+      console.log(`No like found for user ${userId}, activity ${activityId}`);
+      return;
+    }
+    
+    // Remove like
+    await db.delete(likes).where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)));
+    
+    // Update activity like count
+    await db
+      .update(activities)
+      .set({ likes: sql`GREATEST(0, likes - 1)` })
+      .where(eq(activities.id, activityId));
+    
+    console.log(`Unliked activity ${activityId} for user ${userId}`);
+  }
+
+  async isActivityLikedByUser(userId: number, activityId: number): Promise<boolean> {
+    const result = await db
+      .select()
+      .from(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)))
+      .limit(1);
+    return result.length > 0;
+  }
+
   async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {
     const results = await db
       .select()
@@ -1153,14 +1217,16 @@ export class DatabaseStorage implements IStorage {
 
   async updateActivityProgress(userId: number, activityId: number, progress: Partial<ActivityProgress>): Promise<ActivityProgress> {
     const existing = await this.getActivityProgress(userId, activityId);
+    let wasAlreadyMastered = existing?.mastered || false;
     
+    let result;
     if (existing) {
       const [updated] = await db
         .update(activityProgress)
         .set({ ...progress, updatedAt: new Date() })
         .where(and(eq(activityProgress.userId, userId), eq(activityProgress.activityId, activityId)))
         .returning();
-      return updated;
+      result = updated;
     } else {
       const [created] = await db
         .insert(activityProgress)
@@ -1173,8 +1239,29 @@ export class DatabaseStorage implements IStorage {
           ...progress,
         })
         .returning();
-      return created;
+      result = created;
     }
+
+    // Update activity completion count when mastered status changes
+    if (progress.mastered !== undefined) {
+      if (progress.mastered && !wasAlreadyMastered) {
+        // User just marked as mastered - increment completion count
+        await db
+          .update(activities)
+          .set({ completions: sql`completions + 1` })
+          .where(eq(activities.id, activityId));
+        console.log(`Incremented completion count for activity ${activityId}`);
+      } else if (!progress.mastered && wasAlreadyMastered) {
+        // User unmarked as mastered - decrement completion count
+        await db
+          .update(activities)
+          .set({ completions: sql`GREATEST(0, completions - 1)` })
+          .where(eq(activities.id, activityId));
+        console.log(`Decremented completion count for activity ${activityId}`);
+      }
+    }
+
+    return result;
   }
 
   async getUserProgress(userId: number): Promise<ActivityProgress[]> {

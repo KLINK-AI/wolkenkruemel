@@ -257,7 +257,7 @@ export default function ActivitiesPage() {
                         </div>
                         <div className="flex items-center space-x-1">
                           <Users className="w-4 h-4" />
-                          <span>{activity.completions}</span>
+                          <span>{activity.completions} beherrschen das</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <Star className="w-4 h-4" />

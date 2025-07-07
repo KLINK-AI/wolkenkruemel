@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Clock, User, Heart, Star, Share2, Edit } from "lucide-react";
+import { ArrowLeft, Clock, User, Heart, Bookmark, Share2, Edit, Star } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ActivityDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +18,7 @@ export default function ActivityDetailPage() {
   const queryClient = useQueryClient();
   const { currentUser } = useAuth();
   const permissions = usePermissions(currentUser);
+  const { toast } = useToast();
 
   const userId = currentUser?.id;
 
@@ -40,6 +42,8 @@ export default function ActivityDetailPage() {
     enabled: !!id && !!userId,
   });
 
+  const isFavorite = progress?.favorite || false;
+
   const updateProgressMutation = useMutation({
     mutationFn: async (progressUpdate: { tried?: boolean; mastered?: boolean; favorite?: boolean }) => {
       if (!userId) throw new Error("User not authenticated");
@@ -50,11 +54,15 @@ export default function ActivityDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/activity-progress", userId, id] });
       queryClient.invalidateQueries({ queryKey: ["/api/user-progress", userId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/activities"] });
     },
     onError: (error) => {
       console.error("Failed to update progress:", error);
-      // Show error message to user
-      alert("Fehler beim Speichern des Fortschritts. Bitte versuchen Sie es erneut.");
+      toast({
+        title: "Fehler",
+        description: "Fehler beim Speichern des Fortschritts. Bitte versuchen Sie es erneut.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -144,7 +152,30 @@ export default function ActivityDetailPage() {
                         </Button>
                       </Link>
                     )}
-                    <Button variant="outline" size="sm">
+                    {permissions.canSeeProgress && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          updateProgressMutation.mutate({ favorite: !isFavorite });
+                        }}
+                        disabled={updateProgressMutation.isPending}
+                      >
+                        <Bookmark className={`w-4 h-4 mr-1 ${isFavorite ? 'fill-blue-500 text-blue-500' : ''}`} />
+                        {isFavorite ? 'Favorit' : 'Als Favorit'}
+                      </Button>
+                    )}
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        // Like functionality to be implemented
+                        toast({
+                          title: "Like-Funktion",
+                          description: "Like-System wird implementiert...",
+                        });
+                      }}
+                    >
                       <Heart className="w-4 h-4 mr-1" />
                       {activity.likes}
                     </Button>
@@ -166,7 +197,7 @@ export default function ActivityDetailPage() {
                   )}
                   <Badge variant="outline">
                     <Star className="w-3 h-3 mr-1" />
-                    {activity.completions} Abschlüsse
+                    {activity.completions} beherrschen das
                   </Badge>
                 </div>
 
@@ -389,7 +420,7 @@ export default function ActivityDetailPage() {
                     <span className="font-semibold">{activity.likes}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Abschlüsse</span>
+                    <span className="text-muted-foreground">Hunde beherrschen das</span>
                     <span className="font-semibold">{activity.completions}</span>
                   </div>
                   <div className="flex justify-between">

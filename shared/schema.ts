@@ -91,6 +91,7 @@ export const likes = pgTable("likes", {
   userId: integer("user_id").references(() => users.id),
   postId: integer("post_id").references(() => posts.id),
   commentId: integer("comment_id").references(() => comments.id),
+  activityId: integer("activity_id").references(() => activities.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
