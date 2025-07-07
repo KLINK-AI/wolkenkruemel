@@ -163,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const postId = parseInt(req.params.id);
       const { userId } = req.body;
-      await storage.unlikePost(postId, userId);
+      await storage.unlikePost(userId, postId);
       res.json({ message: "Post unliked" });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
