@@ -16,6 +16,7 @@ export interface IStorage {
   getUserByVerificationToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
+  getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined>;
   updateUserSubscription(id: number, customerId: string, subscriptionId: string): Promise<User>;
   
   // Activity operations
@@ -690,6 +691,15 @@ export class DatabaseStorage implements IStorage {
       .set(updates)
       .where(eq(users.id, id))
       .returning();
+    return user;
+  }
+
+  async getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.stripeCustomerId, stripeCustomerId))
+      .limit(1);
     return user;
   }
 

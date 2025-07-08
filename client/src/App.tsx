@@ -19,6 +19,7 @@ import CreateActivityPage from "@/pages/CreateActivityPage";
 import EditActivityPage from "@/pages/EditActivityPage";
 import ProfilePage from "@/pages/ProfilePage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
+import SubscribePage from "@/pages/SubscribePage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 
@@ -45,6 +46,8 @@ function Router() {
         <Route path="/subscription" component={SubscriptionPage} />
         <Route path="/abonnement" component={SubscriptionPage} />
         <Route path="/premium" component={SubscriptionPage} />
+        <Route path="/subscribe" component={SubscribePage} />
+        <Route path="/upgrade" component={SubscribePage} />
         <Route path="/login" component={LoginPage} />
         <Route path="/register" component={RegisterPage} />
         <Route path="/registrieren" component={RegisterPage} />

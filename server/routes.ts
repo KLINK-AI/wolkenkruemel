@@ -974,6 +974,138 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Stripe payment routes for subscription management
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { amount } = req.body;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "eur",
+      });
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // Create subscription for Premium upgrade
+  app.post('/api/create-subscription', async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+
+    try {
+      const user = req.user;
+      const { priceId } = req.body; // monthly or yearly price ID
+      
+      if (!user.email) {
+        return res.status(400).json({ message: 'No user email on file' });
+      }
+
+      // Check if user already has a Stripe customer
+      let customerId = user.stripeCustomerId;
+      
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.displayName || user.username,
+        });
+        customerId = customer.id;
+        
+        // Update user with Stripe customer ID
+        await storage.updateUser(user.id, { stripeCustomerId: customerId });
+      }
+
+      // Create subscription
+      const subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{ price: priceId }],
+        payment_behavior: 'default_incomplete',
+        payment_settings: { save_default_payment_method: 'on_subscription' },
+        expand: ['latest_invoice.payment_intent'],
+      });
+
+      // Update user with subscription info
+      await storage.updateUser(user.id, { 
+        stripeSubscriptionId: subscription.id,
+        tier: 'premium'
+      });
+
+      const invoice = subscription.latest_invoice as any;
+      const paymentIntent = invoice?.payment_intent;
+
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret: paymentIntent?.client_secret,
+      });
+    } catch (error: any) {
+      console.error('Subscription creation error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Webhook endpoint for Stripe events
+  app.post('/api/webhook', async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.log('No webhook secret configured');
+      return res.status(400).send('Webhook secret not configured');
+    }
+
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig!, webhookSecret);
+    } catch (err: any) {
+      console.log(`Webhook signature verification failed.`, err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    try {
+      switch (event.type) {
+        case 'customer.subscription.created':
+        case 'customer.subscription.updated':
+          const subscription = event.data.object;
+          const customer = await stripe.customers.retrieve(subscription.customer as string);
+          
+          if (customer && !customer.deleted) {
+            const user = await storage.getUserByStripeCustomerId(customer.id);
+            if (user) {
+              const isActive = subscription.status === 'active' || subscription.status === 'trialing';
+              await storage.updateUser(user.id, {
+                tier: isActive ? 'premium' : 'free',
+                stripeSubscriptionId: subscription.id
+              });
+            }
+          }
+          break;
+          
+        case 'customer.subscription.deleted':
+          const deletedSub = event.data.object;
+          const deletedCustomer = await stripe.customers.retrieve(deletedSub.customer as string);
+          
+          if (deletedCustomer && !deletedCustomer.deleted) {
+            const user = await storage.getUserByStripeCustomerId(deletedCustomer.id);
+            if (user) {
+              await storage.updateUser(user.id, {
+                tier: 'free',
+                stripeSubscriptionId: null
+              });
+            }
+          }
+          break;
+      }
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      return res.status(500).send('Webhook processing failed');
+    }
+
+    res.json({ received: true });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

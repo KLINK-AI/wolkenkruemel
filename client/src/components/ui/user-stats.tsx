@@ -45,7 +45,7 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
   const statItems = [
     {
       icon: CheckCircle,
-      label: compact ? "Abgeschlossen" : "Aktivitäten abgeschlossen",
+      label: compact ? "Beherrscht" : "Hunde beherrschen das",
       value: stats.activitiesCompleted,
       color: "text-green-600"
     },
@@ -104,7 +104,7 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{item.value}</div>
-                {item.label === "Aktivitäten abgeschlossen" && stats.activitiesCreated > 0 && (
+                {item.label === "Hunde beherrschen das" && stats.activitiesCreated > 0 && (
                   <p className="text-xs text-muted-foreground">
                     von {stats.activitiesCreated} erstellt
                   </p>
