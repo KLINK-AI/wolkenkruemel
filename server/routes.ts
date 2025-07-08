@@ -642,7 +642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const emailSent = await sendEmail({
         to: email,
-        from: process.env.SENDGRID_FROM_EMAIL || 'noreply@wolkenkruemel.com',
+        from: 'stefan@gen-ai.consulting',
         subject: 'E-Mail bestätigen - Wolkenkrümel',
         text,
         html
