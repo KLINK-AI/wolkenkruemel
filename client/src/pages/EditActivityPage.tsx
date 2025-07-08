@@ -44,6 +44,13 @@ export default function EditActivityPage() {
 
   const { data: activity, isLoading: isLoadingActivity, error } = useQuery<Activity>({
     queryKey: ["/api/activities", activityId],
+    queryFn: async () => {
+      const response = await fetch(`/api/activities/${activityId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch activity: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!activityId,
   });
 
