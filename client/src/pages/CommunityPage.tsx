@@ -42,19 +42,13 @@ export default function CommunityPage() {
               </p>
             </div>
 
-            {/* Quick Actions - left aligned */}
+            {/* Quick Actions - center aligned for posts only */}
             {currentUser && (
               <Card>
                 <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row justify-start gap-3">
-                    <Link href="/activities/create">
-                      <Button className="flex items-center gap-2 w-full sm:w-auto">
-                        <Plus className="w-4 h-4" />
-                        Aktivität erstellen
-                      </Button>
-                    </Link>
+                  <div className="flex justify-center">
                     <Link href="/community/create-post">
-                      <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
+                      <Button className="flex items-center gap-2">
                         <Plus className="w-4 h-4" />
                         Beitrag erstellen
                       </Button>

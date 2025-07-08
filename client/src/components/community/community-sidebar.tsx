@@ -76,7 +76,19 @@ export function CommunitySidebar() {
         </CardContent>
       </Card>
 
-
+      {/* Activity Creation Button */}
+      {currentUser && (
+        <Card className={cn("lg:block", isExpanded ? "block" : "hidden lg:block")}>
+          <CardContent className="p-4">
+            <Link href="/activities/create">
+              <Button className="w-full flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Aktivität erstellen
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Trending Topics */}
       <Card className={cn("lg:block", isExpanded ? "block" : "hidden lg:block")}>
