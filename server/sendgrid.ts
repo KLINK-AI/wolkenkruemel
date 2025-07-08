@@ -1,12 +1,8 @@
-import { MailService } from '@sendgrid/mail';
+// Brevo (formerly SendinBlue) email service
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
-if (!process.env.SENDGRID_API_KEY) {
-  console.warn("SENDGRID_API_KEY environment variable not set - email functionality will be disabled");
-}
-
-const mailService = new MailService();
-if (process.env.SENDGRID_API_KEY) {
-  mailService.setApiKey(process.env.SENDGRID_API_KEY);
+if (!process.env.BREVO_API_KEY) {
+  console.warn("BREVO_API_KEY environment variable not set - email functionality will be disabled");
 }
 
 interface EmailParams {
@@ -18,7 +14,7 @@ interface EmailParams {
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
-  if (!process.env.SENDGRID_API_KEY) {
+  if (!process.env.BREVO_API_KEY) {
     console.log(`Email would be sent to: ${params.to}`);
     console.log(`Subject: ${params.subject}`);
     console.log(`Content: ${params.text || params.html}`);
@@ -26,16 +22,40 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
   }
 
   try {
-    await mailService.send({
-      to: params.to,
-      from: params.from,
-      subject: params.subject,
-      text: params.text,
-      html: params.html,
+    const response = await fetch(BREVO_API_URL, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "Wolkenkrümel Team",
+          email: params.from
+        },
+        to: [
+          {
+            email: params.to,
+            name: params.to.split('@')[0]
+          }
+        ],
+        subject: params.subject,
+        textContent: params.text,
+        htmlContent: params.html
+      })
     });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Brevo API error:', response.status, errorData);
+      return false;
+    }
+
+    console.log('Email sent successfully via Brevo');
     return true;
   } catch (error) {
-    console.error('SendGrid email error:', error);
+    console.error('Brevo email error:', error);
     return false;
   }
 }
