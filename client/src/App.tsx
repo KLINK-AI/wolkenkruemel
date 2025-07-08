@@ -37,9 +37,9 @@ function Router() {
         <Route path="/aktivitäten" component={ActivitiesPage} />
         <Route path="/activities/create" component={CreateActivityPage} />
         <Route path="/aktivitäten/create" component={CreateActivityPage} />
+        <Route path="/activities/admin" component={AdminActivitiesPage} />
         <Route path="/activities/:id" component={ActivityDetailPage} />
         <Route path="/activities/:id/edit" component={EditActivityPage} />
-        <Route path="/activities/admin" component={AdminActivitiesPage} />
         <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
         <Route path="/create-activity" component={CreateActivityPage} />
         <Route path="/create" component={CreateActivityPage} />

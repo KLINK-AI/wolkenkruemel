@@ -159,7 +159,7 @@ export default function EditActivityPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground">Aktivität nicht gefunden</p>
+          <p className="text-muted-foreground dark:text-gray-400">Aktivität nicht gefunden</p>
           <Link href="/activities">
             <Button variant="outline" className="mt-4">
               Zurück zur Übersicht

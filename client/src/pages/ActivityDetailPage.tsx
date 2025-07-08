@@ -140,8 +140,8 @@ export default function ActivityDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Aktivität nicht gefunden</h1>
-          <p className="text-gray-600 mb-6">Die angeforderte Aktivität konnte nicht geladen werden.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Aktivität nicht gefunden</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">Die angeforderte Aktivität konnte nicht geladen werden.</p>
           <Link href="/activities">
             <Button>
               <ArrowLeft className="w-4 h-4 mr-2" />

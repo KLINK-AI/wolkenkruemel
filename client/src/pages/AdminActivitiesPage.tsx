@@ -188,7 +188,7 @@ export default function AdminActivitiesPage() {
 
               {filteredActivities.length === 0 && (
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground">Keine Aktivitäten gefunden</p>
+                  <p className="text-muted-foreground dark:text-gray-400">Keine Aktivitäten gefunden</p>
                 </div>
               )}
             </div>
