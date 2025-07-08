@@ -378,7 +378,12 @@ export default function ActivityDetailPage() {
                       </p>
                     </div>
                     {permissions.needsPremiumUpgrade && (
-                      <Button className="mt-3" variant="outline" size="sm">
+                      <Button 
+                        className="mt-3" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank')}
+                      >
                         Premium freischalten
                       </Button>
                     )}

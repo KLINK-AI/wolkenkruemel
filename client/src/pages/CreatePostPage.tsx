@@ -71,6 +71,16 @@ export default function CreatePostPage() {
   });
 
   const handleSubmit = (data: CreatePostFormData) => {
+    // Check if user has premium subscription
+    if (currentUser?.subscriptionTier === 'free') {
+      toast({
+        title: "Premium-Mitgliedschaft erforderlich",
+        description: "Um Beiträge zu erstellen, benötigst du eine Premium-Mitgliedschaft.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     createPostMutation.mutate(data);
   };
 
@@ -121,6 +131,37 @@ export default function CreatePostPage() {
       icon: Trophy,
     },
   ];
+
+  // Early return for free users with premium upgrade option
+  if (currentUser?.subscriptionTier === 'free') {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <Card className="max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle>Premium-Mitgliedschaft erforderlich</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Um Beiträge zu erstellen, benötigst du eine Premium-Mitgliedschaft.
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank')}
+                  className="flex-1"
+                >
+                  Premium freischalten
+                </Button>
+                <Link href="/community">
+                  <Button variant="outline" className="flex-1">Zurück</Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

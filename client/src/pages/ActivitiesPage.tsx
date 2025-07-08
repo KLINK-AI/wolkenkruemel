@@ -125,9 +125,9 @@ export default function ActivitiesPage() {
             </Button>
           </Link>
           {currentUser && (
-            <Link href="/activities/admin">
+            <Link href="/activities/manage">
               <Button variant="outline">
-                Verwalten
+                Meine Aktivitäten
               </Button>
             </Link>
           )}

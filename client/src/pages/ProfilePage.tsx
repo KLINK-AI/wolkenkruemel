@@ -150,12 +150,13 @@ export default function ProfilePage() {
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                       {currentUser.displayName || currentUser.username || "Unnamed User"}
                     </h1>
-                    {(currentUser.firstName || currentUser.lastName) ? (
-                      <p className="text-lg text-muted-foreground">
+                    <p className="text-lg text-muted-foreground">
+                      @{currentUser.username}
+                    </p>
+                    {(currentUser.firstName || currentUser.lastName) && (
+                      <p className="text-sm text-muted-foreground">
                         {currentUser.firstName} {currentUser.lastName}
                       </p>
-                    ) : (
-                      <p className="text-lg text-muted-foreground">@{currentUser.username}</p>
                     )}
                   </div>
                   <Button
@@ -356,7 +357,7 @@ export default function ProfilePage() {
                 </p>
               </div>
               {currentUser.subscriptionTier === "free" && (
-                <Button>
+                <Button onClick={() => window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank')}>
                   Upgrade
                 </Button>
               )}
