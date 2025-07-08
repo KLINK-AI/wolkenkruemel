@@ -1,8 +1,16 @@
 // Brevo (formerly SendinBlue) email service
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
+
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 if (!process.env.BREVO_API_KEY) {
   console.warn("BREVO_API_KEY environment variable not set - email functionality will be disabled");
+} else {
+  console.log("Brevo API key configured - email functionality enabled");
+  console.log("API key starts with:", process.env.BREVO_API_KEY.substring(0, 20) + "...");
 }
 
 interface EmailParams {
@@ -22,6 +30,9 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
   }
 
   try {
+    console.log(`Attempting to send email to: ${params.to}`);
+    console.log(`Using API key: ${process.env.BREVO_API_KEY.substring(0, 20)}...`);
+    
     const response = await fetch(BREVO_API_URL, {
       method: 'POST',
       headers: {
@@ -46,13 +57,24 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       })
     });
 
+    const responseData = await response.json();
+    
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Brevo API error:', response.status, errorData);
+      console.error('Brevo API error:', response.status, responseData);
+      
+      // If API key is invalid, provide helpful message
+      if (responseData.code === 'unauthorized' || responseData.message === 'Key not found') {
+        console.error('ERROR: Brevo API key is invalid or does not have proper permissions');
+        console.error('Please check your Brevo account and ensure:');
+        console.error('1. The API key is correct');
+        console.error('2. The API key has Email sending permissions');
+        console.error('3. You have verified sender email addresses in your Brevo account');
+      }
+      
       return false;
     }
 
-    console.log('Email sent successfully via Brevo');
+    console.log('Email sent successfully via Brevo:', responseData);
     return true;
   } catch (error) {
     console.error('Brevo email error:', error);
