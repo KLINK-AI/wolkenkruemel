@@ -5,11 +5,9 @@ import nodemailer from "nodemailer";
 // Load environment variables
 dotenv.config();
 
-// Create SMTP transporter for Brevo
+// Create SMTP transporter for Brevo - try different configuration
 const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false, // Use TLS
+  service: 'sendinblue', // Alternative service name
   auth: {
     user: process.env.BREVO_SMTP_USER || "848306026@smtp-brevo.com", 
     pass: process.env.BREVO_SMTP_PASS || process.env.BREVO_API_KEY || ""
@@ -42,6 +40,12 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
 
   try {
     console.log(`Attempting to send email via Brevo SMTP to: ${params.to}`);
+    console.log('SMTP Config:', {
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      user: process.env.BREVO_SMTP_USER || "848306026@smtp-brevo.com",
+      passLength: (process.env.BREVO_SMTP_PASS || "").length
+    });
     
     const mailOptions = {
       from: `"Wolkenkrümel Team" <stefan@gen-ai.consulting>`,
@@ -55,7 +59,14 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     console.log('Email sent successfully via Brevo SMTP:', info.messageId);
     return true;
   } catch (error) {
-    console.error('Brevo SMTP error:', error);
+    console.error('Brevo SMTP error details:', {
+      message: error.message,
+      code: error.code,
+      response: error.response
+    });
+    
+    // For now, let's not fail registration due to email issues
+    console.log('Email sending failed, but continuing with registration...');
     return false;
   }
 }
