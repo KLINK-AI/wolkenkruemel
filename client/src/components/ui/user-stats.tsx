@@ -66,7 +66,7 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
   if (compact) {
     return (
       <div className={`space-y-3 ${className}`}>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 pt-4">
           <h3 className="text-lg font-semibold">Deine Statistiken</h3>
           <Badge variant={stats.tier === 'premium' ? 'default' : 'secondary'}>
             {stats.tier === 'premium' ? 'Premium' : 'Kostenlos'}
@@ -90,7 +90,7 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
 
   return (
     <div className={className}>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 pt-4">
         <h3 className="text-lg font-semibold">Deine Statistiken</h3>
         <Badge variant={stats.tier === 'premium' ? 'default' : 'secondary'}>
           {stats.tier === 'premium' ? 'Premium' : 'Kostenlos'}
