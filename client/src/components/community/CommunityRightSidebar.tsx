@@ -84,10 +84,19 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
                 <Button 
                   className="w-full" 
                   size="sm"
-                  onClick={() => setIsPremiumModalOpen(true)}
+                  onClick={() => {
+                    // Demo upgrade - immediately activate premium
+                    fetch('/api/demo-upgrade', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId: realUser?.id })
+                    }).then(() => {
+                      window.location.reload();
+                    });
+                  }}
                 >
                   <Crown className="w-4 h-4 mr-2" />
-                  Premium für mehr Aktivitäten
+                  Premium freischalten (Demo)
                 </Button>
               )}
             </div>
@@ -112,10 +121,19 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
               variant="outline" 
               className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-950/30" 
               size="sm"
-              onClick={() => setIsPremiumModalOpen(true)}
+              onClick={() => {
+                // Demo upgrade - immediately activate premium
+                fetch('/api/demo-upgrade', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ userId: realUser?.id })
+                }).then(() => {
+                  window.location.reload();
+                });
+              }}
             >
               <Crown className="w-4 h-4 mr-2" />
-              {t('premium.unlock')}
+              Premium freischalten (Demo)
             </Button>
           </CardContent>
         </Card>

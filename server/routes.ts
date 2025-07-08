@@ -801,6 +801,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Demo upgrade endpoint - instantly activate premium
+  app.post("/api/demo-upgrade", async (req, res) => {
+    const { userId } = req.body;
+    
+    try {
+      if (!userId) {
+        return res.status(400).json({ error: "User ID required" });
+      }
+      
+      // Update user to premium
+      const updatedUser = await storage.updateUser(userId, {
+        subscriptionTier: "premium"
+      });
+      
+      // Update session
+      if (req.session) {
+        req.session.user = updatedUser;
+      }
+      
+      res.json({ 
+        success: true, 
+        message: "Premium upgrade successful",
+        user: updatedUser 
+      });
+    } catch (error: any) {
+      console.error("Error upgrading user:", error);
+      res.status(500).json({ error: "Upgrade failed" });
+    }
+  });
+
   // Subscription routes
   app.post("/api/create-subscription", async (req, res) => {
     try {
