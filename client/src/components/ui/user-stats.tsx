@@ -66,6 +66,12 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
   if (compact) {
     return (
       <div className={`space-y-3 ${className}`}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold">Deine Statistiken</h3>
+          <Badge variant={stats.tier === 'premium' ? 'default' : 'secondary'}>
+            {stats.tier === 'premium' ? 'Premium' : 'Kostenlos'}
+          </Badge>
+        </div>
         {statItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -104,11 +110,6 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{item.value}</div>
-                {item.label === "Hunde beherrschen das" && stats.activitiesCreated > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    von {stats.activitiesCreated} erstellt
-                  </p>
-                )}
               </CardContent>
             </Card>
           );

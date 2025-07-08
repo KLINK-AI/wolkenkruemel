@@ -22,9 +22,6 @@ export default function CommunityPage() {
               {/* User Stats - moved to left sidebar */}
               {currentUser && (
                 <Card className="mt-4">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Deine Statistiken</CardTitle>
-                  </CardHeader>
                   <CardContent>
                     <UserStats userId={currentUser.id} compact />
                   </CardContent>
