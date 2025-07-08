@@ -5,12 +5,14 @@ import nodemailer from "nodemailer";
 // Load environment variables
 dotenv.config();
 
-// Create SMTP transporter for Brevo - try different configuration
+// Create SMTP transporter for Brevo
 const transporter = nodemailer.createTransport({
-  service: 'sendinblue', // Alternative service name
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false, // Use TLS
   auth: {
-    user: process.env.BREVO_SMTP_USER || "848306026@smtp-brevo.com", 
-    pass: process.env.BREVO_SMTP_PASS || process.env.BREVO_API_KEY || ""
+    user: "stefan@gen-ai.consulting", // Use actual verified email as login
+    pass: process.env.BREVO_SMTP_KEY || "GTdUfjZmEXpsRgvP"
   }
 });
 
