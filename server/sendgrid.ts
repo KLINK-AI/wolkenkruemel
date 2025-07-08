@@ -5,15 +5,19 @@ import nodemailer from "nodemailer";
 // Load environment variables
 dotenv.config();
 
-// Create SMTP transporter for custom mail server
+// Create SMTP transporter for custom mail server - try port 587 (may be less restricted)
 const transporter = nodemailer.createTransport({
   host: "mx.configo.de",
-  port: 465,
-  secure: true, // Use SSL
+  port: 587,
+  secure: false, // Use STARTTLS
   auth: {
     user: "stefan@gen-ai.consulting",
     pass: process.env.CUSTOM_SMTP_PASSWORD || "mD8*QA6N9J*yabMn"
-  }
+  },
+  // Add timeout and connection settings
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 5000, // 5 seconds
+  socketTimeout: 60000 // 60 seconds
 });
 
 if (!process.env.BREVO_API_KEY && !process.env.BREVO_SMTP_PASS) {
@@ -33,18 +37,19 @@ interface EmailParams {
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
-  if (!process.env.BREVO_API_KEY) {
-    console.log(`Email would be sent to: ${params.to}`);
-    console.log(`Subject: ${params.subject}`);
-    console.log(`Content: ${params.text || params.html}`);
-    return true; // Simulate success in development
-  }
+  // Skip this check - we want to send real emails
+  // if (!process.env.BREVO_API_KEY) {
+  //   console.log(`Email would be sent to: ${params.to}`);
+  //   console.log(`Subject: ${params.subject}`);
+  //   console.log(`Content: ${params.text || params.html}`);
+  //   return true; // Simulate success in development
+  // }
 
   try {
     console.log(`Attempting to send email via Custom SMTP to: ${params.to}`);
     console.log('SMTP Config:', {
       host: 'mx.configo.de',
-      port: 465,
+      port: 587,
       user: 'stefan@gen-ai.consulting',
       passLength: (process.env.CUSTOM_SMTP_PASSWORD || "").length
     });
@@ -57,8 +62,15 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       html: params.html
     };
 
+    console.log('Sending email with options:', {
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject
+    });
+
     const info = await transporter.sendMail(mailOptions);
     console.log('Email sent successfully via Custom SMTP:', info.messageId);
+    console.log('Email delivery info:', info);
     return true;
   } catch (error) {
     console.error('Custom SMTP error details:', {
@@ -69,6 +81,7 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     
     // For now, let's not fail registration due to email issues
     console.log('Email sending failed, but continuing with registration...');
+    console.log('Full error details:', error);
     return false;
   }
 }
