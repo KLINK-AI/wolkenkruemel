@@ -54,14 +54,7 @@ export default function EditActivityPage() {
     enabled: !!activityId,
   });
 
-  // Debug logging
-  console.log('EditActivityPage Debug:', {
-    activityId,
-    activity,
-    isLoading: isLoadingActivity,
-    error,
-    currentUser
-  });
+  // Debug logging (removed for production)
 
   const form = useForm<EditActivityFormData>({
     resolver: zodResolver(editActivitySchema),
@@ -355,11 +348,13 @@ export default function EditActivityPage() {
                       <div className="grid grid-cols-2 gap-4">
                         {selectedImages.map((image, index) => (
                           <div key={index} className="relative inline-block">
-                            <img
-                              src={image}
-                              alt={`Aktivität Foto ${index + 1}`}
-                              className="w-full h-32 object-cover rounded-lg border"
-                            />
+                            <div className="w-full h-32 bg-gray-50 dark:bg-gray-800 rounded-lg border flex items-center justify-center p-2">
+                              <img
+                                src={image}
+                                alt={`Aktivität Foto ${index + 1}`}
+                                className="max-w-full max-h-full object-contain rounded-lg"
+                              />
+                            </div>
                             <Button
                               type="button"
                               variant="destructive"

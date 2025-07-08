@@ -237,11 +237,11 @@ export default function CreateActivityPage() {
                           {images.length > 0 && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {images.map((image, index) => (
-                                <div key={index} className="relative">
+                                <div key={index} className="relative bg-gray-50 dark:bg-gray-800 rounded-lg border border-border p-4 flex items-center justify-center" style={{minHeight: "12rem"}}>
                                   <img
                                     src={image}
                                     alt={`Activity preview ${index + 1}`}
-                                    className="w-full h-48 object-cover rounded-lg border border-border"
+                                    className="max-w-full max-h-44 object-contain rounded-lg"
                                   />
                                   <Button
                                     type="button"

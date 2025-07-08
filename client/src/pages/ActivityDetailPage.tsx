@@ -256,20 +256,23 @@ export default function ActivityDetailPage() {
                 {activity.images && activity.images.length > 0 && (
                   <div className="mb-6">
                     {activity.images.length === 1 ? (
-                      <img 
-                        src={activity.images[0]} 
-                        alt={activity.title}
-                        className="w-full h-64 object-cover rounded-lg"
-                      />
+                      <div className="flex justify-center bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                        <img 
+                          src={activity.images[0]} 
+                          alt={activity.title}
+                          className="max-w-full max-h-96 object-contain rounded-lg"
+                        />
+                      </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {activity.images.map((image: string, index: number) => (
-                          <img 
-                            key={index}
-                            src={image} 
-                            alt={`${activity.title} - Bild ${index + 1}`}
-                            className="w-full h-48 object-cover rounded-lg"
-                          />
+                          <div key={index} className="flex justify-center bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                            <img 
+                              src={image} 
+                              alt={`${activity.title} - Bild ${index + 1}`}
+                              className="max-w-full max-h-64 object-contain rounded-lg"
+                            />
+                          </div>
                         ))}
                       </div>
                     )}
