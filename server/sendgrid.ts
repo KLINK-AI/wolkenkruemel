@@ -43,7 +43,7 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       body: JSON.stringify({
         sender: {
           name: "Wolkenkrümel Team",
-          email: params.from
+          email: "stefan@gen-ai.consulting"
         },
         to: [
           {
