@@ -50,6 +50,22 @@ export function getUserPermissions(user: User): UserPermissions {
     };
   }
 
+  // For free users, provide basic permissions with activity limits
+  if (tier === "free") {
+    return {
+      canCreateActivities: true,
+      canCreatePosts: false,
+      canComment: false,
+      canLike: true,
+      canShare: false,
+      canSaveFavorites: false,
+      maxActivities: 5,
+      hasUnlimitedActivities: false,
+      canAccessCommunity: true,
+      canSeeProgress: false,
+    };
+  }
+
   switch (status) {
     case "unverified":
       return basePermissions;
@@ -132,6 +148,11 @@ export function canUserCreateActivity(user: User): boolean {
     return true;
   }
   
+  // For free users, allow up to 5 activities
+  if (user.subscriptionTier === "free") {
+    return (user.activitiesCreated || 0) < 5;
+  }
+  
   return (user.activitiesCreated || 0) < permissions.maxActivities;
 }
 
@@ -140,6 +161,12 @@ export function getActivityLimitMessage(user: User): string {
   
   if (permissions.hasUnlimitedActivities) {
     return "Unbegrenzte Aktivitäten";
+  }
+  
+  // For free users, show limit of 5
+  if (user.subscriptionTier === "free") {
+    const remaining = 5 - (user.activitiesCreated || 0);
+    return `${remaining} von 5 Aktivitäten verbleibend (kostenlos)`;
   }
   
   const remaining = permissions.maxActivities - (user.activitiesCreated || 0);

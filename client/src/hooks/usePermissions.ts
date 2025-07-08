@@ -41,6 +41,8 @@ export function usePermissions(user: User | null) {
       needsEmailVerification: false, // Assume all logged in users are verified
       needsPremiumUpgrade: !isPremium, // Only free users need premium upgrade
       denialReason: isPremium ? null : "premium_upgrade",
+      // Override for free users - they can create up to 5 activities
+      canCreateActivities: isPremium || permissions.maxActivities === 0 || permissions.maxActivities > 0,
     };
   }, [user]);
 }

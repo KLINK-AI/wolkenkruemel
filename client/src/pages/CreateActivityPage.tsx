@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { z } from "zod";
+import type { Activity } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -44,15 +45,51 @@ export default function CreateActivityPage() {
   const { currentUser } = useAuth();
   const permissions = usePermissions(currentUser);
 
-  // Redirect if not authenticated or not premium
+  // Redirect if not authenticated
   if (!currentUser) {
     setLocation("/login");
     return null;
   }
 
-  if (!permissions.canCreateActivity) {
-    setLocation("/community");
-    return null;
+  // Fetch user's activities to check count
+  const { data: activities = [] } = useQuery<Activity[]>({
+    queryKey: ["/api/activities"],
+    queryFn: async () => {
+      const response = await fetch('/api/activities');
+      if (!response.ok) throw new Error('Failed to fetch activities');
+      return response.json();
+    },
+  });
+
+  const userActivityCount = activities.filter(a => a.authorId === currentUser.id).length;
+
+  // Check if free user has reached limit
+  if (currentUser.subscriptionTier === 'free' && userActivityCount >= 5) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>Aktivitätslimit erreicht</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Du hast bereits 5 Aktivitäten erstellt. Upgrade auf Premium für unbegrenzte Aktivitäten!
+            </p>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank')}
+                className="flex-1"
+              >
+                Premium freischalten
+              </Button>
+              <Link href="/activities">
+                <Button variant="outline" className="flex-1">Zurück</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const form = useForm<CreateActivityForm>({
