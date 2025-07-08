@@ -5,14 +5,14 @@ import nodemailer from "nodemailer";
 // Load environment variables
 dotenv.config();
 
-// Create SMTP transporter for Brevo
+// Create SMTP transporter for custom mail server
 const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false, // Use TLS
+  host: "mx.configo.de",
+  port: 465,
+  secure: true, // Use SSL
   auth: {
-    user: "stefan@gen-ai.consulting", // Use actual verified email as login
-    pass: process.env.BREVO_SMTP_KEY || "GTdUfjZmEXpsRgvP"
+    user: "stefan@gen-ai.consulting",
+    pass: process.env.CUSTOM_SMTP_PASSWORD || "mD8*QA6N9J*yabMn"
   }
 });
 
@@ -41,12 +41,12 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
   }
 
   try {
-    console.log(`Attempting to send email via Brevo SMTP to: ${params.to}`);
+    console.log(`Attempting to send email via Custom SMTP to: ${params.to}`);
     console.log('SMTP Config:', {
-      host: 'smtp-relay.brevo.com',
-      port: 587,
-      user: process.env.BREVO_SMTP_USER || "848306026@smtp-brevo.com",
-      passLength: (process.env.BREVO_SMTP_PASS || "").length
+      host: 'mx.configo.de',
+      port: 465,
+      user: 'stefan@gen-ai.consulting',
+      passLength: (process.env.CUSTOM_SMTP_PASSWORD || "").length
     });
     
     const mailOptions = {
@@ -58,10 +58,10 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully via Brevo SMTP:', info.messageId);
+    console.log('Email sent successfully via Custom SMTP:', info.messageId);
     return true;
   } catch (error) {
-    console.error('Brevo SMTP error details:', {
+    console.error('Custom SMTP error details:', {
       message: error.message,
       code: error.code,
       response: error.response
