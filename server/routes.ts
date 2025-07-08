@@ -12,6 +12,9 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { sendEmail, generateEmailVerificationTemplate } from "./sendgrid";
 import crypto from "crypto";
+import session from "express-session";
+import { Pool } from "@neondatabase/serverless";
+import connectPgSimple from "connect-pg-simple";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -22,6 +25,25 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Configure sessions
+  const PgSession = connectPgSimple(session);
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  
+  app.use(session({
+    store: new PgSession({
+      pool: pool,
+      tableName: 'user_sessions'
+    }),
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    }
+  }));
   
   // Community Posts
   app.get("/api/posts", async (req, res) => {
@@ -601,11 +623,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current user endpoint
   app.get("/api/me", async (req, res) => {
     try {
-      if (!req.isAuthenticated()) {
+      if (!req.session?.user) {
         return res.status(401).json({ message: "Not authenticated" });
       }
       
-      const user = req.user;
+      const user = req.session.user;
       const { password, ...safeUser } = user;
       res.json(safeUser);
     } catch (error: any) {
@@ -736,11 +758,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse" });
       }
 
+      // Store user in session
+      req.session.user = user;
+      
       const { password: _, ...safeUser } = user;
       res.json(safeUser);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
+  });
+
+  // User Logout
+  app.post("/api/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logout successful" });
+    });
   });
 
   // Check activity creation limit
@@ -1159,7 +1194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create subscription for Premium upgrade
   app.post('/api/create-subscription', async (req, res) => {
-    if (!req.isAuthenticated()) {
+    if (!req.session?.user) {
       return res.sendStatus(401);
     }
 
