@@ -378,6 +378,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/activities/:id", async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.id);
+      if (isNaN(activityId)) {
+        return res.status(400).json({ message: "Invalid activity ID" });
+      }
+
+      // Check if activity exists
+      const existingActivity = await storage.getActivity(activityId);
+      if (!existingActivity) {
+        return res.status(404).json({ message: "Activity not found" });
+      }
+
+      // TODO: Check if user is the author or admin
+      // if (existingActivity.authorId !== authenticatedUserId && !isAdmin) {
+      //   return res.status(403).json({ message: "You can only delete your own activities" });
+      // }
+
+      await storage.deleteActivity(activityId);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Error deleting activity:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.put("/api/activities/:id/approve", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

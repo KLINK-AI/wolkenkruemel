@@ -17,6 +17,7 @@ import ActivitiesPage from "@/pages/ActivitiesPage";
 import ActivityDetailPage from "@/pages/ActivityDetailPage";
 import CreateActivityPage from "@/pages/CreateActivityPage";
 import EditActivityPage from "@/pages/EditActivityPage";
+import AdminActivitiesPage from "@/pages/AdminActivitiesPage";
 import ProfilePage from "@/pages/ProfilePage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import SubscribePage from "@/pages/SubscribePage";
@@ -38,6 +39,7 @@ function Router() {
         <Route path="/aktivitäten/create" component={CreateActivityPage} />
         <Route path="/activities/:id" component={ActivityDetailPage} />
         <Route path="/activities/:id/edit" component={EditActivityPage} />
+        <Route path="/activities/admin" component={AdminActivitiesPage} />
         <Route path="/aktivitäten/:id" component={ActivityDetailPage} />
         <Route path="/create-activity" component={CreateActivityPage} />
         <Route path="/create" component={CreateActivityPage} />

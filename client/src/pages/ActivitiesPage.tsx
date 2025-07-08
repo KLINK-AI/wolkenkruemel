@@ -117,12 +117,21 @@ export default function ActivitiesPage() {
           <h1 className="text-3xl font-bold text-foreground mb-2">{t('activities.title')}</h1>
           <p className="text-muted-foreground">{t('activities.subtitle')}</p>
         </div>
-        <Link href="/create-activity">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            {t('activities.create')}
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/create-activity">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              {t('activities.create')}
+            </Button>
+          </Link>
+          {currentUser && (
+            <Link href="/activities/admin">
+              <Button variant="outline">
+                Verwalten
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
 
       <Card className="mb-6">
