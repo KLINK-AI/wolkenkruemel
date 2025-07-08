@@ -170,14 +170,15 @@ export default function EditActivityPage() {
     );
   }
 
-  // Check if user is the author
+  // Check if user is the author or admin (user ID 3 is admin)
   const isAuthor = currentUser && activity.author && activity.author.id === currentUser.id;
+  const isAdmin = currentUser && currentUser.id === 3;
 
-  if (!isAuthor) {
+  if (!isAuthor && !isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground">Sie können nur Ihre eigenen Aktivitäten bearbeiten</p>
+          <p className="text-muted-foreground dark:text-gray-400">Sie können nur Ihre eigenen Aktivitäten bearbeiten</p>
           <Link href="/activities">
             <Button variant="outline" className="mt-4">
               Zurück zur Übersicht
