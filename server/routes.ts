@@ -598,6 +598,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user endpoint
+  app.get("/api/me", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
+      const user = req.user;
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.patch("/api/users/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

@@ -336,44 +336,7 @@ export default function ProfilePage() {
           </Card>
         )}
 
-        {/* Profile Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Aktivitäten</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">
-                {currentUser.activitiesCreated || 0}
-              </div>
-              <p className="text-sm text-muted-foreground">erstellt</p>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Beiträge</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">
-                {currentUser.postsCreated || 0}
-              </div>
-              <p className="text-sm text-muted-foreground">verfasst</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Likes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">
-                {currentUser.likesReceived || 0}
-              </div>
-              <p className="text-sm text-muted-foreground">erhalten</p>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Subscription Status */}
         <Card>
@@ -401,7 +364,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        {/* User Statistics */}
+        {/* User Statistics - Corrected Version */}
         {currentUser && (
           <Card>
             <CardHeader>
