@@ -23,6 +23,8 @@ import SubscriptionPage from "@/pages/SubscriptionPage";
 import SubscribePage from "@/pages/SubscribePage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import EmailVerifiedPage from "@/pages/EmailVerifiedPage";
+import UserManagementPage from "@/pages/UserManagementPage";
 
 function Router() {
   return (
@@ -53,6 +55,8 @@ function Router() {
         <Route path="/login" component={LoginPage} />
         <Route path="/register" component={RegisterPage} />
         <Route path="/registrieren" component={RegisterPage} />
+        <Route path="/email-verified" component={EmailVerifiedPage} />
+        <Route path="/admin/users" component={UserManagementPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

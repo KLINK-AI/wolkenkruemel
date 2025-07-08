@@ -615,10 +615,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, email, password, displayName } = req.body;
       
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ message: "E-Mail bereits registriert" });
+      // Check if user already exists by email
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ 
+          message: "E-Mail bereits registriert",
+          field: "email"
+        });
+      }
+
+      // Check if username already exists
+      const existingUserByUsername = await storage.getUserByUsername(username);
+      if (existingUserByUsername) {
+        return res.status(400).json({ 
+          message: "Benutzername bereits vergeben",
+          field: "username"
+        });
+      }
+
+      // Check if display name already exists
+      const existingUserByDisplayName = await storage.getUserByDisplayName(displayName);
+      if (existingUserByDisplayName) {
+        return res.status(400).json({ 
+          message: "Dieser Name ist bereits registriert",
+          field: "displayName"
+        });
       }
 
       // Create user with email verification pending
@@ -678,9 +699,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         emailVerificationToken: null 
       });
 
-      res.json({ message: "E-Mail erfolgreich bestätigt! Sie können sich jetzt anmelden." });
+      // Redirect to success page
+      res.redirect(`${req.protocol}://${req.get('host')}/email-verified?success=true`);
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      console.error('Email verification error:', error);
+      res.redirect(`${req.protocol}://${req.get('host')}/email-verified?error=true`);
     }
   });
 
@@ -943,6 +966,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Mock reported items - in real app would track reports
       res.json([]);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Admin User Management Routes
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/admin/users", async (req, res) => {
+    try {
+      const { username, email, displayName, role, subscriptionTier, isEmailVerified } = req.body;
+      
+      // Check if user already exists
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ message: "E-Mail bereits registriert" });
+      }
+
+      const existingUserByUsername = await storage.getUserByUsername(username);
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: "Benutzername bereits vergeben" });
+      }
+
+      const userData = {
+        username,
+        email,
+        displayName,
+        password: "defaultPassword123", // In production, generate a secure password
+        role: role || 'user',
+        subscriptionTier: subscriptionTier || 'free',
+        isEmailVerified: isEmailVerified || false,
+        emailVerificationToken: null
+      };
+      
+      const user = await storage.createUser(userData);
+      res.json(user);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.put("/api/admin/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const user = await storage.updateUser(userId, updates);
+      res.json(user);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      await storage.deleteUser(userId);
+      res.json({ message: "Benutzer erfolgreich gelöscht" });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

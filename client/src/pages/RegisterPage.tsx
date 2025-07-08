@@ -51,9 +51,23 @@ export default function RegisterPage() {
       });
     },
     onError: (error: any) => {
+      let errorMessage = error.message || "Ein Fehler ist aufgetreten";
+      
+      // Set specific field errors
+      if (error.field === "email") {
+        form.setError("email", { message: error.message });
+        errorMessage = "Diese E-Mail-Adresse ist bereits registriert";
+      } else if (error.field === "username") {
+        form.setError("username", { message: error.message });
+        errorMessage = "Dieser Benutzername ist bereits vergeben";
+      } else if (error.field === "displayName") {
+        form.setError("displayName", { message: error.message });
+        errorMessage = "Dieser Name ist bereits registriert";
+      }
+      
       toast({
         title: "Registrierung fehlgeschlagen",
-        description: error.message || "Ein Fehler ist aufgetreten",
+        description: errorMessage,
         variant: "destructive",
       });
     },

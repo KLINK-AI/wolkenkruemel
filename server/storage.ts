@@ -13,9 +13,12 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByDisplayName(displayName: string): Promise<User | undefined>;
   getUserByVerificationToken(token: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
+  deleteUser(id: number): Promise<void>;
   getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined>;
   updateUserSubscription(id: number, customerId: string, subscriptionId: string): Promise<User>;
   
@@ -110,6 +113,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values()).find(user => user.email === email);
   }
 
+  async getUserByDisplayName(displayName: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.displayName === displayName);
+  }
+
   async getUserByVerificationToken(token: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(user => user.emailVerificationToken === token);
   }
@@ -137,6 +144,10 @@ export class MemStorage implements IStorage {
     return user;
   }
 
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
   async updateUser(id: number, updates: Partial<User>): Promise<User> {
     const user = this.users.get(id);
     if (!user) throw new Error('User not found');
@@ -144,6 +155,13 @@ export class MemStorage implements IStorage {
     const updatedUser = { ...user, ...updates, updatedAt: new Date() };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    if (!this.users.has(id)) {
+      throw new Error("User not found");
+    }
+    this.users.delete(id);
   }
 
   async updateUserSubscription(id: number, customerId: string, subscriptionId: string): Promise<User> {
@@ -672,9 +690,18 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUserByDisplayName(displayName: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.displayName, displayName));
+    return user || undefined;
+  }
+
   async getUserByVerificationToken(token: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.emailVerificationToken, token));
     return user || undefined;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(desc(users.createdAt));
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -692,6 +719,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return user;
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined> {
