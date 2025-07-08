@@ -1,16 +1,27 @@
-// Brevo (formerly SendinBlue) email service
+// Brevo SMTP email service using nodemailer
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 
 // Load environment variables
 dotenv.config();
 
-const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
+// Create SMTP transporter for Brevo
+const transporter = nodemailer.createTransport({
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false, // Use TLS
+  auth: {
+    user: process.env.BREVO_SMTP_USER || "848306026@smtp-brevo.com", 
+    pass: process.env.BREVO_SMTP_PASS || process.env.BREVO_API_KEY || ""
+  }
+});
 
-if (!process.env.BREVO_API_KEY) {
-  console.warn("BREVO_API_KEY environment variable not set - email functionality will be disabled");
+if (!process.env.BREVO_API_KEY && !process.env.BREVO_SMTP_PASS) {
+  console.warn("BREVO SMTP credentials not set - email functionality will be disabled");
 } else {
-  console.log("Brevo API key configured - email functionality enabled");
-  console.log("API key starts with:", process.env.BREVO_API_KEY.substring(0, 20) + "...");
+  console.log("Brevo SMTP configured - email functionality enabled");
+  console.log("SMTP user:", process.env.BREVO_SMTP_USER || "848306026@smtp-brevo.com");
+  console.log("SMTP configured with password from env variables");
 }
 
 interface EmailParams {
@@ -30,54 +41,21 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
   }
 
   try {
-    console.log(`Attempting to send email to: ${params.to}`);
-    console.log(`Using API key: ${process.env.BREVO_API_KEY.substring(0, 20)}...`);
+    console.log(`Attempting to send email via Brevo SMTP to: ${params.to}`);
     
-    const response = await fetch(BREVO_API_URL, {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'api-key': process.env.BREVO_API_KEY,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        sender: {
-          name: "Wolkenkrümel Team",
-          email: "stefan@gen-ai.consulting"
-        },
-        to: [
-          {
-            email: params.to,
-            name: params.to.split('@')[0]
-          }
-        ],
-        subject: params.subject,
-        textContent: params.text,
-        htmlContent: params.html
-      })
-    });
+    const mailOptions = {
+      from: `"Wolkenkrümel Team" <stefan@gen-ai.consulting>`,
+      to: params.to,
+      subject: params.subject,
+      text: params.text,
+      html: params.html
+    };
 
-    const responseData = await response.json();
-    
-    if (!response.ok) {
-      console.error('Brevo API error:', response.status, responseData);
-      
-      // If API key is invalid, provide helpful message
-      if (responseData.code === 'unauthorized' || responseData.message === 'Key not found') {
-        console.error('ERROR: Brevo API key is invalid or does not have proper permissions');
-        console.error('Please check your Brevo account and ensure:');
-        console.error('1. The API key is correct');
-        console.error('2. The API key has Email sending permissions');
-        console.error('3. You have verified sender email addresses in your Brevo account');
-      }
-      
-      return false;
-    }
-
-    console.log('Email sent successfully via Brevo:', responseData);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully via Brevo SMTP:', info.messageId);
     return true;
   } catch (error) {
-    console.error('Brevo email error:', error);
+    console.error('Brevo SMTP error:', error);
     return false;
   }
 }
