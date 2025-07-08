@@ -402,11 +402,19 @@ export default function ActivityDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-3">
-                  <img 
-                    className="w-12 h-12 rounded-full" 
-                    src={activity.author?.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200"}
-                    alt="Author Avatar" 
-                  />
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                    {activity.author?.avatarUrl ? (
+                      <img 
+                        className="w-12 h-12 rounded-full" 
+                        src={activity.author.avatarUrl}
+                        alt="Author Avatar" 
+                      />
+                    ) : (
+                      <span className="text-lg">
+                        {(activity.author?.displayName || activity.author?.username || "U").charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
                   <div>
                     <h4 className="font-semibold">{activity.author?.displayName || activity.author?.username || "Unbekannter Autor"}</h4>
                     <p className="text-sm text-muted-foreground">

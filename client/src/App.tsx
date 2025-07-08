@@ -58,6 +58,7 @@ function Router() {
         <Route path="/register" component={RegisterPage} />
         <Route path="/registrieren" component={RegisterPage} />
         <Route path="/email-verified" component={EmailVerifiedPage} />
+        <Route path="/admin" component={UserManagementPage} />
         <Route path="/admin/users" component={UserManagementPage} />
         <Route component={NotFound} />
       </Switch>
