@@ -34,7 +34,7 @@ export function Navbar() {
   ];
   
   // Admin nav item - only show for admin role
-  const adminNavItem = { path: "/admin", label: t('nav.admin'), icon: Settings };
+  const adminNavItem = { path: "/admin", label: "Admin", icon: Settings };
 
   return (
     <header className="app-header sticky top-0 z-50">
