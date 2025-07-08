@@ -42,9 +42,18 @@ export default function EditActivityPage() {
 
   const activityId = parseInt(id || "0", 10);
 
-  const { data: activity, isLoading: isLoadingActivity } = useQuery<Activity>({
+  const { data: activity, isLoading: isLoadingActivity, error } = useQuery<Activity>({
     queryKey: ["/api/activities", activityId],
     enabled: !!activityId,
+  });
+
+  // Debug logging
+  console.log('EditActivityPage Debug:', {
+    activityId,
+    activity,
+    isLoading: isLoadingActivity,
+    error,
+    currentUser
   });
 
   const form = useForm<EditActivityFormData>({
