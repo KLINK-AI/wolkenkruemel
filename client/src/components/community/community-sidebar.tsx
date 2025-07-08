@@ -2,13 +2,15 @@ import { Link, useLocation } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Home, Users, MessageCircleQuestion, TrendingUp, Plus } from 'lucide-react';
+import { Home, Users, MessageCircleQuestion, TrendingUp, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
 
 export function CommunitySidebar() {
   const [location] = useLocation();
   const { currentUser } = useAuth();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const navigationItems = [
     {
@@ -36,8 +38,22 @@ export function CommunitySidebar() {
       {/* Navigation */}
       <Card>
         <CardContent className="p-4">
-          <h3 className="font-semibold mb-3">Community</h3>
-          <nav className="space-y-1">
+          <div className="flex items-center justify-between mb-3 lg:block">
+            <h3 className="font-semibold">Community</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+          <nav className={cn("space-y-1", "lg:block", isExpanded ? "block" : "hidden lg:block")}>
             {navigationItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -63,26 +79,26 @@ export function CommunitySidebar() {
 
 
       {/* Trending Topics */}
-      <Card>
+      <Card className={cn("lg:block", isExpanded ? "block" : "hidden lg:block")}>
         <CardContent className="p-4">
           <div className="flex items-center space-x-2 mb-3">
             <TrendingUp className="w-4 h-4" />
             <h3 className="font-semibold">Beliebte Themen</h3>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="text-xs font-medium">
+            <Badge variant="outline" className="text-xs font-medium border-primary/50 text-primary">
               #Welpentraining
             </Badge>
-            <Badge variant="outline" className="text-xs font-medium">
+            <Badge variant="outline" className="text-xs font-medium border-primary/50 text-primary">
               #Agility
             </Badge>
-            <Badge variant="outline" className="text-xs font-medium">
+            <Badge variant="outline" className="text-xs font-medium border-primary/50 text-primary">
               #Hundespiele
             </Badge>
-            <Badge variant="outline" className="text-xs font-medium">
+            <Badge variant="outline" className="text-xs font-medium border-primary/50 text-primary">
               #Leinenführigkeit
             </Badge>
-            <Badge variant="outline" className="text-xs font-medium">
+            <Badge variant="outline" className="text-xs font-medium border-primary/50 text-primary">
               #Rückruf
             </Badge>
           </div>
@@ -91,7 +107,7 @@ export function CommunitySidebar() {
 
       {/* User Status */}
       {currentUser && (
-        <Card>
+        <Card className={cn("lg:block", isExpanded ? "block" : "hidden lg:block")}>
           <CardContent className="p-4">
             <div className="text-center">
               <div className="w-12 h-12 rounded-full overflow-hidden bg-primary flex items-center justify-center mx-auto mb-2">

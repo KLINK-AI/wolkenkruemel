@@ -13,26 +13,28 @@ export default function CommunityPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-8">
-          {/* Left Sidebar with Stats */}
-          <div className="w-64 space-y-4">
-            <CommunitySidebar />
-            
-            {/* User Stats - moved to left sidebar */}
-            {currentUser && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Deine Statistiken</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <UserStats userId={currentUser.id} compact />
-                </CardContent>
-              </Card>
-            )}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Sidebar with Stats - Hidden on mobile, collapsible on tablet */}
+          <div className="w-full lg:w-64 space-y-4">
+            <div className="lg:block">
+              <CommunitySidebar />
+              
+              {/* User Stats - moved to left sidebar */}
+              {currentUser && (
+                <Card className="mt-4">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Deine Statistiken</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <UserStats userId={currentUser.id} compact />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
           
           {/* Main Content */}
-          <div className="flex-1 space-y-6">
+          <div className="flex-1 space-y-6 min-w-0">
             <div className="text-center">
               <h1 className="text-3xl font-bold mb-2">Community Feed</h1>
               <p className="text-muted-foreground">
@@ -40,21 +42,21 @@ export default function CommunityPage() {
               </p>
             </div>
 
-            {/* Quick Actions - centered at top */}
+            {/* Quick Actions - left aligned */}
             {currentUser && (
               <Card>
                 <CardContent className="p-4">
-                  <div className="flex justify-center gap-3">
-                    <Link href="/community/create-post">
-                      <Button className="flex items-center gap-2">
-                        <Plus className="w-4 h-4" />
-                        Beitrag erstellen
-                      </Button>
-                    </Link>
+                  <div className="flex flex-col sm:flex-row justify-start gap-3">
                     <Link href="/activities/create">
-                      <Button variant="outline" className="flex items-center gap-2">
+                      <Button className="flex items-center gap-2 w-full sm:w-auto">
                         <Plus className="w-4 h-4" />
                         Aktivität erstellen
+                      </Button>
+                    </Link>
+                    <Link href="/community/create-post">
+                      <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
+                        <Plus className="w-4 h-4" />
+                        Beitrag erstellen
                       </Button>
                     </Link>
                   </div>

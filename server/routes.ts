@@ -189,6 +189,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Activity likes
+  app.post("/api/activities/:id/like", async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.id);
+      const { userId } = req.body;
+      await storage.likeActivity(userId, activityId);
+      res.status(200).json({ message: "Activity liked" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/activities/:id/unlike", async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.id);
+      const { userId } = req.body;
+      await storage.unlikeActivity(userId, activityId);
+      res.status(200).json({ message: "Activity unliked" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.get("/api/activities/:id/like/:userId", async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.id);
+      const userId = parseInt(req.params.userId);
+      const isLiked = await storage.isActivityLikedByUser(userId, activityId);
+      res.json({ isLiked });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Comments
   app.get("/api/posts/:id/comments", async (req, res) => {
     try {

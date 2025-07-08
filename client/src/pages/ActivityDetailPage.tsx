@@ -42,7 +42,18 @@ export default function ActivityDetailPage() {
     enabled: !!id && !!userId,
   });
 
+  const { data: likeData } = useQuery({
+    queryKey: ["/api/activities", id, "like", userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/activities/${id}/like/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch like status");
+      return response.json();
+    },
+    enabled: !!id && !!userId,
+  });
+
   const isFavorite = progress?.favorite || false;
+  const isLiked = likeData?.isLiked || false;
 
   const updateProgressMutation = useMutation({
     mutationFn: async (progressUpdate: { tried?: boolean; mastered?: boolean; favorite?: boolean }) => {
@@ -61,6 +72,29 @@ export default function ActivityDetailPage() {
       toast({
         title: "Fehler",
         description: "Fehler beim Speichern des Fortschritts. Bitte versuchen Sie es erneut.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: async (liked: boolean) => {
+      if (!userId) throw new Error("User not authenticated");
+      if (!id) throw new Error("Activity ID not found");
+      
+      const endpoint = liked ? `/api/activities/${id}/like` : `/api/activities/${id}/unlike`;
+      const response = await apiRequest("POST", endpoint, { userId });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/activities", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/activities", id, "like", userId] });
+    },
+    onError: (error) => {
+      console.error("Failed to update like status:", error);
+      toast({
+        title: "Fehler",
+        description: "Fehler beim Speichern des Likes. Bitte versuchen Sie es erneut.",
         variant: "destructive",
       });
     },
@@ -169,14 +203,20 @@ export default function ActivityDetailPage() {
                       variant="outline" 
                       size="sm"
                       onClick={() => {
-                        // Like functionality to be implemented
-                        toast({
-                          title: "Like-Funktion",
-                          description: "Like-System wird implementiert...",
-                        });
+                        if (!userId) {
+                          toast({
+                            title: "Anmeldung erforderlich",
+                            description: "Bitte melden Sie sich an, um Aktivitäten zu liken.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        likeMutation.mutate(!isLiked);
                       }}
+                      disabled={likeMutation.isPending}
+                      className={isLiked ? "text-red-500 border-red-500" : ""}
                     >
-                      <Heart className="w-4 h-4 mr-1" />
+                      <Heart className={`w-4 h-4 mr-1 ${isLiked ? "fill-current" : ""}`} />
                       {activity.likes}
                     </Button>
                     <Button variant="outline" size="sm">
