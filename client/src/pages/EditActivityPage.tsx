@@ -43,7 +43,7 @@ export default function EditActivityPage() {
   const activityId = parseInt(id || "0", 10);
 
   const { data: activity, isLoading: isLoadingActivity } = useQuery<Activity>({
-    queryKey: [`/api/activities/${activityId}`],
+    queryKey: ["/api/activities", activityId],
     enabled: !!activityId,
   });
 
