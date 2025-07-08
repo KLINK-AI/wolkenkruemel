@@ -16,9 +16,12 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
 const userFormSchema = z.object({
-  username: z.string().min(3, "Benutzername muss mindestens 3 Zeichen haben"),
+  displayName: z.string().min(3, "Anzeigename muss mindestens 3 Zeichen haben"),
   email: z.string().email("Gültige E-Mail-Adresse erforderlich"),
-  displayName: z.string().min(2, "Name muss mindestens 2 Zeichen haben"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  location: z.string().optional(),
+  bio: z.string().optional(),
   role: z.enum(["user", "admin", "moderator"]),
   subscriptionTier: z.enum(["free", "premium", "professional"]),
   isEmailVerified: z.boolean()
@@ -28,9 +31,12 @@ type UserForm = z.infer<typeof userFormSchema>;
 
 interface User {
   id: number;
-  username: string;
-  email: string;
   displayName: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  location?: string;
+  bio?: string;
   role: string;
   subscriptionTier: string;
   isEmailVerified: boolean;
@@ -56,9 +62,12 @@ export default function UserManagementPage() {
   const form = useForm<UserForm>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
-      username: "",
-      email: "",
       displayName: "",
+      email: "",
+      firstName: "",
+      lastName: "",
+      location: "",
+      bio: "",
       role: "user",
       subscriptionTier: "free",
       isEmailVerified: false
@@ -135,17 +144,21 @@ export default function UserManagementPage() {
   });
 
   const filteredUsers = users.filter((user: User) =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+    (user.displayName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.firstName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.lastName || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
     form.reset({
-      username: user.username,
-      email: user.email,
       displayName: user.displayName,
+      email: user.email,
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      location: user.location || "",
+      bio: user.bio || "",
       role: user.role as any,
       subscriptionTier: user.subscriptionTier as any,
       isEmailVerified: user.isEmailVerified
@@ -162,8 +175,8 @@ export default function UserManagementPage() {
     updateUserMutation.mutate({ id: selectedUser.id, ...data });
   };
 
-  const handleDeleteUser = (userId: number, username: string) => {
-    if (confirm(`Sind Sie sicher, dass Sie den Benutzer "${username}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
+  const handleDeleteUser = (userId: number, displayName: string) => {
+    if (confirm(`Sind Sie sicher, dass Sie den Benutzer "${displayName}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
       deleteUserMutation.mutate(userId);
     }
   };
@@ -205,10 +218,10 @@ export default function UserManagementPage() {
                   <form onSubmit={form.handleSubmit(handleCreateUser)} className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="username"
+                      name="displayName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Benutzername</FormLabel>
+                          <FormLabel>Anzeigename</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -231,10 +244,49 @@ export default function UserManagementPage() {
                     />
                     <FormField
                       control={form.control}
-                      name="displayName"
+                      name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Anzeigename</FormLabel>
+                          <FormLabel>Vorname</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nachname</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Standort</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="bio"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Über mich</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -321,9 +373,11 @@ export default function UserManagementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Benutzername</TableHead>
+                  <TableHead>Anzeigename</TableHead>
                   <TableHead>E-Mail</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead>Vorname</TableHead>
+                  <TableHead>Nachname</TableHead>
+                  <TableHead>Standort</TableHead>
                   <TableHead>Rolle</TableHead>
                   <TableHead>Abonnement</TableHead>
                   <TableHead>Verifiziert</TableHead>
@@ -334,9 +388,11 @@ export default function UserManagementPage() {
               <TableBody>
                 {filteredUsers.map((user: User) => (
                   <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.username}</TableCell>
+                    <TableCell className="font-medium">{user.displayName}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.displayName}</TableCell>
+                    <TableCell>{user.firstName || "-"}</TableCell>
+                    <TableCell>{user.lastName || "-"}</TableCell>
+                    <TableCell>{user.location || "-"}</TableCell>
                     <TableCell>
                       <Badge className={getRoleBadgeColor(user.role)}>
                         {user.role === "admin" ? "Administrator" : 
@@ -369,7 +425,7 @@ export default function UserManagementPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleDeleteUser(user.id, user.username)}
+                          onClick={() => handleDeleteUser(user.id, user.displayName)}
                           className="text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -394,10 +450,10 @@ export default function UserManagementPage() {
             <form onSubmit={form.handleSubmit(handleUpdateUser)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="username"
+                name="displayName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Benutzername</FormLabel>
+                    <FormLabel>Anzeigename</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -420,10 +476,49 @@ export default function UserManagementPage() {
               />
               <FormField
                 control={form.control}
-                name="displayName"
+                name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Anzeigename</FormLabel>
+                    <FormLabel>Vorname</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nachname</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Standort</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Über mich</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>

@@ -633,11 +633,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Check if display name already exists
+      // Check if display name already exists (displayName should be unique like username)
       const existingUserByDisplayName = await storage.getUserByDisplayName(displayName);
       if (existingUserByDisplayName) {
         return res.status(400).json({ 
-          message: "Dieser Name ist bereits registriert",
+          message: "Dieser Anzeigename ist bereits vergeben",
           field: "displayName"
         });
       }
@@ -983,7 +983,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/users", async (req, res) => {
     try {
-      const { username, email, displayName, role, subscriptionTier, isEmailVerified } = req.body;
+      const { displayName, email, firstName, lastName, location, bio, role, subscriptionTier, isEmailVerified } = req.body;
       
       // Check if user already exists
       const existingUserByEmail = await storage.getUserByEmail(email);
@@ -991,15 +991,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "E-Mail bereits registriert" });
       }
 
-      const existingUserByUsername = await storage.getUserByUsername(username);
+      const existingUserByUsername = await storage.getUserByUsername(displayName);
       if (existingUserByUsername) {
-        return res.status(400).json({ message: "Benutzername bereits vergeben" });
+        return res.status(400).json({ message: "Anzeigename bereits vergeben" });
       }
 
       const userData = {
-        username,
+        username: displayName, // Use displayName as username for compatibility
         email,
         displayName,
+        firstName,
+        lastName,
+        location,
+        bio,
         password: "defaultPassword123", // In production, generate a secure password
         role: role || 'user',
         subscriptionTier: subscriptionTier || 'free',

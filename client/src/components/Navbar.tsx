@@ -132,6 +132,14 @@ export function Navbar() {
                       Profil
                     </DropdownMenuItem>
                   </Link>
+                  {currentUser.role === 'admin' && (
+                    <Link href="/admin/users">
+                      <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        Admin-Bereich
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
                   <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />
                     Einstellungen
