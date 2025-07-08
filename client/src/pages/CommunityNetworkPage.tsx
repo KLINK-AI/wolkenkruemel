@@ -25,9 +25,6 @@ export default function CommunityNetworkPage() {
             {/* User Stats - only for authenticated users */}
             {currentUser && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Deine Statistiken</CardTitle>
-                </CardHeader>
                 <CardContent>
                   <UserStats userId={currentUser.id} />
                 </CardContent>
