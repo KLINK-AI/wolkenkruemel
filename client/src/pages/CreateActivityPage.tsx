@@ -76,11 +76,23 @@ export default function CreateActivityPage() {
               Du hast bereits 5 Aktivitäten erstellt. Upgrade auf Premium für unbegrenzte Aktivitäten!
             </p>
             <div className="flex gap-2">
-              <Link href="/premium">
-                <Button className="flex-1">
-                  Premium freischalten
-                </Button>
-              </Link>
+              <Button 
+                onClick={() => {
+                  // Demo upgrade for test phase
+                  fetch('/api/demo-upgrade', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUser?.id })
+                  }).then(() => {
+                    window.location.reload();
+                  }).catch(error => {
+                    console.error('Demo upgrade failed:', error);
+                  });
+                }}
+                className="flex-1"
+              >
+                Premium freischalten (Testphase)
+              </Button>
               <Link href="/activities">
                 <Button variant="outline" className="flex-1">Zurück</Button>
               </Link>

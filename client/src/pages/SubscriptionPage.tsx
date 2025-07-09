@@ -218,11 +218,20 @@ export default function SubscriptionPage() {
                     <Button 
                       className="w-full" 
                       onClick={() => {
-                        window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank');
+                        // Demo upgrade for test phase
+                        fetch('/api/demo-upgrade', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ userId: currentUser?.id })
+                        }).then(() => {
+                          window.location.reload();
+                        }).catch(error => {
+                          console.error('Demo upgrade failed:', error);
+                        });
                       }}
                       variant={plan.popular ? "default" : "outline"}
                     >
-                      {isUpgrade ? 'Premium freischalten' : 'Premium freischalten'}
+                      {isUpgrade ? 'Premium freischalten (Testphase)' : 'Premium freischalten (Testphase)'}
                     </Button>
                   )}
                 </CardContent>
@@ -262,17 +271,7 @@ export default function SubscriptionPage() {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Gibt es eine Geld-zurück-Garantie?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Ja, wir bieten eine 30-Tage-Geld-zurück-Garantie. Falls du nicht 
-                  zufrieden bist, erstatten wir den vollen Betrag zurück.
-                </p>
-              </CardContent>
-            </Card>
+
             
             <Card>
               <CardHeader>

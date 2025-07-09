@@ -382,9 +382,20 @@ export default function ActivityDetailPage() {
                         className="mt-3" 
                         variant="outline" 
                         size="sm"
-                        onClick={() => window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank')}
+                        onClick={() => {
+                          // Demo upgrade for test phase
+                          fetch('/api/demo-upgrade', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: currentUser?.id })
+                          }).then(() => {
+                            window.location.reload();
+                          }).catch(error => {
+                            console.error('Demo upgrade failed:', error);
+                          });
+                        }}
                       >
-                        Premium freischalten
+                        Premium freischalten (Testphase)
                       </Button>
                     )}
                   </div>

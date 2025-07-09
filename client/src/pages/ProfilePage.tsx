@@ -358,11 +358,22 @@ export default function ProfilePage() {
                 </p>
               </div>
               {currentUser.subscriptionTier === "free" && (
-                <Link href="/premium">
-                  <Button>
-                    Upgrade
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={() => {
+                    // Demo upgrade for test phase
+                    fetch('/api/demo-upgrade', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId: currentUser?.id })
+                    }).then(() => {
+                      window.location.reload();
+                    }).catch(error => {
+                      console.error('Demo upgrade failed:', error);
+                    });
+                  }}
+                >
+                  Upgrade (Testphase)
+                </Button>
               )}
             </div>
           </CardContent>

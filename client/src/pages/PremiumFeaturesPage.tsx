@@ -114,7 +114,7 @@ export default function PremiumFeaturesPage() {
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                 >
                   <Crown className="w-4 h-4 mr-2" />
-                  Premium freischalten
+                  Premium freischalten (Testphase)
                 </Button>
               </div>
             </CardContent>
