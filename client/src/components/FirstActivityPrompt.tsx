@@ -44,10 +44,10 @@ export default function FirstActivityPrompt() {
           </p>
         </div>
         
-        <Link href="/activities/create">
+        <Link href="/premium">
           <Button className="bg-blue-600 hover:bg-blue-700 text-white mt-4" size="lg">
             <Plus className="w-5 h-5 mr-2" />
-            Erste Aktivität erstellen
+            Premium Feature
           </Button>
         </Link>
       </CardContent>

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, User, Settings, Moon, Sun, Users, Calendar, LogOut, Menu, X } from "lucide-react";
+import { Home, User, Settings, Moon, Sun, Users, Calendar, LogOut, Menu, X, Crown } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,7 @@ export function Navbar() {
     { path: "/", label: t('nav.home'), icon: Home },
     { path: "/activities", label: t('nav.activities'), icon: Calendar },
     { path: "/community", label: t('nav.community'), icon: Users },
+    { path: "/premium", label: "Premium Features", icon: Crown },
   ];
   
   // Admin nav item - only show for admin role

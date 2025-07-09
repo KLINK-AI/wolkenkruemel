@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Save, Mail, MapPin, Calendar, Edit3, Upload, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { UserStats } from "@/components/ui/user-stats";
+import { Link } from "wouter";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -357,9 +358,11 @@ export default function ProfilePage() {
                 </p>
               </div>
               {currentUser.subscriptionTier === "free" && (
-                <Button onClick={() => window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank')}>
-                  Upgrade
-                </Button>
+                <Link href="/premium">
+                  <Button>
+                    Upgrade
+                  </Button>
+                </Link>
               )}
             </div>
           </CardContent>

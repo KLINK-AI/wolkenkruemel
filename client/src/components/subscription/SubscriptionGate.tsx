@@ -259,21 +259,12 @@ export default function SubscriptionGate({
             </div>
             <Button 
               onClick={() => {
-                // Demo upgrade - immediately activate premium
-                fetch('/api/demo-upgrade', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ userId: user?.id })
-                }).then(() => {
-                  window.location.reload();
-                }).catch(error => {
-                  console.error('Demo upgrade failed:', error);
-                });
+                window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank');
               }}
               className="bg-primary hover:bg-primary/90"
             >
               <Crown className="w-4 h-4 mr-2" />
-              Premium freischalten (Demo)
+              Premium freischalten
             </Button>
           </div>
         </CardContent>

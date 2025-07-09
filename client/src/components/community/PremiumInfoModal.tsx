@@ -118,21 +118,12 @@ export default function PremiumInfoModal({ isOpen, onClose }: PremiumInfoModalPr
           <Button 
             className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
             onClick={() => {
-              // Demo upgrade - immediately activate premium
-              fetch('/api/demo-upgrade', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: realUser?.id })
-              }).then(() => {
-                onClose();
-                window.location.reload();
-              }).catch(error => {
-                console.error('Demo upgrade failed:', error);
-              });
+              onClose();
+              window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank');
             }}
           >
             <Crown className="w-4 h-4 mr-2" />
-            Premium freischalten (Demo)
+            Premium freischalten
           </Button>
         </div>
       </DialogContent>

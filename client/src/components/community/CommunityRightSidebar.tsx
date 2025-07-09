@@ -85,18 +85,11 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
                   className="w-full" 
                   size="sm"
                   onClick={() => {
-                    // Demo upgrade - immediately activate premium
-                    fetch('/api/demo-upgrade', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ userId: realUser?.id })
-                    }).then(() => {
-                      window.location.reload();
-                    });
+                    window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank');
                   }}
                 >
                   <Crown className="w-4 h-4 mr-2" />
-                  Premium freischalten (Demo)
+                  Premium freischalten
                 </Button>
               )}
             </div>
@@ -122,20 +115,11 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
               className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-950/30" 
               size="sm"
               onClick={() => {
-                // Demo upgrade - immediately activate premium
-                fetch('/api/demo-upgrade', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ userId: realUser?.id })
-                }).then(() => {
-                  window.location.reload();
-                }).catch(error => {
-                  console.error('Demo upgrade failed:', error);
-                });
+                window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank');
               }}
             >
               <Crown className="w-4 h-4 mr-2" />
-              Premium freischalten (Demo)
+              Premium freischalten
             </Button>
           </CardContent>
         </Card>
