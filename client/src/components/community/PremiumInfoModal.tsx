@@ -126,11 +126,13 @@ export default function PremiumInfoModal({ isOpen, onClose }: PremiumInfoModalPr
               }).then(() => {
                 onClose();
                 window.location.reload();
+              }).catch(error => {
+                console.error('Demo upgrade failed:', error);
               });
             }}
           >
             <Crown className="w-4 h-4 mr-2" />
-            Premium freischalten
+            Premium freischalten (Demo)
           </Button>
         </div>
       </DialogContent>

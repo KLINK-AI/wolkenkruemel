@@ -18,7 +18,8 @@ const registerSchema = z.object({
   password: z.string()
     .min(8, "Passwort muss mindestens 8 Zeichen haben")
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/, "Passwort muss mindestens einen Kleinbuchstaben, einen Großbuchstaben und eine Zahl enthalten"),
-  displayName: z.string().min(2, "Name muss mindestens 2 Zeichen haben").max(100, "Name darf maximal 100 Zeichen haben"),
+  firstName: z.string().min(2, "Vorname muss mindestens 2 Zeichen haben").max(50, "Vorname darf maximal 50 Zeichen haben"),
+  lastName: z.string().min(2, "Nachname muss mindestens 2 Zeichen haben").max(50, "Nachname darf maximal 50 Zeichen haben"),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -34,13 +35,19 @@ export default function RegisterPage() {
       username: "",
       email: "",
       password: "",
-      displayName: "",
+      firstName: "",
+      lastName: "",
     },
   });
 
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterForm) => {
-      const response = await apiRequest("POST", "/api/register", data);
+      // Map to backend format with displayName as username
+      const registrationData = {
+        ...data,
+        displayName: data.username  // Use username as displayName
+      };
+      const response = await apiRequest("POST", "/api/register", registrationData);
       return response.json();
     },
     onSuccess: () => {
@@ -61,8 +68,8 @@ export default function RegisterPage() {
         form.setError("username", { message: error.message });
         errorMessage = "Dieser Benutzername ist bereits vergeben";
       } else if (error.field === "displayName") {
-        form.setError("displayName", { message: error.message });
-        errorMessage = "Dieser Name ist bereits registriert";
+        form.setError("username", { message: error.message });
+        errorMessage = "Dieser Benutzername ist bereits registriert";
       }
       
       toast({
@@ -115,12 +122,26 @@ export default function RegisterPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="displayName"
+                name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ihr Name</FormLabel>
+                    <FormLabel>Vorname</FormLabel>
                     <FormControl>
-                      <Input placeholder="Max Mustermann" {...field} />
+                      <Input placeholder="Max" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Mustermann" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -147,10 +147,21 @@ export default function CreatePostPage() {
               </p>
               <div className="flex gap-2">
                 <Button 
-                  onClick={() => window.open('https://buy.stripe.com/test_9AQdTu8rAdE83hmbII', '_blank')}
+                  onClick={() => {
+                    // Demo upgrade - immediately activate premium
+                    fetch('/api/demo-upgrade', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId: currentUser?.id })
+                    }).then(() => {
+                      window.location.reload();
+                    }).catch(error => {
+                      console.error('Demo upgrade failed:', error);
+                    });
+                  }}
                   className="flex-1"
                 >
-                  Premium freischalten
+                  Premium freischalten (Demo)
                 </Button>
                 <Link href="/community">
                   <Button variant="outline" className="flex-1">Zurück</Button>

@@ -85,6 +85,8 @@ export default function CreateActivityPage() {
                     body: JSON.stringify({ userId: currentUser?.id })
                   }).then(() => {
                     window.location.reload();
+                  }).catch(error => {
+                    console.error('Demo upgrade failed:', error);
                   });
                 }}
                 className="flex-1"

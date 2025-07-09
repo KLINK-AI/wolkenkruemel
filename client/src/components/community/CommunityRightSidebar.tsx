@@ -129,6 +129,8 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
                   body: JSON.stringify({ userId: realUser?.id })
                 }).then(() => {
                   window.location.reload();
+                }).catch(error => {
+                  console.error('Demo upgrade failed:', error);
                 });
               }}
             >

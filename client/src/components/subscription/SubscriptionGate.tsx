@@ -258,11 +258,22 @@ export default function SubscriptionGate({
               </p>
             </div>
             <Button 
-              onClick={() => setShowUpgrade(true)}
+              onClick={() => {
+                // Demo upgrade - immediately activate premium
+                fetch('/api/demo-upgrade', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ userId: user?.id })
+                }).then(() => {
+                  window.location.reload();
+                }).catch(error => {
+                  console.error('Demo upgrade failed:', error);
+                });
+              }}
               className="bg-primary hover:bg-primary/90"
             >
               <Crown className="w-4 h-4 mr-2" />
-              Upgrade Now
+              Premium freischalten (Demo)
             </Button>
           </div>
         </CardContent>
