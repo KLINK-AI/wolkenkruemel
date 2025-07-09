@@ -1,15 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Crown, Check, X, Users } from "lucide-react";
 import PremiumInfoModal from "@/components/community/PremiumInfoModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export default function PremiumFeaturesPage() {
   const [showModal, setShowModal] = useState(false);
   const { currentUser } = useAuth();
   const queryClient = useQueryClient();
+  
+  // Fetch current user from server to ensure we have the latest data
+  const { data: serverUser } = useQuery({
+    queryKey: ['/api/me'],
+    queryFn: async () => {
+      const response = await fetch('/api/me');
+      if (!response.ok) {
+        throw new Error('Not authenticated');
+      }
+      return response.json();
+    },
+    retry: false,
+    staleTime: 0
+  });
+  
+  const activeUser = serverUser || currentUser;
 
   const freeFeatures = [
     "Alle Aktivitäten ansehen",
@@ -28,6 +45,8 @@ export default function PremiumFeaturesPage() {
   ];
 
   console.log('PremiumFeaturesPage - currentUser:', currentUser);
+  console.log('PremiumFeaturesPage - serverUser:', serverUser);
+  console.log('PremiumFeaturesPage - activeUser:', activeUser);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -120,14 +139,16 @@ export default function PremiumFeaturesPage() {
                     e.preventDefault();
                     console.log('Button clicked!');
                     console.log('Current user:', currentUser);
+                    console.log('Server user:', serverUser);
+                    console.log('Active user:', activeUser);
                     
-                    if (!currentUser?.id) {
+                    if (!activeUser?.id) {
                       console.error('No user ID found - redirecting to login');
                       window.location.href = '/login';
                       return;
                     }
                     
-                    console.log('Attempting demo upgrade for user:', currentUser.id);
+                    console.log('Attempting demo upgrade for user:', activeUser.id);
                     
                     try {
                       const response = await fetch('/api/demo-upgrade', {
@@ -136,7 +157,7 @@ export default function PremiumFeaturesPage() {
                           'Content-Type': 'application/json',
                           'Accept': 'application/json'
                         },
-                        body: JSON.stringify({ userId: currentUser.id })
+                        body: JSON.stringify({ userId: activeUser.id })
                       });
                       
                       console.log('Response status:', response.status);
@@ -154,7 +175,7 @@ export default function PremiumFeaturesPage() {
                       // Invalidate auth cache to refresh user data
                       queryClient.invalidateQueries({ queryKey: ['/api/me'] });
                       queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
-                      queryClient.invalidateQueries({ queryKey: ['/api/users', currentUser.id, 'subscription'] });
+                      queryClient.invalidateQueries({ queryKey: ['/api/users', activeUser.id, 'subscription'] });
                       
                       alert('Premium-Upgrade erfolgreich!');
                       window.location.reload();
@@ -164,10 +185,10 @@ export default function PremiumFeaturesPage() {
                     }
                   }}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                  disabled={!currentUser?.id}
+                  disabled={!activeUser?.id}
                 >
                   <Crown className="w-4 h-4 mr-2" />
-                  {currentUser?.id ? 'Premium freischalten' : 'Bitte zuerst anmelden'}
+                  {activeUser?.id ? 'Premium freischalten' : 'Bitte zuerst anmelden'}
                 </Button>
               </div>
             </CardContent>
