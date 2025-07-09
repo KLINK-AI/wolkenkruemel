@@ -216,14 +216,48 @@ export default function SubscriptionPage() {
                       Aktueller Plan
                     </Button>
                   ) : (
-                    <Link href="/premium">
-                      <Button 
-                        className="w-full" 
-                        variant={plan.popular ? "default" : "outline"}
-                      >
-                        {isUpgrade ? 'Premium freischalten' : 'Premium freischalten'}
-                      </Button>
-                    </Link>
+                    <Button 
+                      className="w-full" 
+                      variant={plan.popular ? "default" : "outline"}
+                      onClick={async () => {
+                        try {
+                          alert('Starte Demo-Upgrade...');
+                          
+                          // Use current user ID or fallback to 29 (Peter)
+                          const upgradeUserId = currentUser?.id || 29;
+                          
+                          const response = await fetch('/api/demo-upgrade', {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: { 
+                              'Content-Type': 'application/json',
+                              'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ userId: upgradeUserId })
+                          });
+                          
+                          if (!response.ok) {
+                            const errorData = await response.json();
+                            alert('Upgrade fehlgeschlagen: ' + (errorData.error || 'Unbekannter Fehler'));
+                            return;
+                          }
+                          
+                          const result = await response.json();
+                          
+                          // Invalidate cache
+                          queryClient.invalidateQueries({ queryKey: ['/api/me'] });
+                          queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
+                          queryClient.invalidateQueries({ queryKey: ['/api/users', upgradeUserId, 'subscription'] });
+                          
+                          alert('Premium-Upgrade erfolgreich! Die Seite wird neu geladen...');
+                          window.location.reload();
+                        } catch (error) {
+                          alert('Fehler beim Upgrade: ' + error.message);
+                        }
+                      }}
+                    >
+                      {isUpgrade ? 'Premium freischalten' : 'Premium freischalten'}
+                    </Button>
                   )}
                 </CardContent>
               </Card>
