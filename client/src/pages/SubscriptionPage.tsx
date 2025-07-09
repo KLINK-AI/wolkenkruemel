@@ -10,6 +10,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { queryClient } from "@/lib/queryClient";
 import SubscriptionCheckout from "../components/subscription/SubscriptionCheckout";
+import { Link } from "wouter";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
