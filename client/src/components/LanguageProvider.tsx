@@ -189,7 +189,7 @@ const translations = {
     'home.features.bonding.description': 'Baue eine tiefere Verbindung zu deinem Hund durch gemeinsame Aktivitäten auf.',
     'home.cta.title': 'Bereit, deine erste Aktivität zu teilen?',
     'home.cta.subtitle': 'Hilf anderen Hundebesitzern mit deinen Erfahrungen und werde Teil unserer Community.',
-    'home.cta.button': 'Erste Aktivität erstellen',
+    'home.cta.button': 'Aktivität erstellen',
     
     // Time translations
     'time.now': 'Gerade eben',

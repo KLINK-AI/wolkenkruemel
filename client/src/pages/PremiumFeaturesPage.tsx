@@ -3,9 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Crown, Check, X, Users } from "lucide-react";
 import PremiumInfoModal from "@/components/community/PremiumInfoModal";
+import { useAuth } from "@/hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function PremiumFeaturesPage() {
   const [showModal, setShowModal] = useState(false);
+  const { currentUser } = useAuth();
+  const queryClient = useQueryClient();
 
   const freeFeatures = [
     "Alle Aktivitäten ansehen",
@@ -110,11 +114,25 @@ export default function PremiumFeaturesPage() {
                 </div>
                 
                 <Button 
-                  onClick={() => setShowModal(true)}
+                  onClick={() => {
+                    // Demo upgrade for test phase
+                    fetch('/api/demo-upgrade', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ userId: currentUser?.id })
+                    }).then(() => {
+                      // Invalidate auth cache to refresh user data
+                      queryClient.invalidateQueries({ queryKey: ['/api/me'] });
+                      queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
+                      window.location.reload();
+                    }).catch(error => {
+                      console.error('Demo upgrade failed:', error);
+                    });
+                  }}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                 >
                   <Crown className="w-4 h-4 mr-2" />
-                  Premium freischalten (Testphase)
+                  Premium freischalten
                 </Button>
               </div>
             </CardContent>

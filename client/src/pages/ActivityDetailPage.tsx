@@ -378,25 +378,15 @@ export default function ActivityDetailPage() {
                       </p>
                     </div>
                     {permissions.needsPremiumUpgrade && (
-                      <Button 
-                        className="mt-3" 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          // Demo upgrade for test phase
-                          fetch('/api/demo-upgrade', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ userId: currentUser?.id })
-                          }).then(() => {
-                            window.location.reload();
-                          }).catch(error => {
-                            console.error('Demo upgrade failed:', error);
-                          });
-                        }}
-                      >
-                        Premium freischalten (Testphase)
-                      </Button>
+                      <Link href="/premium">
+                        <Button 
+                          className="mt-3" 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          Premium freischalten
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 )}

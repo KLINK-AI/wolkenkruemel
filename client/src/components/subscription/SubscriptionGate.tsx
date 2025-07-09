@@ -257,24 +257,14 @@ export default function SubscriptionGate({
                 This feature requires a {requiredTier} subscription or higher.
               </p>
             </div>
-            <Button 
-              onClick={() => {
-                // Demo upgrade for test phase
-                fetch('/api/demo-upgrade', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ userId: user?.id })
-                }).then(() => {
-                  window.location.reload();
-                }).catch(error => {
-                  console.error('Demo upgrade failed:', error);
-                });
-              }}
-              className="bg-primary hover:bg-primary/90"
-            >
-              <Crown className="w-4 h-4 mr-2" />
-              Premium freischalten (Testphase)
-            </Button>
+            <Link href="/premium">
+              <Button 
+                className="bg-primary hover:bg-primary/90"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                Premium freischalten
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>

@@ -215,24 +215,14 @@ export default function SubscriptionPage() {
                       Aktueller Plan
                     </Button>
                   ) : (
-                    <Button 
-                      className="w-full" 
-                      onClick={() => {
-                        // Demo upgrade for test phase
-                        fetch('/api/demo-upgrade', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ userId: currentUser?.id })
-                        }).then(() => {
-                          window.location.reload();
-                        }).catch(error => {
-                          console.error('Demo upgrade failed:', error);
-                        });
-                      }}
-                      variant={plan.popular ? "default" : "outline"}
-                    >
-                      {isUpgrade ? 'Premium freischalten (Testphase)' : 'Premium freischalten (Testphase)'}
-                    </Button>
+                    <Link href="/premium">
+                      <Button 
+                        className="w-full" 
+                        variant={plan.popular ? "default" : "outline"}
+                      >
+                        {isUpgrade ? 'Premium freischalten' : 'Premium freischalten'}
+                      </Button>
+                    </Link>
                   )}
                 </CardContent>
               </Card>

@@ -81,25 +81,15 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
                 {permissions.hasUnlimitedActivities ? "Aktivitätslimit erreicht" : "Keine Berechtigung"}
               </Button>
               {!permissions.hasUnlimitedActivities && (
-                <Button 
-                  className="w-full" 
-                  size="sm"
-                  onClick={() => {
-                    // Demo upgrade for test phase
-                    fetch('/api/demo-upgrade', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ userId: realUser?.id })
-                    }).then(() => {
-                      window.location.reload();
-                    }).catch(error => {
-                      console.error('Demo upgrade failed:', error);
-                    });
-                  }}
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Premium freischalten (Testphase)
-                </Button>
+                <Link href="/premium">
+                  <Button 
+                    className="w-full" 
+                    size="sm"
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Premium freischalten
+                  </Button>
+                </Link>
               )}
             </div>
           )}
@@ -119,26 +109,16 @@ export default function CommunityRightSidebar({ currentUserId }: CommunityRightS
             <p className="text-sm text-amber-600 dark:text-amber-200 mb-4">
               {t('premium.unlockDescription')}
             </p>
-            <Button 
-              variant="outline" 
-              className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-950/30" 
-              size="sm"
-              onClick={() => {
-                // Demo upgrade for test phase
-                fetch('/api/demo-upgrade', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ userId: realUser?.id })
-                }).then(() => {
-                  window.location.reload();
-                }).catch(error => {
-                  console.error('Demo upgrade failed:', error);
-                });
-              }}
-            >
-              <Crown className="w-4 h-4 mr-2" />
-              Premium freischalten (Testphase)
-            </Button>
+            <Link href="/premium">
+              <Button 
+                variant="outline" 
+                className="w-full border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-950/30" 
+                size="sm"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                Premium freischalten
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       )}

@@ -125,6 +125,9 @@ export default function PremiumInfoModal({ isOpen, onClose }: PremiumInfoModalPr
                 body: JSON.stringify({ userId: realUser?.id })
               }).then(() => {
                 onClose();
+                // Invalidate auth cache to refresh user data
+                queryClient.invalidateQueries({ queryKey: ['/api/me'] });
+                queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
                 window.location.reload();
               }).catch(error => {
                 console.error('Demo upgrade failed:', error);
@@ -132,7 +135,7 @@ export default function PremiumInfoModal({ isOpen, onClose }: PremiumInfoModalPr
             }}
           >
             <Crown className="w-4 h-4 mr-2" />
-            Premium freischalten (Testphase)
+            Premium freischalten
           </Button>
         </div>
       </DialogContent>
