@@ -114,20 +114,39 @@ export default function PremiumFeaturesPage() {
                 </div>
                 
                 <Button 
-                  onClick={() => {
-                    // Demo upgrade for test phase
-                    fetch('/api/demo-upgrade', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ userId: currentUser?.id })
-                    }).then(() => {
+                  onClick={async () => {
+                    if (!currentUser?.id) {
+                      console.error('No user ID found');
+                      return;
+                    }
+                    
+                    console.log('Attempting demo upgrade for user:', currentUser.id);
+                    
+                    try {
+                      const response = await fetch('/api/demo-upgrade', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: currentUser.id })
+                      });
+                      
+                      if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Demo upgrade failed:', errorData);
+                        return;
+                      }
+                      
+                      const result = await response.json();
+                      console.log('Demo upgrade successful:', result);
+                      
                       // Invalidate auth cache to refresh user data
                       queryClient.invalidateQueries({ queryKey: ['/api/me'] });
                       queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
+                      queryClient.invalidateQueries({ queryKey: ['/api/users', currentUser.id, 'subscription'] });
+                      
                       window.location.reload();
-                    }).catch(error => {
+                    } catch (error) {
                       console.error('Demo upgrade failed:', error);
-                    });
+                    }
                   }}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                 >
