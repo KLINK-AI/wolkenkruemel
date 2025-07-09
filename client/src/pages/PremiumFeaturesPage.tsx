@@ -27,6 +27,8 @@ export default function PremiumFeaturesPage() {
     "Unbegrenzte Community-Interaktionen"
   ];
 
+  console.log('PremiumFeaturesPage - currentUser:', currentUser);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -114,9 +116,14 @@ export default function PremiumFeaturesPage() {
                 </div>
                 
                 <Button 
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    console.log('Button clicked!');
+                    console.log('Current user:', currentUser);
+                    
                     if (!currentUser?.id) {
-                      console.error('No user ID found');
+                      console.error('No user ID found - redirecting to login');
+                      window.location.href = '/login';
                       return;
                     }
                     
@@ -125,13 +132,19 @@ export default function PremiumFeaturesPage() {
                     try {
                       const response = await fetch('/api/demo-upgrade', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                          'Content-Type': 'application/json',
+                          'Accept': 'application/json'
+                        },
                         body: JSON.stringify({ userId: currentUser.id })
                       });
+                      
+                      console.log('Response status:', response.status);
                       
                       if (!response.ok) {
                         const errorData = await response.json();
                         console.error('Demo upgrade failed:', errorData);
+                        alert('Upgrade fehlgeschlagen: ' + (errorData.error || 'Unbekannter Fehler'));
                         return;
                       }
                       
@@ -143,15 +156,18 @@ export default function PremiumFeaturesPage() {
                       queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
                       queryClient.invalidateQueries({ queryKey: ['/api/users', currentUser.id, 'subscription'] });
                       
+                      alert('Premium-Upgrade erfolgreich!');
                       window.location.reload();
                     } catch (error) {
                       console.error('Demo upgrade failed:', error);
+                      alert('Upgrade fehlgeschlagen: ' + error.message);
                     }
                   }}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                  disabled={!currentUser?.id}
                 >
                   <Crown className="w-4 h-4 mr-2" />
-                  Premium freischalten
+                  {currentUser?.id ? 'Premium freischalten' : 'Bitte zuerst anmelden'}
                 </Button>
               </div>
             </CardContent>
