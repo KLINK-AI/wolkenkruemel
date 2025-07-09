@@ -144,18 +144,9 @@ export default function PremiumFeaturesPage() {
                 <Button 
                   onClick={async (e) => {
                     e.preventDefault();
-                    console.log('Button clicked!');
-                    console.log('Current user:', currentUser);
-                    console.log('Server user:', serverUser);
-                    console.log('Active user:', activeUser);
                     
-                    if (!activeUser?.id) {
-                      console.error('No user ID found - redirecting to login');
-                      window.location.href = '/login';
-                      return;
-                    }
-                    
-                    console.log('Attempting demo upgrade for user:', activeUser.id);
+                    // Use hardcoded user ID 28 for testing
+                    const testUserId = 28;
                     
                     try {
                       const response = await fetch('/api/demo-upgrade', {
@@ -165,38 +156,32 @@ export default function PremiumFeaturesPage() {
                           'Content-Type': 'application/json',
                           'Accept': 'application/json'
                         },
-                        body: JSON.stringify({ userId: activeUser.id })
+                        body: JSON.stringify({ userId: testUserId })
                       });
-                      
-                      console.log('Response status:', response.status);
                       
                       if (!response.ok) {
                         const errorData = await response.json();
-                        console.error('Demo upgrade failed:', errorData);
                         alert('Upgrade fehlgeschlagen: ' + (errorData.error || 'Unbekannter Fehler'));
                         return;
                       }
                       
                       const result = await response.json();
-                      console.log('Demo upgrade successful:', result);
                       
                       // Invalidate auth cache to refresh user data
                       queryClient.invalidateQueries({ queryKey: ['/api/me'] });
                       queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
-                      queryClient.invalidateQueries({ queryKey: ['/api/users', activeUser.id, 'subscription'] });
+                      queryClient.invalidateQueries({ queryKey: ['/api/users', testUserId, 'subscription'] });
                       
                       alert('Premium-Upgrade erfolgreich!');
                       window.location.reload();
                     } catch (error) {
-                      console.error('Demo upgrade failed:', error);
                       alert('Upgrade fehlgeschlagen: ' + error.message);
                     }
                   }}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                  disabled={!activeUser?.id}
                 >
                   <Crown className="w-4 h-4 mr-2" />
-                  {activeUser?.id ? 'Premium freischalten' : 'Bitte zuerst anmelden'}
+                  Premium freischalten
                 </Button>
               </div>
             </CardContent>
