@@ -92,6 +92,13 @@ export function useAuth() {
     }
   };
 
+  const forceUserUpdate = (completeUser: User) => {
+    localStorage.setItem('currentUser', JSON.stringify(completeUser));
+    globalCurrentUser = completeUser;
+    window.dispatchEvent(new CustomEvent('userChanged'));
+    notifySubscribers();
+  };
+
   const logout = () => {
     localStorage.removeItem('currentUser');
     globalCurrentUser = null;
@@ -105,6 +112,7 @@ export function useAuth() {
     isLoading,
     login,
     logout,
-    updateUser
+    updateUser,
+    forceUserUpdate
   };
 }

@@ -79,7 +79,7 @@ const subscriptionPlans: SubscriptionPlan[] = [
 ];
 
 export default function SubscriptionPage() {
-  const { currentUser } = useAuth();
+  const { currentUser, forceUserUpdate } = useAuth();
   const { t } = useLanguage();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
@@ -244,13 +244,22 @@ export default function SubscriptionPage() {
                           
                           const result = await response.json();
                           
+                          // Update localStorage with new user data
+                          if (result.user) {
+                            forceUserUpdate(result.user);
+                          }
+                          
                           // Invalidate cache
                           queryClient.invalidateQueries({ queryKey: ['/api/me'] });
                           queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
                           queryClient.invalidateQueries({ queryKey: ['/api/users', upgradeUserId, 'subscription'] });
                           
                           alert('Premium-Upgrade erfolgreich! Die Seite wird neu geladen...');
-                          window.location.reload();
+                          
+                          // Force a hard reload to ensure everything is updated
+                          setTimeout(() => {
+                            window.location.reload();
+                          }, 1000);
                         } catch (error) {
                           alert('Fehler beim Upgrade: ' + error.message);
                         }
