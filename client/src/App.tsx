@@ -26,7 +26,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import EmailVerifiedPage from "@/pages/EmailVerifiedPage";
 import UserManagementPage from "@/pages/UserManagementPage";
-import PremiumFeaturesPage from "@/pages/PremiumFeaturesPage";
+
 
 function Router() {
   return (
@@ -59,7 +59,6 @@ function Router() {
         <Route path="/register" component={RegisterPage} />
         <Route path="/registrieren" component={RegisterPage} />
         <Route path="/email-verified" component={EmailVerifiedPage} />
-        <Route path="/premium" component={PremiumFeaturesPage} />
         <Route path="/admin" component={UserManagementPage} />
         <Route path="/admin/users" component={UserManagementPage} />
         <Route component={NotFound} />
