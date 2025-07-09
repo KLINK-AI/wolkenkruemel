@@ -623,6 +623,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current user endpoint
   app.get("/api/me", async (req, res) => {
     try {
+      console.log('Session data:', req.session);
+      console.log('Session user:', req.session?.user);
+      
       if (!req.session?.user) {
         return res.status(401).json({ message: "Not authenticated" });
       }
@@ -631,6 +634,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password, ...safeUser } = user;
       res.json(safeUser);
     } catch (error: any) {
+      console.error('Error in /api/me:', error);
       res.status(500).json({ message: error.message });
     }
   });

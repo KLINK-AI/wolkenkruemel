@@ -16,8 +16,15 @@ export default function PremiumFeaturesPage() {
   const { data: serverUser } = useQuery({
     queryKey: ['/api/me'],
     queryFn: async () => {
-      const response = await fetch('/api/me');
+      const response = await fetch('/api/me', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       if (!response.ok) {
+        console.log('Failed to fetch user from server:', response.status);
         throw new Error('Not authenticated');
       }
       return response.json();
@@ -153,6 +160,7 @@ export default function PremiumFeaturesPage() {
                     try {
                       const response = await fetch('/api/demo-upgrade', {
                         method: 'POST',
+                        credentials: 'include',
                         headers: { 
                           'Content-Type': 'application/json',
                           'Accept': 'application/json'
