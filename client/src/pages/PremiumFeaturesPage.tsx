@@ -51,9 +51,24 @@ export default function PremiumFeaturesPage() {
     "Unbegrenzte Community-Interaktionen"
   ];
 
+  // Debug information
   console.log('PremiumFeaturesPage - currentUser:', currentUser);
   console.log('PremiumFeaturesPage - serverUser:', serverUser);
   console.log('PremiumFeaturesPage - activeUser:', activeUser);
+  
+  // Test the button functionality on page load
+  console.log('Page loaded - testing button functionality');
+  
+  // Add a simple click test
+  const testButtonClick = () => {
+    console.log('Button test function called');
+    alert('Button funktioniert!');
+  };
+  
+  // Test immediately
+  setTimeout(() => {
+    console.log('Testing button after 2 seconds...');
+  }, 2000);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -141,48 +156,59 @@ export default function PremiumFeaturesPage() {
                   </div>
                 </div>
                 
-                <Button 
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    
-                    // Use hardcoded user ID 28 for testing
-                    const testUserId = 28;
-                    
-                    try {
-                      const response = await fetch('/api/demo-upgrade', {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: { 
-                          'Content-Type': 'application/json',
-                          'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ userId: testUserId })
-                      });
-                      
-                      if (!response.ok) {
-                        const errorData = await response.json();
-                        alert('Upgrade fehlgeschlagen: ' + (errorData.error || 'Unbekannter Fehler'));
-                        return;
+                <div className="space-y-2">
+                  <Button 
+                    onClick={() => {
+                      alert('Button wurde geklickt!');
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Test Button (Klick mich!)
+                  </Button>
+                  
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        alert('Starte Premium-Upgrade...');
+                        
+                        // Use hardcoded user ID 28 for testing
+                        const testUserId = 28;
+                        
+                        const response = await fetch('/api/demo-upgrade', {
+                          method: 'POST',
+                          credentials: 'include',
+                          headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                          },
+                          body: JSON.stringify({ userId: testUserId })
+                        });
+                        
+                        if (!response.ok) {
+                          const errorData = await response.json();
+                          alert('Upgrade fehlgeschlagen: ' + (errorData.error || 'Unbekannter Fehler'));
+                          return;
+                        }
+                        
+                        const result = await response.json();
+                        
+                        // Invalidate auth cache to refresh user data
+                        queryClient.invalidateQueries({ queryKey: ['/api/me'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/users', testUserId, 'subscription'] });
+                        
+                        alert('Premium-Upgrade erfolgreich!');
+                        window.location.reload();
+                      } catch (error) {
+                        alert('Fehler: ' + error.message);
                       }
-                      
-                      const result = await response.json();
-                      
-                      // Invalidate auth cache to refresh user data
-                      queryClient.invalidateQueries({ queryKey: ['/api/me'] });
-                      queryClient.invalidateQueries({ queryKey: ['/api/user-stats'] });
-                      queryClient.invalidateQueries({ queryKey: ['/api/users', testUserId, 'subscription'] });
-                      
-                      alert('Premium-Upgrade erfolgreich!');
-                      window.location.reload();
-                    } catch (error) {
-                      alert('Upgrade fehlgeschlagen: ' + error.message);
-                    }
-                  }}
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Premium freischalten
-                </Button>
+                    }}
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Premium freischalten
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
