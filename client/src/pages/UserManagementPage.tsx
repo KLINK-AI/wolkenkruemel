@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Edit, UserPlus, Search } from "lucide-react";
@@ -443,6 +443,9 @@ export default function UserManagementPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Benutzer bearbeiten</DialogTitle>
+            <DialogDescription>
+              Bearbeiten Sie die Benutzerinformationen und Berechtigungen.
+            </DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleUpdateUser)} className="space-y-4">
@@ -479,7 +482,7 @@ export default function UserManagementPage() {
                   <FormItem>
                     <FormLabel>Vorname</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -492,7 +495,7 @@ export default function UserManagementPage() {
                   <FormItem>
                     <FormLabel>Nachname</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -505,7 +508,7 @@ export default function UserManagementPage() {
                   <FormItem>
                     <FormLabel>Standort</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -518,7 +521,7 @@ export default function UserManagementPage() {
                   <FormItem>
                     <FormLabel>Über mich</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
