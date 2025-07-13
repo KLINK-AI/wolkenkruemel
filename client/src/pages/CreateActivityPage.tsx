@@ -2,10 +2,43 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import heic2any from "heic2any";
-
-// Debug: Log heic2any library status
-console.log('heic2any library loaded in CreateActivityPage:', typeof heic2any);
+// HEIC conversion utility
+const convertHeicToJpeg = async (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        reject(new Error('Cannot get canvas context'));
+        return;
+      }
+      
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const convertedFile = new File([blob], 
+            file.name.replace(/\.heic$/i, '.jpg'), 
+            { type: 'image/jpeg' }
+          );
+          resolve(convertedFile);
+        } else {
+          reject(new Error('Canvas blob conversion failed'));
+        }
+      }, 'image/jpeg', 0.94);
+    };
+    
+    img.onerror = () => {
+      reject(new Error('Image loading failed'));
+    };
+    
+    img.src = URL.createObjectURL(file);
+  });
+};
 import { useLocation } from "wouter";
 import { z } from "zod";
 import type { Activity } from "@shared/schema";
@@ -186,29 +219,13 @@ export default function CreateActivityPage() {
           console.log('Starting HEIC conversion...', {
             fileName,
             fileType,
-            fileSize: file.size,
-            heic2anyType: typeof heic2any
+            fileSize: file.size
           });
           
-          // Convert HEIC to JPEG
-          const convertedBlob = await heic2any({
-            blob: file,
-            toType: 'image/jpeg',
-            quality: 0.94
-          });
+          // Try to convert HEIC to JPEG using canvas
+          processedFile = await convertHeicToJpeg(file);
 
-          console.log('HEIC conversion result:', convertedBlob);
-
-          // Handle array result (heic2any sometimes returns an array)
-          const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-
-          // Create a File object from the converted blob
-          processedFile = new File([finalBlob as Blob], 
-            fileName.replace(/\.heic$/i, '.jpg'), 
-            { type: 'image/jpeg' }
-          );
-
-          console.log('Created processed file:', processedFile);
+          console.log('HEIC conversion successful:', processedFile);
 
           toast({
             title: "Konvertierung erfolgreich",
@@ -223,7 +240,7 @@ export default function CreateActivityPage() {
           });
           toast({
             title: "HEIC-Konvertierung fehlgeschlagen",
-            description: `Fehler: ${conversionError.message || 'Unbekannter Fehler'}`,
+            description: `Fehler: ${conversionError.message || 'Unbekannter Fehler'}. Bitte ändern Sie die iPhone-Kamera-Einstellungen zu 'Kompatibler' (Einstellungen > Kamera > Formate).`,
             variant: "destructive",
           });
           setIsImageUploading(false);
