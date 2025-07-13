@@ -44,7 +44,18 @@ export function Navbar() {
           {/* Logo and Brand */}
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-10 h-10 flex-shrink-0">
-              <LogoFallback />
+              <img 
+                src="/Wolkenkruemel.png" 
+                alt="Wolkenkrümel Logo" 
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  console.error('Logo konnte nicht geladen werden:', e);
+                  // Fallback SVG nur als letzte Option
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.parentElement!.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-blue-100 rounded-full text-blue-600 font-bold">W</div>`;
+                }}
+              />
             </div>
             <span className="text-xl font-semibold hidden sm:block">
               Wolkenkrümel
