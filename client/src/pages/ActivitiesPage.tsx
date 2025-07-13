@@ -24,13 +24,27 @@ export default function ActivitiesPage() {
   const { currentUser } = useAuth();
   const userId = currentUser?.id;
   
-  const { data: activities = [], isLoading } = useQuery<Activity[]>({
+  const { data: activities = [], isLoading, error } = useQuery<Activity[]>({
     queryKey: ["/api/activities"],
     queryFn: async () => {
-      const response = await fetch('/api/activities');
-      if (!response.ok) throw new Error('Failed to fetch activities');
-      return response.json();
+      console.log('Fetching activities...');
+      const response = await fetch('/api/activities', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        console.error('Failed to fetch activities:', response.statusText);
+        throw new Error(`Failed to fetch activities: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Fetched activities:', data.length);
+      return data;
     },
+    staleTime: 0, // Force fresh data
+    retry: 3,
   });
 
   const { data: userProgress = [] } = useQuery({
@@ -105,6 +119,17 @@ export default function ActivitiesPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center text-red-500">
+          <p>Fehler beim Laden der Aktivitäten: {error.message}</p>
+          <p className="text-sm mt-2">Bitte versuchen Sie es später erneut.</p>
         </div>
       </div>
     );
