@@ -156,6 +156,16 @@ export default function CreateActivityPage() {
       return;
     }
 
+    // Check for HEIC files and show helpful message
+    if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+      toast({
+        title: "HEIC-Format nicht unterstützt",
+        description: "Bitte konvertieren Sie HEIC-Dateien zu JPG/PNG oder verwenden Sie die iPhone-Kamera im JPG-Modus (Einstellungen > Kamera > Formate > Kompatibler).",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsImageUploading(true);
     const reader = new FileReader();
     
@@ -303,7 +313,7 @@ export default function CreateActivityPage() {
                               <label className="cursor-pointer">
                                 <input
                                   type="file"
-                                  accept="image/*,.heic,.HEIC"
+                                  accept="image/*"
                                   onChange={handleImageUpload}
                                   className="hidden"
                                 />
