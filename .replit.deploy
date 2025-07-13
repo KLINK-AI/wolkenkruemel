@@ -1,0 +1,7 @@
+[deployment]
+build = ["npm", "run", "build"]
+run = ["node", "dist/index.js"]
+deploymentTarget = "gce"
+
+[env]
+NODE_ENV = "production"
