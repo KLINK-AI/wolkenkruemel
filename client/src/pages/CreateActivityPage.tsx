@@ -217,6 +217,12 @@ export default function CreateActivityPage() {
             title: "Konvertierung erfolgreich",
             description: "Ihre HEIC-Datei wurde erfolgreich zu JPG konvertiert!",
           });
+          
+          setIsImageUploading(false);
+          return; // Exit here after successful HEIC conversion
+          
+          setIsImageUploading(false);
+          return; // Exit here after successful HEIC conversion
         } catch (conversionError) {
           console.error("HEIC conversion failed:", conversionError);
           console.error("Error details:", {

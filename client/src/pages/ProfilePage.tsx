@@ -156,6 +156,8 @@ export default function ProfilePage() {
               title: "Konvertierung erfolgreich",
               description: "Ihre HEIC-Datei wurde erfolgreich zu JPG konvertiert!",
             });
+            
+            return; // Exit here after successful HEIC conversion
           } catch (conversionError) {
             console.error("HEIC conversion failed:", conversionError);
             console.error("Error details:", {
