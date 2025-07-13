@@ -2,42 +2,23 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-// HEIC conversion utility
-const convertHeicToJpeg = async (file: File): Promise<File> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      if (!ctx) {
-        reject(new Error('Cannot get canvas context'));
-        return;
-      }
-      
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-      
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const convertedFile = new File([blob], 
-            file.name.replace(/\.heic$/i, '.jpg'), 
-            { type: 'image/jpeg' }
-          );
-          resolve(convertedFile);
-        } else {
-          reject(new Error('Canvas blob conversion failed'));
-        }
-      }, 'image/jpeg', 0.94);
-    };
-    
-    img.onerror = () => {
-      reject(new Error('Image loading failed'));
-    };
-    
-    img.src = URL.createObjectURL(file);
+// HEIC conversion utility using backend API
+const convertHeicToJpeg = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('heicFile', file);
+
+  const response = await fetch('/api/convert-heic', {
+    method: 'POST',
+    body: formData
   });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'HEIC conversion failed');
+  }
+
+  const result = await response.json();
+  return result.dataUrl;
 };
 import { useLocation } from "wouter";
 import { z } from "zod";
@@ -222,10 +203,15 @@ export default function CreateActivityPage() {
             fileSize: file.size
           });
           
-          // Try to convert HEIC to JPEG using canvas
-          processedFile = await convertHeicToJpeg(file);
+          // Convert HEIC to JPEG using backend API
+          const convertedDataUrl = await convertHeicToJpeg(file);
 
-          console.log('HEIC conversion successful:', processedFile);
+          console.log('HEIC conversion successful, data URL length:', convertedDataUrl.length);
+
+          // Use the converted data URL directly
+          const newImages = [...images, convertedDataUrl];
+          setImages(newImages);
+          form.setValue("images", newImages);
 
           toast({
             title: "Konvertierung erfolgreich",

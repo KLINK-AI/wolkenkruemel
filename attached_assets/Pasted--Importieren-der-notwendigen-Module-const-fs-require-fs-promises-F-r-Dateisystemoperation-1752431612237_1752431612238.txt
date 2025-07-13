@@ -1,0 +1,52 @@
+// Importieren der notwendigen Module
+const fs = require('fs').promises; // Für Dateisystemoperationen (asynchron)
+const convert = require('heic-convert'); // Die heic-convert Bibliothek
+
+/**
+ * Konvertiert eine HEIC-Datei in eine JPG-Datei.
+ * @param {string} inputPath Der Pfad zur Eingabe-HEIC-Datei.
+ * @param {string} outputPath Der Pfad, unter dem die Ausgabe-JPG-Datei gespeichert werden soll.
+ */
+async function convertHeicToJpg(inputPath, outputPath) {
+    try {
+        // Lesen des HEIC-Dateiinhalts als Buffer
+        const inputBuffer = await fs.readFile(inputPath);
+
+        // Konvertieren des Buffers von HEIC zu JPG
+        // 'format': 'JPEG' gibt das Ausgabeformat an
+        // 'quality': 1 ist die höchste JPG-Qualität (zwischen 0 und 1)
+        const outputBuffer = await convert({
+            buffer: inputBuffer, // Der HEIC-Datei-Buffer
+            format: 'JPEG',      // Ausgabeformat
+            quality: 1           // JPEG-Kompressionsqualität (0 bis 1)
+        });
+
+        // Schreiben des konvertierten JPG-Buffers in eine neue Datei
+        await fs.writeFile(outputPath, outputBuffer);
+
+        console.log(`Erfolgreich konvertiert: ${inputPath} zu ${outputPath}`);
+    } catch (error) {
+        console.error(`Fehler bei der Konvertierung von ${inputPath}:`, error);
+    }
+}
+
+// Beispielaufruf der Funktion
+// Stellen Sie sicher, dass Sie eine 'sample.heic' Datei im selben Verzeichnis haben
+// oder passen Sie den Pfad entsprechend an.
+const heicFilePath = './sample.heic';
+const jpgFilePath = './output.jpg';
+
+// Überprüfen, ob die Beispiel-HEIC-Datei existiert, bevor die Konvertierung versucht wird.
+// Dies ist wichtig für die Ausführbarkeit des Beispiels.
+(async () => {
+    try {
+        await fs.access(heicFilePath); // Prüfen, ob die Datei existiert
+        await convertHeicToJpg(heicFilePath, jpgFilePath);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            console.error(`Fehler: Die Datei '${heicFilePath}' wurde nicht gefunden. Bitte stellen Sie sicher, dass eine HEIC-Beispieldatei vorhanden ist.`);
+        } else {
+            console.error(`Ein unerwarteter Fehler ist aufgetreten:`, error);
+        }
+    }
+})();

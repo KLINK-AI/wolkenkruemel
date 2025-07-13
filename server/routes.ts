@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
+import heicConvert from 'heic-convert';
+import multer from 'multer';
 import { storage } from "./storage";
 import { 
   insertActivitySchema, insertPostSchema, insertCommentSchema, 
@@ -24,6 +26,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-06-20",
 });
 
+// Configure multer for HEIC uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  }
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Configure sessions
@@ -44,6 +54,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     }
   }));
+
+  // HEIC to JPEG conversion endpoint
+  app.post('/api/convert-heic', upload.single('heicFile'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      const { buffer, originalname } = req.file;
+      
+      console.log('Converting HEIC file:', {
+        originalName: originalname,
+        size: buffer.length,
+        mimeType: req.file.mimetype
+      });
+
+      // Convert HEIC to JPEG
+      const outputBuffer = await heicConvert({
+        buffer: buffer,
+        format: 'JPEG',
+        quality: 0.94
+      });
+
+      console.log('HEIC conversion successful, output size:', outputBuffer.length);
+
+      // Convert buffer to base64 data URL
+      const base64 = outputBuffer.toString('base64');
+      const dataUrl = `data:image/jpeg;base64,${base64}`;
+
+      res.json({
+        success: true,
+        dataUrl: dataUrl,
+        originalName: originalname.replace(/\.heic$/i, '.jpg')
+      });
+
+    } catch (error) {
+      console.error('HEIC conversion failed:', error);
+      res.status(500).json({ 
+        error: 'HEIC conversion failed',
+        message: error.message 
+      });
+    }
+  });
   
   // Community Posts
   app.get("/api/posts", async (req, res) => {
