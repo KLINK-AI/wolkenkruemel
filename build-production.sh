@@ -1,32 +1,27 @@
 #!/bin/bash
 
-echo "🚀 Starting production build process..."
+echo "🚀 Building production deployment..."
 
-# Set environment variables
+# Set environment
 export NODE_ENV=production
 
-# Clean previous builds
-echo "🧹 Cleaning previous builds..."
+# Clean and prepare
 rm -rf dist/
 mkdir -p dist/public
 
 # Run deployment fixes
-echo "🔧 Applying deployment fixes..."
 node deployment-fix.js
 
-# Build frontend with timeout
+# Build frontend (with extended timeout)
 echo "🏗️ Building frontend..."
-timeout 120 npm run build:client || {
-    echo "⚠️ Frontend build timed out or failed, using fallback..."
-    # Create basic static files structure
+timeout 300 vite build || {
+    echo "⚠️ Frontend build failed, using fallback..."
     mkdir -p dist/public
+    # Copy any existing static files
     cp -r client/public/* dist/public/ 2>/dev/null || true
-    
-    # Use the production-ready index.html we created
-    echo "✅ Using production-ready fallback index.html"
 }
 
-# Build backend with targeted configuration
+# Build backend with production optimizations
 echo "🏗️ Building backend..."
 npx esbuild server/index.ts \
     --platform=node \
@@ -34,22 +29,22 @@ npx esbuild server/index.ts \
     --bundle \
     --format=esm \
     --outdir=dist \
-    --target=node18 \
+    --target=node20 \
     --external:pg-native \
     --external:bufferutil \
     --external:utf-8-validate \
+    --external:heic-convert \
     --minify \
-    --sourcemap
+    --sourcemap \
+    --keep-names
 
 # Verify build
-if [ -f "dist/index.js" ]; then
-    echo "✅ Backend build successful"
-else
-    echo "❌ Backend build failed"
+if [ ! -f "dist/index.js" ]; then
+    echo "❌ Build failed!"
     exit 1
 fi
 
-# Create production environment file
+# Create production environment
 cat > dist/.env << EOF
 NODE_ENV=production
 DATABASE_URL=${DATABASE_URL}
@@ -57,8 +52,9 @@ STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
 VITE_STRIPE_PUBLIC_KEY=${VITE_STRIPE_PUBLIC_KEY}
 EOF
 
-echo "📦 Build complete!"
-echo "📁 Files in dist/:"
-ls -la dist/
+# Copy production assets
+cp -r shared dist/ 2>/dev/null || true
 
-echo "🎉 Production build ready for deployment!"
+echo "✅ Production build complete!"
+echo "📦 Build size: $(du -h dist/index.js | cut -f1)"
+echo "🎯 Ready for deployment"
