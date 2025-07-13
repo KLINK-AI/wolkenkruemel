@@ -117,6 +117,13 @@ export default function ProfilePage() {
           });
 
           try {
+            console.log('Starting HEIC conversion...', {
+              fileName,
+              fileType,
+              fileSize: file.size,
+              heic2anyType: typeof heic2any
+            });
+            
             // Convert HEIC to JPEG
             const convertedBlob = await heic2any({
               blob: file,
@@ -124,11 +131,18 @@ export default function ProfilePage() {
               quality: 0.94
             });
 
+            console.log('HEIC conversion result:', convertedBlob);
+
+            // Handle array result (heic2any sometimes returns an array)
+            const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+
             // Create a File object from the converted blob
-            processedFile = new File([convertedBlob as Blob], 
+            processedFile = new File([finalBlob as Blob], 
               fileName.replace(/\.heic$/i, '.jpg'), 
               { type: 'image/jpeg' }
             );
+
+            console.log('Created processed file:', processedFile);
 
             toast({
               title: "Konvertierung erfolgreich",
@@ -136,9 +150,14 @@ export default function ProfilePage() {
             });
           } catch (conversionError) {
             console.error("HEIC conversion failed:", conversionError);
+            console.error("Error details:", {
+              message: conversionError.message,
+              stack: conversionError.stack,
+              name: conversionError.name
+            });
             toast({
               title: "HEIC-Konvertierung fehlgeschlagen",
-              description: "Die HEIC-Datei konnte nicht konvertiert werden. Bitte verwenden Sie JPG/PNG oder ändern Sie die iPhone-Kamera-Einstellungen.",
+              description: `Fehler: ${conversionError.message || 'Unbekannter Fehler'}`,
               variant: "destructive",
             });
             return;
