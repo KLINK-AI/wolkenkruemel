@@ -396,26 +396,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Activities
   app.get("/api/activities", async (req, res) => {
     try {
-      console.log("Starting activities API call...");
-      
-      // Test database connection first
-      const dbConnected = await testDatabaseConnection();
-      if (!dbConnected) {
-        console.error("Database connection test failed");
-        return res.status(500).json({ error: "Database connection failed" });
-      }
-      
       const limit = parseInt(req.query.limit as string) || 20;
       const offset = parseInt(req.query.offset as string) || 0;
-      console.log(`Fetching activities with limit: ${limit}, offset: ${offset}`);
-      
       const activities = await storage.getActivities(limit, offset);
-      console.log(`Successfully fetched ${activities.length} activities`);
-      
       res.json(activities);
     } catch (error: any) {
-      console.error("Error in activities API:", error);
-      res.status(500).json({ message: error.message, stack: error.stack });
+      res.status(500).json({ message: error.message });
     }
   });
 
