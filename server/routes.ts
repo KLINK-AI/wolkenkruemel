@@ -868,6 +868,161 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Password Reset Request
+  app.post("/api/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "E-Mail-Adresse ist erforderlich" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal whether email exists or not
+        return res.json({ message: "Falls ein Konto mit dieser E-Mail existiert, wurde eine Passwort-Reset-E-Mail gesendet." });
+      }
+
+      // Generate reset token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const resetExpires = new Date(Date.now() + 3600000); // 1 hour from now
+
+      // Update user with reset token
+      await storage.updateUser(user.id, {
+        passwordResetToken: resetToken,
+        passwordResetExpires: resetExpires
+      });
+
+      // Send reset email
+      const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+      const emailSent = await sendEmail({
+        to: email,
+        from: 'stefan@gen-ai.consulting',
+        subject: 'Passwort zurücksetzen - Wolkenkrümel',
+        text: `Sie haben eine Passwort-Reset-Anfrage gestellt. Klicken Sie auf den Link, um Ihr Passwort zurückzusetzen: ${resetUrl}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #4f46e5;">Passwort zurücksetzen</h2>
+            <p>Sie haben eine Passwort-Reset-Anfrage für Ihr Wolkenkrümel-Konto gestellt.</p>
+            <p>Klicken Sie auf den Button unten, um Ihr Passwort zurückzusetzen:</p>
+            <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0;">Passwort zurücksetzen</a>
+            <p>Dieser Link ist nur 1 Stunde gültig.</p>
+            <p>Falls Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail.</p>
+          </div>
+        `
+      });
+
+      if (!emailSent) {
+        console.error('Failed to send password reset email');
+        return res.status(500).json({ message: "Fehler beim Senden der E-Mail. Versuchen Sie es später erneut." });
+      }
+
+      res.json({ message: "Falls ein Konto mit dieser E-Mail existiert, wurde eine Passwort-Reset-E-Mail gesendet." });
+    } catch (error: any) {
+      console.error('Password reset request error:', error);
+      res.status(500).json({ message: "Fehler beim Senden der Passwort-Reset-E-Mail" });
+    }
+  });
+
+  // Password Reset
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token || !newPassword) {
+        return res.status(400).json({ message: "Token und neues Passwort sind erforderlich" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Passwort muss mindestens 6 Zeichen lang sein" });
+      }
+
+      const user = await storage.getUserByPasswordResetToken(token);
+      if (!user) {
+        return res.status(400).json({ message: "Ungültiger oder abgelaufener Reset-Token" });
+      }
+
+      // Update password and clear reset token
+      await storage.updateUserPassword(user.id, newPassword);
+
+      res.json({ message: "Passwort erfolgreich zurückgesetzt" });
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      res.status(500).json({ message: "Fehler beim Zurücksetzen des Passworts" });
+    }
+  });
+
+  // Change Password (for logged in users)
+  app.post("/api/change-password", async (req, res) => {
+    try {
+      const { userId, currentPassword, newPassword } = req.body;
+      
+      if (!userId || !currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Alle Felder sind erforderlich" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Neues Passwort muss mindestens 6 Zeichen lang sein" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Benutzer nicht gefunden" });
+      }
+
+      // Verify current password
+      if (user.password !== currentPassword) {
+        return res.status(400).json({ message: "Aktuelles Passwort ist falsch" });
+      }
+
+      // Update password
+      await storage.updateUserPassword(user.id, newPassword);
+
+      res.json({ message: "Passwort erfolgreich geändert" });
+    } catch (error: any) {
+      console.error('Password change error:', error);
+      res.status(500).json({ message: "Fehler beim Ändern des Passworts" });
+    }
+  });
+
+  // Admin: Reset User Password
+  app.post("/api/admin/reset-user-password", async (req, res) => {
+    try {
+      const { adminId, targetUserId, newPassword } = req.body;
+      
+      if (!adminId || !targetUserId || !newPassword) {
+        return res.status(400).json({ message: "Alle Felder sind erforderlich" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Neues Passwort muss mindestens 6 Zeichen lang sein" });
+      }
+
+      // Check if requester is admin
+      const admin = await storage.getUser(adminId);
+      if (!admin || admin.role !== 'admin') {
+        return res.status(403).json({ message: "Admin-Berechtigung erforderlich" });
+      }
+
+      // Get target user
+      const targetUser = await storage.getUser(targetUserId);
+      if (!targetUser) {
+        return res.status(404).json({ message: "Zielbenutzer nicht gefunden" });
+      }
+
+      // Update password
+      await storage.updateUserPassword(targetUserId, newPassword);
+
+      res.json({ 
+        message: `Passwort für ${targetUser.username} erfolgreich zurückgesetzt`,
+        targetUser: targetUser.username
+      });
+    } catch (error: any) {
+      console.error('Admin password reset error:', error);
+      res.status(500).json({ message: "Fehler beim Zurücksetzen des Passworts" });
+    }
+  });
+
   // Check activity creation limit
   app.get("/api/users/:id/activity-limit", async (req, res) => {
     try {

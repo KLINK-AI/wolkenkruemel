@@ -12,6 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useAuth } from "@/hooks/useAuth";
+import ForgotPasswordForm from "@/components/ForgotPasswordForm";
 
 const loginSchema = z.object({
   email: z.string().email("Gültige E-Mail-Adresse erforderlich"),
@@ -22,6 +23,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
   const { login } = useAuth();
@@ -59,6 +61,14 @@ export default function LoginPage() {
   const onSubmit = (data: LoginForm) => {
     loginMutation.mutate(data);
   };
+
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-900 dark:to-gray-800 p-4">
+        <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-900 dark:to-gray-800 p-4">
@@ -109,6 +119,16 @@ export default function LoginPage() {
               </Button>
             </form>
           </Form>
+
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setShowForgotPassword(true)}
+              className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+            >
+              Passwort vergessen?
+            </button>
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">

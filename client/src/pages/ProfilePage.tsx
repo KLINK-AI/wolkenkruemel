@@ -26,13 +26,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Mail, MapPin, Calendar, Edit3, Upload, X } from "lucide-react";
+import { Save, Mail, MapPin, Calendar, Edit3, Upload, X, Key, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { UserStats } from "@/components/ui/user-stats";
 import { Link } from "wouter";
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
@@ -43,6 +44,11 @@ export default function ProfilePage() {
     location: "",
     email: "",
     avatarUrl: ""
+  });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -92,9 +98,55 @@ export default function ProfilePage() {
     },
   });
 
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: typeof passwordData) => {
+      await apiRequest("POST", "/api/change-password", {
+        userId: currentUser.id,
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Passwort geändert",
+        description: "Ihr Passwort wurde erfolgreich geändert.",
+      });
+      setIsChangingPassword(false);
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fehler",
+        description: error.message || "Beim Ändern des Passworts ist ein Fehler aufgetreten.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateProfileMutation.mutate(formData);
+  };
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Passwörter stimmen nicht überein",
+        description: "Bitte überprüfen Sie die Passwort-Bestätigung.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      toast({
+        title: "Passwort zu kurz",
+        description: "Das Passwort muss mindestens 6 Zeichen lang sein.",
+        variant: "destructive",
+      });
+      return;
+    }
+    changePasswordMutation.mutate(passwordData);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -437,7 +489,7 @@ export default function ProfilePage() {
 
 
         {/* Subscription Status */}
-        <Card>
+        <Card className="mb-8">
           <CardHeader>
             <CardTitle>Abonnement</CardTitle>
           </CardHeader>
@@ -461,6 +513,91 @@ export default function ProfilePage() {
                 </Link>
               )}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Password Change */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="w-5 h-5" />
+              Passwort ändern
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!isChangingPassword ? (
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Passwort</p>
+                  <p className="text-sm text-muted-foreground">Ändern Sie Ihr Passwort für mehr Sicherheit</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsChangingPassword(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Key className="w-4 h-4" />
+                  Passwort ändern
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="currentPassword">Aktuelles Passwort</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                    placeholder="Ihr aktuelles Passwort"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="newPassword">Neues Passwort</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                    placeholder="Neues Passwort (mindestens 6 Zeichen)"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    placeholder="Neues Passwort bestätigen"
+                    required
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      setIsChangingPassword(false);
+                      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                    }}
+                  >
+                    Abbrechen
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={changePasswordMutation.isPending}
+                    className="flex items-center gap-2"
+                  >
+                    <Key className="w-4 h-4" />
+                    {changePasswordMutation.isPending ? "Ändern..." : "Passwort ändern"}
+                  </Button>
+                </div>
+              </form>
+            )}
           </CardContent>
         </Card>
 

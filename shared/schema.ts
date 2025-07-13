@@ -28,6 +28,8 @@ export const users = pgTable("users", {
   location: text("location"),
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationToken: text("email_verification_token"),
+  passwordResetToken: text("password_reset_token"),
+  passwordResetExpires: timestamp("password_reset_expires"),
   role: text("role").default("user"), // user, admin, moderator
   status: text("status").default("unverified"), // unverified, verified, pending_payment, active, premium
   subscriptionTier: text("subscription_tier").default("free"), // free, premium, pro

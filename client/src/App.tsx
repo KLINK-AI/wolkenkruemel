@@ -26,6 +26,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import EmailVerifiedPage from "@/pages/EmailVerifiedPage";
 import UserManagementPage from "@/pages/UserManagementPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 
 
 function Router() {
@@ -59,6 +60,7 @@ function Router() {
         <Route path="/register" component={RegisterPage} />
         <Route path="/registrieren" component={RegisterPage} />
         <Route path="/email-verified" component={EmailVerifiedPage} />
+        <Route path="/reset-password/:token" component={ResetPasswordPage} />
         <Route path="/admin" component={UserManagementPage} />
         <Route path="/admin/users" component={UserManagementPage} />
         <Route component={NotFound} />

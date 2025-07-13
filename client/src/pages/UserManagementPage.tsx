@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Edit, UserPlus, Search } from "lucide-react";
+import { Trash2, Edit, UserPlus, Search, Key } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -143,6 +143,25 @@ export default function UserManagementPage() {
     }
   });
 
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      await apiRequest("POST", `/api/admin/reset-password`, { userId });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Passwort zurückgesetzt",
+        description: "Ein neues temporäres Passwort wurde an die E-Mail-Adresse des Benutzers gesendet.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fehler",
+        description: error.message || "Beim Zurücksetzen des Passworts ist ein Fehler aufgetreten.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const filteredUsers = users.filter((user: User) =>
     (user.displayName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -178,6 +197,12 @@ export default function UserManagementPage() {
   const handleDeleteUser = (userId: number, displayName: string) => {
     if (confirm(`Sind Sie sicher, dass Sie den Benutzer "${displayName}" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.`)) {
       deleteUserMutation.mutate(userId);
+    }
+  };
+
+  const handleResetPassword = (userId: number, displayName: string) => {
+    if (confirm(`Sind Sie sicher, dass Sie das Passwort für "${displayName}" zurücksetzen möchten? Ein neues temporäres Passwort wird per E-Mail gesendet.`)) {
+      resetPasswordMutation.mutate(userId);
     }
   };
 
@@ -419,6 +444,15 @@ export default function UserManagementPage() {
                           onClick={() => handleEditUser(user)}
                         >
                           <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleResetPassword(user.id, user.displayName)}
+                          className="text-blue-600 hover:text-blue-700"
+                          disabled={resetPasswordMutation.isPending}
+                        >
+                          <Key className="w-4 h-4" />
                         </Button>
                         <Button
                           size="sm"
