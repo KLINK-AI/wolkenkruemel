@@ -614,3 +614,16 @@ export class DatabaseStorage implements IStorage {
 }
 
 export const storage = new DatabaseStorage();
+
+// Debug function to test database connection
+export async function testDatabaseConnection() {
+  try {
+    console.log('Testing database connection...');
+    const testUsers = await storage.getAllUsers();
+    console.log(`Database connection successful: ${testUsers.length} users found`);
+    return true;
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return false;
+  }
+}
