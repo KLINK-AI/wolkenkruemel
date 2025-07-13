@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Edit2, Reply, MoreHorizontal, Trash2, Check, X, Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { fetchApi, postApi } from '@/lib/api';
 
 interface CommentItemProps {
   comment: Comment & { 
@@ -36,11 +36,13 @@ export function CommentItem({ comment, postId, onReply, isReply = false }: Comme
 
   const handleEdit = async () => {
     try {
-      await apiRequest(`/api/comments/${comment.id}`, {
+      const response = await fetch(`/api/comments/${comment.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: editContent }),
       });
+      
+      if (!response.ok) throw new Error('Edit failed');
       
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ['/api/posts', postId, 'comments'] });
@@ -53,9 +55,11 @@ export function CommentItem({ comment, postId, onReply, isReply = false }: Comme
     if (!confirm('Kommentar wirklich löschen?')) return;
     
     try {
-      await apiRequest(`/api/comments/${comment.id}`, {
+      const response = await fetch(`/api/comments/${comment.id}`, {
         method: 'DELETE',
       });
+      
+      if (!response.ok) throw new Error('Delete failed');
       
       queryClient.invalidateQueries({ queryKey: ['/api/posts', postId, 'comments'] });
     } catch (error) {
@@ -67,14 +71,10 @@ export function CommentItem({ comment, postId, onReply, isReply = false }: Comme
     if (!replyContent.trim()) return;
     
     try {
-      await apiRequest(`/api/posts/${postId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: replyContent,
-          authorId: user?.id,
-          parentId: comment.id,
-        }),
+      await postApi(`/api/posts/${postId}/comments`, {
+        content: replyContent,
+        authorId: user?.id,
+        parentId: comment.id,
       });
       
       setIsReplying(false);
@@ -89,10 +89,8 @@ export function CommentItem({ comment, postId, onReply, isReply = false }: Comme
     if (!user) return;
     
     try {
-      await apiRequest(`/api/comments/${comment.id}/like`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id }),
+      await postApi(`/api/comments/${comment.id}/like`, {
+        userId: user.id,
       });
       
       setIsLiked(!isLiked);

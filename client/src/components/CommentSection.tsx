@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageCircle, Send } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { fetchApi, postApi } from '@/lib/api';
 
 interface CommentSectionProps {
   postId: number;
@@ -21,10 +21,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
   const { data: comments, isLoading } = useQuery({
     queryKey: ['/api/posts', postId, 'comments'],
-    queryFn: async () => {
-      const response = await apiRequest(`/api/posts/${postId}/comments`);
-      return response.json();
-    },
+    queryFn: () => fetchApi(`/api/posts/${postId}/comments`),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,13 +29,9 @@ export function CommentSection({ postId }: CommentSectionProps) {
     if (!newComment.trim() || !user) return;
 
     try {
-      await apiRequest(`/api/posts/${postId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: newComment,
-          authorId: user.id,
-        }),
+      await postApi(`/api/posts/${postId}/comments`, {
+        content: newComment,
+        authorId: user.id,
       });
 
       setNewComment('');
