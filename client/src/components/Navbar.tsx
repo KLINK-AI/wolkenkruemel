@@ -38,7 +38,7 @@ export function Navbar() {
   const adminNavItem = { path: "/admin", label: "Admin", icon: Settings };
 
   return (
-    <header className="app-header sticky top-0 z-50">
+    <header className="app-header sticky top-0 z-[9999] bg-background/95 backdrop-blur-sm border-b border-border/40">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
