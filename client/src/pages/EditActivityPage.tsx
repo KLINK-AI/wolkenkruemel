@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { apiRequest } from "@/lib/queryClient";
+import heic2any from "heic2any";
 import { useLanguage } from "@/components/LanguageProvider";
 import { Link } from "wouter";
 import { ArrowLeft, Upload, X, Trash2 } from "lucide-react";
@@ -454,7 +455,7 @@ export default function EditActivityPage() {
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                        accept="image/*"
                         onChange={handleImageUpload}
                         className="hidden"
                       />

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import heic2any from "heic2any";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,7 +84,7 @@ export default function ProfilePage() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
@@ -95,40 +96,82 @@ export default function ProfilePage() {
         return;
       }
 
-      // Check for HEIC files
-      const fileName = file.name.toLowerCase();
-      const fileType = file.type.toLowerCase();
-      
-      if (fileType === 'image/heic' || 
-          fileType === 'image/heif' || 
-          fileName.endsWith('.heic') || 
-          fileName.endsWith('.heif') ||
-          (fileType === '' && (fileName.endsWith('.heic') || fileName.endsWith('.heif')))) {
-        toast({
-          title: "HEIC-Format nicht unterstützt",
-          description: "iPhone HEIC-Dateien können nicht verarbeitet werden. Bitte ändern Sie die iPhone-Kamera-Einstellungen zu 'Kompatibler' oder konvertieren Sie die Datei zu JPG/PNG.",
-          variant: "destructive",
-        });
-        return;
-      }
+      try {
+        // Check if it's a HEIC file and convert it
+        const fileName = file.name.toLowerCase();
+        const fileType = file.type.toLowerCase();
+        
+        let processedFile = file;
+        
+        // HEIC files often have no MIME type or unknown type
+        if (fileType === 'image/heic' || 
+            fileType === 'image/heif' || 
+            fileName.endsWith('.heic') || 
+            fileName.endsWith('.heif') ||
+            (fileName.includes('.heic') || fileName.includes('.heif')) ||
+            (fileType === '' && (fileName.endsWith('.heic') || fileName.endsWith('.heif')))) {
+          
+          toast({
+            title: "HEIC-Datei wird konvertiert",
+            description: "Ihre iPhone-Foto wird automatisch zu JPG konvertiert...",
+          });
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(result);
-        setFormData(prev => ({
-          ...prev,
-          avatarUrl: result
-        }));
-      };
-      reader.onerror = () => {
+          try {
+            // Convert HEIC to JPEG
+            const convertedBlob = await heic2any({
+              blob: file,
+              toType: 'image/jpeg',
+              quality: 0.94
+            });
+
+            // Create a File object from the converted blob
+            processedFile = new File([convertedBlob as Blob], 
+              fileName.replace(/\.heic$/i, '.jpg'), 
+              { type: 'image/jpeg' }
+            );
+
+            toast({
+              title: "Konvertierung erfolgreich",
+              description: "Ihre HEIC-Datei wurde erfolgreich zu JPG konvertiert!",
+            });
+          } catch (conversionError) {
+            console.error("HEIC conversion failed:", conversionError);
+            toast({
+              title: "HEIC-Konvertierung fehlgeschlagen",
+              description: "Die HEIC-Datei konnte nicht konvertiert werden. Bitte verwenden Sie JPG/PNG oder ändern Sie die iPhone-Kamera-Einstellungen.",
+              variant: "destructive",
+            });
+            return;
+          }
+        }
+
+        // Read the processed file (either original or converted)
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          setImagePreview(result);
+          setFormData(prev => ({
+            ...prev,
+            avatarUrl: result
+          }));
+        };
+        reader.onerror = () => {
+          toast({
+            title: "Datei-Lesefehler",
+            description: "Die Datei konnte nicht gelesen werden. Bitte versuchen Sie es erneut.",
+            variant: "destructive",
+          });
+        };
+        reader.readAsDataURL(processedFile);
+
+      } catch (error) {
+        console.error("Image upload error:", error);
         toast({
-          title: "HEIC-Datei erkannt",
-          description: "Diese Datei ist wahrscheinlich eine HEIC-Datei. Bitte verwenden Sie JPG/PNG oder ändern Sie die iPhone-Kamera-Einstellungen.",
+          title: "Upload-Fehler",
+          description: "Beim Hochladen der Datei ist ein Fehler aufgetreten.",
           variant: "destructive",
         });
-      };
-      reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -268,7 +311,7 @@ export default function ProfilePage() {
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                        accept="image/*"
                         onChange={handleImageUpload}
                         className="hidden"
                       />

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import heic2any from "heic2any";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import type { Activity } from "@shared/schema";
@@ -143,7 +144,7 @@ export default function CreateActivityPage() {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -156,48 +157,91 @@ export default function CreateActivityPage() {
       return;
     }
 
-    // Improved HEIC detection - also check for empty or unknown file types
-    const fileName = file.name.toLowerCase();
-    const fileType = file.type.toLowerCase();
-    
-    // HEIC files often have no MIME type or unknown type
-    if (fileType === 'image/heic' || 
-        fileType === 'image/heif' || 
-        fileName.endsWith('.heic') || 
-        fileName.endsWith('.heif') ||
-        (fileName.includes('.heic') || fileName.includes('.heif')) ||
-        (fileType === '' && (fileName.endsWith('.heic') || fileName.endsWith('.heif')))) {
-      toast({
-        title: "HEIC-Format nicht unterstützt",
-        description: "iPhone HEIC-Dateien können nicht verarbeitet werden. Bitte ändern Sie die iPhone-Kamera-Einstellungen zu 'Kompatibler' (Einstellungen > Kamera > Formate) oder konvertieren Sie die Datei zu JPG/PNG.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsImageUploading(true);
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      if (result) {
-        const newImages = [...images, result];
-        setImages(newImages);
-        form.setValue("images", newImages);
+
+    try {
+      // Check if it's a HEIC file and convert it
+      const fileName = file.name.toLowerCase();
+      const fileType = file.type.toLowerCase();
+      
+      let processedFile = file;
+      
+      // HEIC files often have no MIME type or unknown type
+      if (fileType === 'image/heic' || 
+          fileType === 'image/heif' || 
+          fileName.endsWith('.heic') || 
+          fileName.endsWith('.heif') ||
+          (fileName.includes('.heic') || fileName.includes('.heif')) ||
+          (fileType === '' && (fileName.endsWith('.heic') || fileName.endsWith('.heif')))) {
+        
+        toast({
+          title: "HEIC-Datei wird konvertiert",
+          description: "Ihre iPhone-Foto wird automatisch zu JPG konvertiert...",
+        });
+
+        try {
+          // Convert HEIC to JPEG
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: 'image/jpeg',
+            quality: 0.94
+          });
+
+          // Create a File object from the converted blob
+          processedFile = new File([convertedBlob as Blob], 
+            fileName.replace(/\.heic$/i, '.jpg'), 
+            { type: 'image/jpeg' }
+          );
+
+          toast({
+            title: "Konvertierung erfolgreich",
+            description: "Ihre HEIC-Datei wurde erfolgreich zu JPG konvertiert!",
+          });
+        } catch (conversionError) {
+          console.error("HEIC conversion failed:", conversionError);
+          toast({
+            title: "HEIC-Konvertierung fehlgeschlagen",
+            description: "Die HEIC-Datei konnte nicht konvertiert werden. Bitte verwenden Sie JPG/PNG oder ändern Sie die iPhone-Kamera-Einstellungen.",
+            variant: "destructive",
+          });
+          setIsImageUploading(false);
+          return;
+        }
       }
-      setIsImageUploading(false);
-    };
-    
-    reader.onerror = () => {
+
+      // Read the processed file (either original or converted)
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        if (result) {
+          const newImages = [...images, result];
+          setImages(newImages);
+          form.setValue("images", newImages);
+        }
+        setIsImageUploading(false);
+      };
+      
+      reader.onerror = () => {
+        toast({
+          title: "Datei-Lesefehler",
+          description: "Die Datei konnte nicht gelesen werden. Bitte versuchen Sie es erneut.",
+          variant: "destructive",
+        });
+        setIsImageUploading(false);
+      };
+      
+      reader.readAsDataURL(processedFile);
+
+    } catch (error) {
+      console.error("Image upload error:", error);
       toast({
-        title: "HEIC-Datei erkannt",
-        description: "Diese Datei ist wahrscheinlich eine HEIC-Datei von einem iPhone. Bitte ändern Sie die iPhone-Kamera-Einstellungen zu 'Kompatibler' oder konvertieren Sie die Datei zu JPG/PNG.",
+        title: "Upload-Fehler",
+        description: "Beim Hochladen der Datei ist ein Fehler aufgetreten.",
         variant: "destructive",
       });
       setIsImageUploading(false);
-    };
-    
-    reader.readAsDataURL(file);
+    }
     
     // Reset input to allow same file upload again
     if (event.target) {
@@ -322,7 +366,7 @@ export default function CreateActivityPage() {
                               <label className="cursor-pointer">
                                 <input
                                   type="file"
-                                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                  accept="image/*"
                                   onChange={handleImageUpload}
                                   className="hidden"
                                 />
