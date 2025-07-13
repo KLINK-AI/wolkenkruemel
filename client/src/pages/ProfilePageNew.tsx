@@ -119,8 +119,6 @@ export default function ProfilePage() {
     switch (tier) {
       case "premium":
         return <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">Premium</Badge>;
-      case "professional":
-        return <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">Professional</Badge>;
       default:
         return <Badge variant="outline">Kostenlos</Badge>;
     }

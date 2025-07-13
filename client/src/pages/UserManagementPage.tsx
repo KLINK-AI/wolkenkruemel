@@ -191,7 +191,6 @@ export default function UserManagementPage() {
 
   const getSubscriptionBadgeColor = (tier: string) => {
     switch (tier) {
-      case "professional": return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
       case "premium": return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
       default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
@@ -401,8 +400,7 @@ export default function UserManagementPage() {
                     </TableCell>
                     <TableCell>
                       <Badge className={getSubscriptionBadgeColor(user.subscriptionTier)}>
-                        {user.subscriptionTier === "professional" ? "Professional" :
-                         user.subscriptionTier === "premium" ? "Premium" : "Kostenlos"}
+                        {user.subscriptionTier === "premium" ? "Premium" : "Kostenlos"}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -563,7 +561,6 @@ export default function UserManagementPage() {
                       <SelectContent>
                         <SelectItem value="free">Kostenlos</SelectItem>
                         <SelectItem value="premium">Premium</SelectItem>
-                        <SelectItem value="professional">Professional</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
