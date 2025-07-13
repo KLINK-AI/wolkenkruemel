@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 import { useLanguage } from "@/components/LanguageProvider";
+import { Eye, EyeOff } from "lucide-react";
 
 const registerSchema = z.object({
   username: z.string().min(3, "Benutzername muss mindestens 3 Zeichen haben").max(50, "Benutzername darf maximal 50 Zeichen haben"),
@@ -26,6 +27,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -183,7 +185,22 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Passwort</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="Mindestens 8 Zeichen" {...field} />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          placeholder="Mindestens 8 Zeichen" 
+                          {...field} 
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
                     </FormControl>
                     <div className="text-sm text-muted-foreground mt-1">
                       Passwort muss mindestens 8 Zeichen haben und einen Kleinbuchstaben, einen Großbuchstaben und eine Zahl enthalten

@@ -814,11 +814,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/verify-email/:token", async (req, res) => {
     try {
       const { token } = req.params;
+      console.log('Email verification attempt for token:', token);
+      
       const user = await storage.getUserByVerificationToken(token);
       
       if (!user) {
-        return res.status(400).json({ message: "Ungültiger oder abgelaufener Bestätigungslink" });
+        console.log('No user found for token:', token);
+        return res.redirect(`/email-verified?error=true`);
       }
+
+      console.log('User found for verification:', user.email);
 
       // Verify email
       await storage.updateUser(user.id, { 
@@ -826,11 +831,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         emailVerificationToken: null 
       });
 
+      console.log('Email verified successfully for user:', user.email);
+
       // Redirect to success page
-      res.redirect(`${req.protocol}://${req.get('host')}/email-verified?success=true`);
+      return res.redirect(`/email-verified?success=true`);
     } catch (error: any) {
       console.error('Email verification error:', error);
-      res.redirect(`${req.protocol}://${req.get('host')}/email-verified?error=true`);
+      return res.redirect(`/email-verified?error=true`);
     }
   });
 
