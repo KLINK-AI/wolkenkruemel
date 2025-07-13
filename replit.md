@@ -153,12 +153,13 @@ Changelog:
 - July 08, 2025. RESOLVED: Critical login system restoration - Fixed session management configuration, created PostgreSQL session table, implemented /api/me endpoint, and restored full authentication functionality after logout issues. Database cleaned of all test users, leaving only admin account for production testing.
 - July 08, 2025. FIXED: Complete UX improvements for free users - Fixed first/last name display in profiles, implemented working Premium upgrade buttons with Stripe integration, created separate UserActivitiesPage for normal users (only showing their own activities), added proper freemium restrictions with clear upgrade paths, and created motivational FirstActivityPrompt component to encourage user engagement.
 - July 09, 2025. RESOLVED: Premium upgrade functionality fully operational - Fixed frontend-backend synchronization issue where Premium upgrades were successful on server but not reflected in UI. Users can now upgrade to Premium via /premium page (SubscriptionPage) with immediate status updates. Removed duplicate PremiumFeaturesPage route - SubscriptionPage is now the single source for all Premium upgrades.
+- July 13, 2025. COMPLETED: Beta testing issues resolved - Fixed disappearing logo in Navbar after Premium upgrade (using reliable SVG fallback), improved mobile image display with object-contain for portrait images, added complete tag editing functionality to EditActivityPage (add/remove tags), implemented activity deletion with confirmation dialog, and added HEIC file format support for iPhone photo uploads. All critical user feedback from first beta tester "IggyTaru" has been addressed.
 
 ## Development Priorities
 
 ### Next Priority Tasks (Updated July 08, 2025)
 
-**PLATFORM STATUS: READY FOR USER TESTING** ✅
+**PLATFORM STATUS: BETA TESTING FEEDBACK IMPLEMENTED** ✅
 
 **1. Production Deployment** (Aktuelle Priorität) 
 - Plattform ist vollständig produktionsbereit

@@ -9,10 +9,11 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { apiRequest } from "@/lib/queryClient";
 import { useLanguage } from "@/components/LanguageProvider";
 import { Link } from "wouter";
-import { ArrowLeft, Upload, X } from "lucide-react";
+import { ArrowLeft, Upload, X, Trash2 } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +38,8 @@ export default function EditActivityPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [currentTags, setCurrentTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { currentUser } = useAuth();
 
@@ -69,18 +72,45 @@ export default function EditActivityPage() {
     } : undefined,
   });
 
-  // Load existing images when activity is loaded
+  // Load existing images and tags when activity is loaded
   useEffect(() => {
-    if (activity && activity.images) {
-      setSelectedImages(activity.images);
+    if (activity) {
+      if (activity.images) {
+        setSelectedImages(activity.images);
+      }
+      if (activity.tags) {
+        setCurrentTags(activity.tags);
+      }
     }
   }, [activity]);
+
+  const deleteActivityMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("DELETE", `/api/activities/${activityId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/activities"] });
+      toast({
+        title: "Aktivität gelöscht",
+        description: "Die Aktivität wurde erfolgreich gelöscht.",
+      });
+      setLocation("/activities");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fehler",
+        description: error.message || "Aktivität konnte nicht gelöscht werden.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const updateActivityMutation = useMutation({
     mutationFn: async (data: EditActivityFormData) => {
       const finalData = {
         ...data,
         images: selectedImages.length > 0 ? selectedImages : data.images,
+        tags: currentTags,
       };
       
       await apiRequest("PATCH", `/api/activities/${activityId}`, finalData);
@@ -147,6 +177,17 @@ export default function EditActivityPage() {
     const newImages = selectedImages.filter((_, i) => i !== index);
     setSelectedImages(newImages);
     form.setValue("images", newImages);
+  };
+
+  const addTag = () => {
+    if (newTag.trim() && !currentTags.includes(newTag.trim())) {
+      setCurrentTags([...currentTags, newTag.trim()]);
+      setNewTag("");
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setCurrentTags(currentTags.filter(tag => tag !== tagToRemove));
   };
 
   const onSubmit = (data: EditActivityFormData) => {
@@ -323,6 +364,62 @@ export default function EditActivityPage() {
                     />
                   </div>
 
+                  {/* Tags Section */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Tags verwalten
+                      </label>
+                      <div className="flex gap-2 mb-3">
+                        <Input
+                          value={newTag}
+                          onChange={(e) => setNewTag(e.target.value)}
+                          placeholder="Neuen Tag hinzufügen..."
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addTag();
+                            }
+                          }}
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          onClick={addTag}
+                          variant="outline"
+                          disabled={!newTag.trim() || currentTags.includes(newTag.trim())}
+                        >
+                          Tag hinzufügen
+                        </Button>
+                      </div>
+                      
+                      {/* Current Tags */}
+                      <div className="flex flex-wrap gap-2">
+                        {currentTags.map((tag, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                          >
+                            <span>{tag}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeTag(tag)}
+                              className="hover:text-red-600 ml-1"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {currentTags.length === 0 && (
+                        <p className="text-sm text-gray-500 italic">
+                          Keine Tags vorhanden. Fügen Sie Tags hinzu, um Ihre Aktivität besser auffindbar zu machen.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="space-y-4">
                     <FormLabel>Fotos</FormLabel>
                     <div className="flex items-center gap-4">
@@ -338,7 +435,7 @@ export default function EditActivityPage() {
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="image/*"
+                        accept="image/*,.heic,.HEIC"
                         onChange={handleImageUpload}
                         className="hidden"
                       />
@@ -383,6 +480,29 @@ export default function EditActivityPage() {
                         Abbrechen
                       </Button>
                     </Link>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" type="button">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Löschen
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Aktivität löschen</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Sind Sie sicher, dass Sie "{activity?.title}" löschen möchten? 
+                            Diese Aktion kann nicht rückgängig gemacht werden.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteActivityMutation.mutate()}>
+                            Löschen
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </form>
               </Form>

@@ -107,7 +107,7 @@ export function LazyImage({
           onLoad={handleLoad}
           onError={handleError}
           className={cn(
-            'w-full h-full object-cover transition-opacity duration-300',
+            'w-full h-full object-contain sm:object-cover transition-opacity duration-300',
             isLoaded ? 'opacity-100' : 'opacity-0'
           )}
         />

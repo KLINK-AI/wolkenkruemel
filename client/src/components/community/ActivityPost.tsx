@@ -334,7 +334,7 @@ export default function ActivityPost({ post }: ActivityPostProps) {
           <img 
             src={post.imageUrl} 
             alt="Post image" 
-            className="rounded-lg w-full h-64 object-cover" 
+            className="rounded-lg w-full h-64 object-contain sm:object-cover bg-muted" 
           />
         </CardContent>
       )}

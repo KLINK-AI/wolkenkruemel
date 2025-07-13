@@ -303,7 +303,7 @@ export default function CreateActivityPage() {
                               <label className="cursor-pointer">
                                 <input
                                   type="file"
-                                  accept="image/*"
+                                  accept="image/*,.heic,.HEIC"
                                   onChange={handleImageUpload}
                                   className="hidden"
                                 />
