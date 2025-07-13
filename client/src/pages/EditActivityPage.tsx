@@ -372,7 +372,7 @@ export default function EditActivityPage() {
                       </label>
                       <div className="flex gap-2 mb-3">
                         <Input
-                          value={newTag}
+                          value={newTag || ""}
                           onChange={(e) => setNewTag(e.target.value)}
                           placeholder="Neuen Tag hinzufügen..."
                           onKeyPress={(e) => {
