@@ -84,600 +84,6 @@ export interface IStorage {
   getSuggestedUsers(userId: number): Promise<User[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User> = new Map();
-  private activities: Map<number, Activity> = new Map();
-  private posts: Map<number, Post> = new Map();
-  private comments: Map<number, Comment> = new Map();
-  private likes: Map<number, { userId: number; postId?: number; commentId?: number }> = new Map();
-  private follows: Map<number, { followerId: number; followingId: number }> = new Map();
-  private events: Map<number, Event> = new Map();
-  private notifications: Map<number, Notification> = new Map();
-  private activityProgress: Map<string, ActivityProgress> = new Map();
-  
-  private currentUserId = 1;
-  private currentActivityId = 1;
-  private currentPostId = 1;
-  private currentCommentId = 1;
-  private currentLikeId = 1;
-  private currentFollowId = 1;
-  private currentEventId = 1;
-  private currentNotificationId = 1;
-  private currentActivityProgressId = 1;
-
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
-  }
-
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
-  }
-
-  async getUserByDisplayName(displayName: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.displayName === displayName);
-  }
-
-  async getUserByVerificationToken(token: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.emailVerificationToken === token);
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = {
-      ...insertUser,
-      id,
-      status: 'unverified',
-      firstName: null,
-      lastName: null,
-      location: null,
-      emailVerificationToken: null,
-      isEmailVerified: false,
-      role: 'user',
-      subscriptionTier: 'free',
-      activitiesCreated: 0,
-      postsCreated: 0,
-      likesReceived: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.users.set(id, user);
-    return user;
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
-  }
-
-  async updateUser(id: number, updates: Partial<User>): Promise<User> {
-    const user = this.users.get(id);
-    if (!user) throw new Error('User not found');
-    
-    const updatedUser = { ...user, ...updates, updatedAt: new Date() };
-    this.users.set(id, updatedUser);
-    return updatedUser;
-  }
-
-  async deleteUser(id: number): Promise<void> {
-    if (!this.users.has(id)) {
-      throw new Error("User not found");
-    }
-    this.users.delete(id);
-  }
-
-  async updateUserSubscription(id: number, customerId: string, subscriptionId: string): Promise<User> {
-    return this.updateUser(id, { 
-      stripeCustomerId: customerId, 
-      stripeSubscriptionId: subscriptionId,
-      subscriptionTier: 'premium'
-    });
-  }
-
-  async getActivities(limit = 20, offset = 0): Promise<(Activity & { author: User })[]> {
-    const allActivities = Array.from(this.activities.values())
-      .sort((a, b) => (b.createdAt || new Date()).getTime() - (a.createdAt || new Date()).getTime())
-      .map(activity => {
-        const author = this.users.get(activity.authorId as any) || {
-          id: 0,
-          username: 'Unknown',
-          email: '',
-          password: '',
-          displayName: 'Unbekannter Benutzer',
-          bio: null,
-          avatarUrl: null,
-          role: 'user',
-          subscriptionTier: 'free',
-          activitiesCreated: 0,
-          postsCreated: 0,
-          likesReceived: 0,
-          isEmailVerified: false,
-          stripeCustomerId: null,
-          stripeSubscriptionId: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-        return { ...activity, author };
-      });
-    return allActivities.slice(offset, offset + limit);
-  }
-
-  async getActivity(id: number): Promise<(Activity & { author: User }) | undefined> {
-    const activity = this.activities.get(id);
-    if (!activity) return undefined;
-    
-    const author = activity.authorId ? await this.getUser(activity.authorId) : null;
-    const defaultAuthor = {
-      id: 0,
-      username: 'Unknown',
-      email: '',
-      password: '',
-      displayName: 'Unbekannter Autor',
-      bio: null,
-      avatarUrl: null,
-      role: 'user',
-      subscriptionTier: 'free',
-      activitiesCreated: 0,
-      postsCreated: 0,
-      likesReceived: 0,
-      isEmailVerified: false,
-      stripeCustomerId: null,
-      stripeSubscriptionId: null,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    return { ...activity, author: author || defaultAuthor };
-  }
-
-  async getActivitiesByAuthor(authorId: number): Promise<Activity[]> {
-    return Array.from(this.activities.values()).filter(activity => 
-      typeof activity.authorId === 'string' ? parseInt(activity.authorId) === authorId : activity.authorId === authorId
-    );
-  }
-
-  async createActivity(insertActivity: InsertActivity): Promise<Activity> {
-    const id = this.currentActivityId++;
-    const activity: Activity = {
-      ...insertActivity,
-      id,
-      likes: 0,
-      completions: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.activities.set(id, activity);
-    
-    // Update user's activity count
-    if (insertActivity.authorId) {
-      const user = await this.getUser(insertActivity.authorId);
-      if (user) {
-        await this.updateUser(insertActivity.authorId, { 
-          activitiesCreated: user.activitiesCreated + 1 
-        });
-      }
-    }
-    
-    return activity;
-  }
-
-  async updateActivity(id: number, updates: Partial<Activity>): Promise<Activity> {
-    const activity = this.activities.get(id);
-    if (!activity) throw new Error('Activity not found');
-    
-    const updatedActivity = { ...activity, ...updates, updatedAt: new Date() };
-    this.activities.set(id, updatedActivity);
-    return updatedActivity;
-  }
-
-  async deleteActivity(id: number): Promise<void> {
-    this.activities.delete(id);
-  }
-
-  async approveActivity(id: number): Promise<Activity> {
-    return this.updateActivity(id, { isApproved: true });
-  }
-
-  async getPosts(limit = 20, offset = 0): Promise<(Post & { author: User, linkedActivity?: Activity })[]> {
-    const allPosts = Array.from(this.posts.values())
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
-      .slice(offset, offset + limit);
-    
-    const postsWithAuthors = await Promise.all(
-      allPosts.map(async (post) => {
-        const author = post.authorId ? await this.getUser(post.authorId) : null;
-        const linkedActivity = post.linkedActivityId ? await this.getActivity(post.linkedActivityId) : undefined;
-        const defaultAuthor = {
-          id: 0,
-          username: 'Unknown',
-          email: '',
-          password: '',
-          displayName: 'Unbekannter Benutzer',
-          bio: null,
-          avatarUrl: null,
-          role: 'user',
-          subscriptionTier: 'free',
-          activitiesCreated: 0,
-          postsCreated: 0,
-          likesReceived: 0,
-          isEmailVerified: false,
-          stripeCustomerId: null,
-          stripeSubscriptionId: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-        return { ...post, author: author || defaultAuthor, linkedActivity };
-      })
-    );
-    
-    return postsWithAuthors;
-  }
-
-  async getPost(id: number): Promise<(Post & { author: User, linkedActivity?: Activity }) | undefined> {
-    const post = this.posts.get(id);
-    if (!post) return undefined;
-    
-    const author = await this.getUser(post.authorId);
-    const linkedActivity = post.linkedActivityId ? await this.getActivity(post.linkedActivityId) : undefined;
-    
-    return { ...post, author: author!, linkedActivity };
-  }
-
-  async getPostsByAuthor(authorId: number): Promise<Post[]> {
-    return Array.from(this.posts.values()).filter(post => post.authorId === authorId);
-  }
-
-  async createPost(insertPost: InsertPost): Promise<Post> {
-    const id = this.currentPostId++;
-    const post: Post = {
-      ...insertPost,
-      id,
-      likes: 0,
-      comments: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.posts.set(id, post);
-    
-    // Update user's post count
-    const user = await this.getUser(insertPost.authorId);
-    if (user) {
-      await this.updateUser(insertPost.authorId, { 
-        postsCreated: user.postsCreated + 1 
-      });
-    }
-    
-    return post;
-  }
-
-  async updatePost(id: number, updates: Partial<Post>): Promise<Post> {
-    const post = this.posts.get(id);
-    if (!post) throw new Error('Post not found');
-    
-    const updatedPost = { ...post, ...updates, updatedAt: new Date() };
-    this.posts.set(id, updatedPost);
-    console.log(`Updated post ${id} with:`, updates, `Result:`, updatedPost.likes);
-    return updatedPost;
-  }
-
-  async deletePost(id: number): Promise<void> {
-    this.posts.delete(id);
-  }
-
-  async likePost(userId: number, postId: number): Promise<void> {
-    // Check if already liked
-    const existingLike = Array.from(this.likes.values()).find(
-      like => like.userId === userId && like.postId === postId
-    );
-    
-    if (existingLike) {
-      console.log(`User ${userId} already liked post ${postId}`);
-      return;
-    }
-    
-    const likeId = this.currentLikeId++;
-    this.likes.set(likeId, { userId, postId });
-    
-    const post = this.posts.get(postId);
-    if (post) {
-      const newLikeCount = post.likes + 1;
-      await this.updatePost(postId, { likes: newLikeCount });
-      console.log(`Liked post ${postId}, old count: ${post.likes}, new count: ${newLikeCount}`);
-    }
-  }
-
-  async unlikePost(userId: number, postId: number): Promise<void> {
-    console.log(`Attempting to unlike post ${postId} for user ${userId}`);
-    
-    const likeEntry = Array.from(this.likes.entries()).find(
-      ([_, like]) => like.userId === userId && like.postId === postId
-    );
-    
-    if (likeEntry) {
-      this.likes.delete(likeEntry[0]);
-      console.log(`Successfully deleted like entry ${likeEntry[0]} for user ${userId}, post ${postId}`);
-      
-      const post = this.posts.get(postId);
-      if (post) {
-        const newLikeCount = Math.max(0, post.likes - 1);
-        await this.updatePost(postId, { likes: newLikeCount });
-        console.log(`Unliked post ${postId}, old count: ${post.likes}, new count: ${newLikeCount}`);
-      }
-    } else {
-      console.log(`ERROR: No like entry found for user ${userId}, post ${postId}`);
-      console.log(`All current likes:`, Array.from(this.likes.entries()).map(([id, like]) => ({ id, userId: like.userId, postId: like.postId })));
-    }
-  }
-
-  async getPost(id: number): Promise<Post | null> {
-    const post = this.posts.get(id);
-    if (!post) return null;
-
-    const author = await this.getUser(post.authorId);
-    if (!author) return null;
-
-    return {
-      ...post,
-      author: {
-        id: author.id,
-        username: author.username,
-        displayName: author.displayName || author.username,
-        avatarUrl: author.avatarUrl || '',
-        subscriptionTier: author.subscriptionTier,
-      }
-    };
-  }
-
-  async unlikePost(userId: number, postId: number): Promise<void> {
-    const likeEntry = Array.from(this.likes.entries()).find(
-      ([_, like]) => like.userId === userId && like.postId === postId
-    );
-    
-    if (likeEntry) {
-      this.likes.delete(likeEntry[0]);
-      const post = this.posts.get(postId);
-      if (post) {
-        await this.updatePost(postId, { likes: Math.max(0, post.likes - 1) });
-      }
-    }
-  }
-
-  async isPostLikedByUser(userId: number, postId: number): Promise<boolean> {
-    const likeEntry = Array.from(this.likes.values()).find(
-      like => like.userId === userId && like.postId === postId
-    );
-    const isLiked = !!likeEntry;
-    console.log(`Like status check: user ${userId}, post ${postId} = ${isLiked}`);
-    
-    if (isLiked) {
-      console.log(`Found like entry:`, likeEntry);
-    } else {
-      console.log(`No like found. All likes for post ${postId}:`, Array.from(this.likes.values()).filter(like => like.postId === postId));
-    }
-    
-    return isLiked;
-  }
-
-  async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {
-    const postComments = Array.from(this.comments.values())
-      .filter(comment => comment.postId === postId)
-      .sort((a, b) => (a.createdAt?.getTime() || 0) - (b.createdAt?.getTime() || 0));
-    
-    const commentsWithAuthors = await Promise.all(
-      postComments.map(async (comment) => {
-        const author = await this.getUser(comment.authorId);
-        return { ...comment, author: author! };
-      })
-    );
-    
-    return commentsWithAuthors;
-  }
-
-  async createComment(insertComment: InsertComment): Promise<Comment> {
-    const id = this.currentCommentId++;
-    const comment: Comment = {
-      ...insertComment,
-      id,
-      likes: 0,
-      createdAt: new Date(),
-    };
-    this.comments.set(id, comment);
-    
-    // Update post comment count
-    if (insertComment.postId) {
-      const post = this.posts.get(insertComment.postId);
-      if (post) {
-        await this.updatePost(insertComment.postId, { comments: post.comments + 1 });
-      }
-    }
-    
-    return comment;
-  }
-
-  async updateComment(id: number, updates: Partial<Comment>): Promise<Comment> {
-    const comment = this.comments.get(id);
-    if (!comment) throw new Error('Comment not found');
-    
-    const updatedComment = { ...comment, ...updates };
-    this.comments.set(id, updatedComment);
-    return updatedComment;
-  }
-
-  async deleteComment(id: number): Promise<void> {
-    this.comments.delete(id);
-  }
-
-  async likeComment(userId: number, commentId: number): Promise<void> {
-    const likeId = this.currentLikeId++;
-    this.likes.set(likeId, { userId, commentId });
-    
-    const comment = this.comments.get(commentId);
-    if (comment) {
-      await this.updateComment(commentId, { likes: comment.likes + 1 });
-    }
-  }
-
-  async followUser(followerId: number, followingId: number): Promise<void> {
-    const followId = this.currentFollowId++;
-    this.follows.set(followId, { followerId, followingId });
-  }
-
-  async unfollowUser(followerId: number, followingId: number): Promise<void> {
-    const followEntry = Array.from(this.follows.entries()).find(
-      ([_, follow]) => follow.followerId === followerId && follow.followingId === followingId
-    );
-    
-    if (followEntry) {
-      this.follows.delete(followEntry[0]);
-    }
-  }
-
-  async getFollowers(userId: number): Promise<User[]> {
-    const followerIds = Array.from(this.follows.values())
-      .filter(follow => follow.followingId === userId)
-      .map(follow => follow.followerId);
-    
-    const followers = await Promise.all(
-      followerIds.map(id => this.getUser(id))
-    );
-    
-    return followers.filter(Boolean) as User[];
-  }
-
-  async getFollowing(userId: number): Promise<User[]> {
-    const followingIds = Array.from(this.follows.values())
-      .filter(follow => follow.followerId === userId)
-      .map(follow => follow.followingId);
-    
-    const following = await Promise.all(
-      followingIds.map(id => this.getUser(id))
-    );
-    
-    return following.filter(Boolean) as User[];
-  }
-
-  async getEvents(limit = 10): Promise<Event[]> {
-    return Array.from(this.events.values())
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-      .slice(0, limit);
-  }
-
-  async createEvent(insertEvent: InsertEvent): Promise<Event> {
-    const id = this.currentEventId++;
-    const event: Event = {
-      ...insertEvent,
-      id,
-      attendees: 0,
-      createdAt: new Date(),
-    };
-    this.events.set(id, event);
-    return event;
-  }
-
-  async joinEvent(userId: number, eventId: number): Promise<void> {
-    const event = this.events.get(eventId);
-    if (event) {
-      const updatedEvent = { ...event, attendees: event.attendees + 1 };
-      this.events.set(eventId, updatedEvent);
-    }
-  }
-
-  async getNotifications(userId: number): Promise<Notification[]> {
-    return Array.from(this.notifications.values())
-      .filter(notification => notification.userId === userId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
-  }
-
-  async createNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification> {
-    const id = this.currentNotificationId++;
-    const newNotification: Notification = {
-      ...notification,
-      id,
-      createdAt: new Date(),
-    };
-    this.notifications.set(id, newNotification);
-    return newNotification;
-  }
-
-  async markNotificationRead(id: number): Promise<void> {
-    const notification = this.notifications.get(id);
-    if (notification) {
-      this.notifications.set(id, { ...notification, isRead: true });
-    }
-  }
-
-  async getTrendingTags(): Promise<{ tag: string; count: number }[]> {
-    const tagCounts = new Map<string, number>();
-    
-    // Count tags from posts
-    Array.from(this.posts.values()).forEach(post => {
-      post.tags?.forEach(tag => {
-        tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
-      });
-    });
-    
-    // Count tags from activities
-    Array.from(this.activities.values()).forEach(activity => {
-      activity.tags?.forEach(tag => {
-        tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
-      });
-    });
-    
-    return Array.from(tagCounts.entries())
-      .map(([tag, count]) => ({ tag, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
-  }
-
-  async getSuggestedUsers(userId: number): Promise<User[]> {
-    const currentUser = await this.getUser(userId);
-    if (!currentUser) return [];
-    
-    // Get users that the current user is not following
-    const following = await this.getFollowing(userId);
-    const followingIds = new Set(following.map(u => u.id));
-    
-    return Array.from(this.users.values())
-      .filter(user => user.id !== userId && !followingIds.has(user.id))
-      .sort((a, b) => b.likesReceived - a.likesReceived)
-      .slice(0, 5);
-  }
-
-  // Activity Progress operations
-  async getActivityProgress(userId: number, activityId: number): Promise<ActivityProgress | undefined> {
-    const key = `${userId}-${activityId}`;
-    return this.activityProgress.get(key);
-  }
-
-  async updateActivityProgress(userId: number, activityId: number, progress: Partial<ActivityProgress>): Promise<ActivityProgress> {
-    const key = `${userId}-${activityId}`;
-    const existing = this.activityProgress.get(key);
-    
-    const updatedProgress: ActivityProgress = {
-      id: existing?.id || this.currentActivityProgressId++,
-      userId,
-      activityId,
-      tried: false,
-      mastered: false,
-      favorite: false,
-      createdAt: existing?.createdAt || new Date(),
-      updatedAt: new Date(),
-      ...existing,
-      ...progress,
-    };
-    
-    this.activityProgress.set(key, updatedProgress);
-    return updatedProgress;
-  }
-
-  async getUserProgress(userId: number): Promise<ActivityProgress[]> {
-    return Array.from(this.activityProgress.values())
-      .filter(progress => progress.userId === userId);
-  }
-}
-
 export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -705,33 +111,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByPasswordResetToken(token: string): Promise<User | undefined> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(and(
-        eq(users.passwordResetToken, token),
-        sql`password_reset_expires > NOW()`
-      ))
-      .limit(1);
-    return user;
+    const [user] = await db.select().from(users).where(eq(users.passwordResetToken, token));
+    return user || undefined;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
   }
 
   async updateUserPassword(id: number, newPassword: string): Promise<User> {
     const [user] = await db
       .update(users)
-      .set({
-        password: newPassword,
-        passwordResetToken: null,
-        passwordResetExpires: null,
-        updatedAt: new Date()
-      })
+      .set({ password: newPassword, passwordResetToken: null, passwordResetExpires: null })
       .where(eq(users.id, id))
       .returning();
     return user;
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    return await db.select().from(users).orderBy(desc(users.createdAt));
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -756,58 +150,38 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.stripeCustomerId, stripeCustomerId))
-      .limit(1);
-    return user;
+    const [user] = await db.select().from(users).where(eq(users.stripeCustomerId, stripeCustomerId));
+    return user || undefined;
   }
 
   async updateUserSubscription(id: number, customerId: string, subscriptionId: string): Promise<User> {
     const [user] = await db
       .update(users)
-      .set({
+      .set({ 
         stripeCustomerId: customerId,
         stripeSubscriptionId: subscriptionId,
+        subscriptionTier: 'premium'
       })
       .where(eq(users.id, id))
       .returning();
     return user;
   }
 
-  async getActivities(limit = 20, offset = 0): Promise<(Activity & { author: User })[]> {
-    return await db
+  async getActivities(limit = 50, offset = 0): Promise<(Activity & { author: User })[]> {
+    const results = await db
       .select()
       .from(activities)
       .leftJoin(users, eq(activities.authorId, users.id))
       .limit(limit)
       .offset(offset)
-      .orderBy(desc(activities.createdAt))
-      .then(results => 
-        results.map(result => ({
-          ...result.activities,
-          author: result.users || {
-            id: 0,
-            username: 'Unknown',
-            displayName: 'Unbekannter Benutzer',
-            email: '',
-            password: '',
-            bio: null,
-            avatarUrl: null,
-            role: 'user',
-            subscriptionTier: 'free',
-            activitiesCreated: 0,
-            postsCreated: 0,
-            likesReceived: 0,
-            isEmailVerified: false,
-            stripeCustomerId: null,
-            stripeSubscriptionId: null,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        }))
-      );
+      .orderBy(desc(activities.createdAt));
+
+    return results
+      .filter(result => result.users)
+      .map(result => ({
+        ...result.activities,
+        author: result.users!
+      }));
   }
 
   async getActivity(id: number): Promise<(Activity & { author: User }) | undefined> {
@@ -816,34 +190,12 @@ export class DatabaseStorage implements IStorage {
       .from(activities)
       .leftJoin(users, eq(activities.authorId, users.id))
       .where(eq(activities.id, id));
-    
-    if (!result) return undefined;
-    
+
+    if (!result || !result.users) return undefined;
+
     return {
       ...result.activities,
-      author: result.users || {
-        id: 0,
-        username: 'Unknown',
-        displayName: 'Unbekannter Autor',
-        email: '',
-        password: '',
-        bio: null,
-        avatarUrl: null,
-        role: 'user',
-        subscriptionTier: 'free',
-        activitiesCreated: 0,
-        postsCreated: 0,
-        likesReceived: 0,
-        isEmailVerified: false,
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        firstName: null,
-        lastName: null,
-        location: null,
-        status: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
+      author: result.users
     };
   }
 
@@ -860,6 +212,15 @@ export class DatabaseStorage implements IStorage {
       .insert(activities)
       .values(insertActivity)
       .returning();
+
+    // Increment user's activities created count
+    if (insertActivity.authorId) {
+      await db
+        .update(users)
+        .set({ activitiesCreated: sql`${users.activitiesCreated} + 1` })
+        .where(eq(users.id, insertActivity.authorId));
+    }
+
     return activity;
   }
 
@@ -885,7 +246,7 @@ export class DatabaseStorage implements IStorage {
     return activity;
   }
 
-  async getPosts(limit = 20, offset = 0): Promise<(Post & { author: User, linkedActivity?: Activity })[]> {
+  async getPosts(limit = 50, offset = 0): Promise<(Post & { author: User, linkedActivity?: Activity })[]> {
     const results = await db
       .select()
       .from(posts)
@@ -894,56 +255,14 @@ export class DatabaseStorage implements IStorage {
       .limit(limit)
       .offset(offset)
       .orderBy(desc(posts.createdAt));
-    
-    // Get comment counts for all posts
-    const postIds = results.map(result => result.posts.id);
-    let commentCounts: Array<{ postId: number | null; count: number }> = [];
-    
-    if (postIds.length > 0) {
-      commentCounts = await db
-        .select({
-          postId: comments.postId,
-          count: sql<number>`count(*)`.as('count')
-        })
-        .from(comments)
-        .where(inArray(comments.postId, postIds))
-        .groupBy(comments.postId);
-    }
-    
-    const commentCountMap = new Map(
-      commentCounts
-        .filter(cc => cc.postId !== null)
-        .map(cc => [cc.postId!, Number(cc.count)])
-    );
-    
-    return results.map(result => ({
-      ...result.posts,
-      comments: commentCountMap.get(result.posts.id) || 0,
-      author: result.users || {
-        id: 0,
-        username: "unknown",
-        email: "",
-        password: "",
-        displayName: "Unbekannter Benutzer",
-        firstName: null,
-        lastName: null,
-        bio: null,
-        avatarUrl: null,
-        location: null,
-        isEmailVerified: false,
-        emailVerificationToken: null,
-        role: "user",
-        subscriptionTier: "free",
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        activitiesCreated: 0,
-        postsCreated: 0,
-        likesReceived: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      linkedActivity: result.activities || undefined
-    }));
+
+    return results
+      .filter(result => result.users)
+      .map(result => ({
+        ...result.posts,
+        author: result.users!,
+        linkedActivity: result.activities || undefined
+      }));
   }
 
   async getPost(id: number): Promise<(Post & { author: User, linkedActivity?: Activity }) | undefined> {
@@ -953,34 +272,12 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(activities, eq(posts.linkedActivityId, activities.id))
       .where(eq(posts.id, id));
-    
-    if (!result) return undefined;
-    
+
+    if (!result || !result.users) return undefined;
+
     return {
       ...result.posts,
-      author: result.users || {
-        id: 0,
-        username: "unknown",
-        email: "",
-        password: "",
-        displayName: "Unbekannter Benutzer",
-        firstName: null,
-        lastName: null,
-        bio: null,
-        avatarUrl: null,
-        location: null,
-        isEmailVerified: false,
-        emailVerificationToken: null,
-        role: "user",
-        subscriptionTier: "free",
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        activitiesCreated: 0,
-        postsCreated: 0,
-        likesReceived: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
+      author: result.users,
       linkedActivity: result.activities || undefined
     };
   }
@@ -998,6 +295,15 @@ export class DatabaseStorage implements IStorage {
       .insert(posts)
       .values(insertPost)
       .returning();
+
+    // Increment user's posts created count
+    if (insertPost.authorId) {
+      await db
+        .update(users)
+        .set({ postsCreated: sql`${users.postsCreated} + 1` })
+        .where(eq(users.id, insertPost.authorId));
+    }
+
     return post;
   }
 
@@ -1015,121 +321,51 @@ export class DatabaseStorage implements IStorage {
   }
 
   async likePost(userId: number, postId: number): Promise<void> {
-    // Check if already liked
-    const existingLike = await db
-      .select()
-      .from(likes)
-      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)))
-      .limit(1);
-    
-    if (existingLike.length > 0) {
-      console.log(`User ${userId} already liked post ${postId}`);
-      return;
-    }
-    
-    // Add like
     await db.insert(likes).values({ userId, postId });
-    
-    // Update post like count
     await db
       .update(posts)
-      .set({ likes: sql`likes + 1` })
+      .set({ likes: sql`${posts.likes} + 1` })
       .where(eq(posts.id, postId));
-    
-    console.log(`Liked post ${postId} for user ${userId}`);
   }
 
   async unlikePost(userId: number, postId: number): Promise<void> {
-    // Check if like exists
-    const existingLike = await db
-      .select()
-      .from(likes)
-      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)))
-      .limit(1);
-    
-    if (existingLike.length === 0) {
-      console.log(`No like found for user ${userId}, post ${postId}`);
-      return;
-    }
-    
-    // Remove like
     await db.delete(likes).where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
-    
-    // Update post like count
     await db
       .update(posts)
-      .set({ likes: sql`GREATEST(0, likes - 1)` })
+      .set({ likes: sql`GREATEST(0, ${posts.likes} - 1)` })
       .where(eq(posts.id, postId));
-    
-    console.log(`Unliked post ${postId} for user ${userId}`);
   }
 
   async isPostLikedByUser(userId: number, postId: number): Promise<boolean> {
-    const result = await db
+    const [like] = await db
       .select()
       .from(likes)
-      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)))
-      .limit(1);
-    return result.length > 0;
+      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
+    return !!like;
   }
 
   async likeActivity(userId: number, activityId: number): Promise<void> {
-    // Check if already liked
-    const existingLike = await db
-      .select()
-      .from(likes)
-      .where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)))
-      .limit(1);
-    
-    if (existingLike.length > 0) {
-      console.log(`User ${userId} already liked activity ${activityId}`);
-      return;
-    }
-    
-    // Add like
     await db.insert(likes).values({ userId, activityId });
-    
-    // Update activity like count
     await db
       .update(activities)
-      .set({ likes: sql`likes + 1` })
+      .set({ likes: sql`${activities.likes} + 1` })
       .where(eq(activities.id, activityId));
-    
-    console.log(`Liked activity ${activityId} for user ${userId}`);
   }
 
   async unlikeActivity(userId: number, activityId: number): Promise<void> {
-    // Check if like exists
-    const existingLike = await db
-      .select()
-      .from(likes)
-      .where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)))
-      .limit(1);
-    
-    if (existingLike.length === 0) {
-      console.log(`No like found for user ${userId}, activity ${activityId}`);
-      return;
-    }
-    
-    // Remove like
     await db.delete(likes).where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)));
-    
-    // Update activity like count
     await db
       .update(activities)
-      .set({ likes: sql`GREATEST(0, likes - 1)` })
+      .set({ likes: sql`GREATEST(0, ${activities.likes} - 1)` })
       .where(eq(activities.id, activityId));
-    
-    console.log(`Unliked activity ${activityId} for user ${userId}`);
   }
 
   async isActivityLikedByUser(userId: number, activityId: number): Promise<boolean> {
-    const result = await db
+    const [like] = await db
       .select()
       .from(likes)
-      .where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)))
-      .limit(1);
-    return result.length > 0;
+      .where(and(eq(likes.userId, userId), eq(likes.activityId, activityId)));
+    return !!like;
   }
 
   async getCommentsByPost(postId: number): Promise<(Comment & { author: User, replies?: (Comment & { author: User })[] })[]> {
@@ -1138,44 +374,33 @@ export class DatabaseStorage implements IStorage {
       .from(comments)
       .leftJoin(users, eq(comments.authorId, users.id))
       .where(eq(comments.postId, postId))
-      .orderBy(desc(comments.createdAt));
-    
-    const allComments = results.map(result => ({
-      ...result.comments,
-      author: result.users || {
-        id: 0,
-        username: "unknown",
-        email: "",
-        password: "",
-        displayName: "Unbekannter Benutzer",
-        firstName: null,
-        lastName: null,
-        bio: null,
-        avatarUrl: null,
-        location: null,
-        isEmailVerified: false,
-        emailVerificationToken: null,
-        role: "user",
-        subscriptionTier: "free",
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        activitiesCreated: 0,
-        postsCreated: 0,
-        likesReceived: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-    }));
+      .orderBy(comments.createdAt);
 
-    // Organize comments hierarchically
-    const topLevelComments = allComments.filter(comment => !comment.parentId);
-    const replies = allComments.filter(comment => comment.parentId);
-    
-    // Add replies to their parent comments
-    topLevelComments.forEach(comment => {
-      comment.replies = replies.filter(reply => reply.parentId === comment.id);
-    });
-    
+    // Group comments by parent-child relationship
+    const commentMap = new Map<number, Comment & { author: User, replies: (Comment & { author: User })[] }>();
+    const topLevelComments: (Comment & { author: User, replies: (Comment & { author: User })[] })[] = [];
+
+    for (const result of results) {
+      if (!result.users) continue;
+
+      const comment = {
+        ...result.comments,
+        author: result.users,
+        replies: [] as (Comment & { author: User })[]
+      };
+
+      commentMap.set(comment.id, comment);
+
+      if (comment.parentId) {
+        const parent = commentMap.get(comment.parentId);
+        if (parent) {
+          parent.replies.push(comment);
+        }
+      } else {
+        topLevelComments.push(comment);
+      }
+    }
+
     return topLevelComments;
   }
 
@@ -1184,16 +409,22 @@ export class DatabaseStorage implements IStorage {
       .insert(comments)
       .values(insertComment)
       .returning();
+
+    // Increment post's comment count
+    if (insertComment.postId) {
+      await db
+        .update(posts)
+        .set({ comments: sql`${posts.comments} + 1` })
+        .where(eq(posts.id, insertComment.postId));
+    }
+
     return comment;
   }
 
   async updateComment(id: number, updates: Partial<Comment>): Promise<Comment> {
     const [comment] = await db
       .update(comments)
-      .set({
-        ...updates,
-        updatedAt: new Date(),
-      })
+      .set({ ...updates, updatedAt: new Date() })
       .where(eq(comments.id, id))
       .returning();
     return comment;
@@ -1208,21 +439,12 @@ export class DatabaseStorage implements IStorage {
     return comment || undefined;
   }
 
-  async updateComment(id: number, updates: Partial<Comment>): Promise<Comment> {
-    const [comment] = await db
-      .update(comments)
-      .set(updates)
-      .where(eq(comments.id, id))
-      .returning();
-    return comment;
-  }
-
-  async deleteComment(id: number): Promise<void> {
-    await db.delete(comments).where(eq(comments.id, id));
-  }
-
   async likeComment(userId: number, commentId: number): Promise<void> {
     await db.insert(likes).values({ userId, commentId });
+    await db
+      .update(comments)
+      .set({ likes: sql`${comments.likes} + 1` })
+      .where(eq(comments.id, commentId));
   }
 
   async followUser(followerId: number, followingId: number): Promise<void> {
@@ -1234,19 +456,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getFollowers(userId: number): Promise<User[]> {
-    return await db
+    const results = await db
       .select()
       .from(follows)
       .leftJoin(users, eq(follows.followerId, users.id))
       .where(eq(follows.followingId, userId));
+
+    return results
+      .filter(result => result.users)
+      .map(result => result.users!);
   }
 
   async getFollowing(userId: number): Promise<User[]> {
-    return await db
+    const results = await db
       .select()
       .from(follows)
       .leftJoin(users, eq(follows.followingId, users.id))
       .where(eq(follows.followerId, userId));
+
+    return results
+      .filter(result => result.users)
+      .map(result => result.users!);
   }
 
   async getEvents(limit = 10): Promise<Event[]> {
