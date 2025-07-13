@@ -15,7 +15,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ postId }: CommentSectionProps) {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuth();
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState('');
 

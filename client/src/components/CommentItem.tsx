@@ -22,7 +22,7 @@ interface CommentItemProps {
 }
 
 export function CommentItem({ comment, postId, onReply, isReply = false }: CommentItemProps) {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuth();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
