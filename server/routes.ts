@@ -312,18 +312,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/posts/:id/comments", async (req, res) => {
     try {
       const postId = parseInt(req.params.id);
-      const { content, authorId } = req.body;
+      const { content, authorId, parentId } = req.body;
       
       const commentData = {
         content,
         authorId,
         postId,
+        parentId: parentId || null,
       };
       
       const comment = await storage.createComment(commentData);
       res.status(201).json(comment);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Update comment
+  app.patch("/api/comments/:id", async (req, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      const { content } = req.body;
+      
+      const updatedComment = await storage.updateComment(commentId, { 
+        content,
+        updatedAt: new Date()
+      });
+      
+      res.json(updatedComment);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Delete comment
+  app.delete("/api/comments/:id", async (req, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      await storage.deleteComment(commentId);
+      res.status(200).json({ message: "Comment deleted" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 

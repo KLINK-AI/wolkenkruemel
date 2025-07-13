@@ -15,6 +15,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { CommentSection } from "@/components/CommentSection";
 
 // Helper functions for post types
 function getPostTypeIcon(type: string) {
@@ -396,7 +397,7 @@ function PostCard({
                 }}
               >
                 <MessageCircle className="w-4 h-4 mr-1" />
-                {post.comments}
+                Kommentare
               </Button>
             </div>
             
@@ -409,45 +410,7 @@ function PostCard({
 
           {/* Comments Section */}
           {showComments && (
-            <div className="space-y-3 border-t pt-3">
-              {/* Comment Input */}
-              {currentUser && (
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="Schreibe einen Kommentar..."
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button 
-                    onClick={handleComment}
-                    disabled={!commentText.trim()}
-                    size="sm"
-                  >
-                    Senden
-                  </Button>
-                </div>
-              )}
-
-              {/* Comments List */}
-              {comments && comments.length > 0 && (
-                <div className="space-y-2">
-                  {comments.map((comment: any) => (
-                    <div key={comment.id} className="flex space-x-2 text-sm">
-                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                        <span className="text-primary-foreground text-xs">
-                          {comment.author.displayName?.charAt(0) || comment.author.username.charAt(0)}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-xs">{comment.author.displayName || comment.author.username}</p>
-                        <p className="text-muted-foreground">{comment.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <CommentSection postId={post.id} />
           )}
         </div>
       </CardContent>

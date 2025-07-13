@@ -84,6 +84,7 @@ export const comments = pgTable("comments", {
   likes: integer("likes").default(0),
   isApproved: boolean("is_approved").default(true),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const likes = pgTable("likes", {

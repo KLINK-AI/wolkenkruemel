@@ -48,10 +48,11 @@ export interface IStorage {
   isActivityLikedByUser(userId: number, activityId: number): Promise<boolean>;
   
   // Comment operations
-  getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]>;
+  getCommentsByPost(postId: number): Promise<(Comment & { author: User, replies?: (Comment & { author: User })[] })[]>;
   createComment(comment: InsertComment): Promise<Comment>;
   updateComment(id: number, updates: Partial<Comment>): Promise<Comment>;
   deleteComment(id: number): Promise<void>;
+  getComment(id: number): Promise<Comment | undefined>;
   likeComment(userId: number, commentId: number): Promise<void>;
   
   // Follow operations
@@ -1102,7 +1103,7 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
-  async getCommentsByPost(postId: number): Promise<(Comment & { author: User })[]> {
+  async getCommentsByPost(postId: number): Promise<(Comment & { author: User, replies?: (Comment & { author: User })[] })[]> {
     const results = await db
       .select()
       .from(comments)
@@ -1110,7 +1111,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(comments.postId, postId))
       .orderBy(desc(comments.createdAt));
     
-    return results.map(result => ({
+    const allComments = results.map(result => ({
       ...result.comments,
       author: result.users || {
         id: 0,
@@ -1136,6 +1137,17 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date(),
       }
     }));
+
+    // Organize comments hierarchically
+    const topLevelComments = allComments.filter(comment => !comment.parentId);
+    const replies = allComments.filter(comment => comment.parentId);
+    
+    // Add replies to their parent comments
+    topLevelComments.forEach(comment => {
+      comment.replies = replies.filter(reply => reply.parentId === comment.id);
+    });
+    
+    return topLevelComments;
   }
 
   async createComment(insertComment: InsertComment): Promise<Comment> {
@@ -1144,6 +1156,27 @@ export class DatabaseStorage implements IStorage {
       .values(insertComment)
       .returning();
     return comment;
+  }
+
+  async updateComment(id: number, updates: Partial<Comment>): Promise<Comment> {
+    const [comment] = await db
+      .update(comments)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(comments.id, id))
+      .returning();
+    return comment;
+  }
+
+  async deleteComment(id: number): Promise<void> {
+    await db.delete(comments).where(eq(comments.id, id));
+  }
+
+  async getComment(id: number): Promise<Comment | undefined> {
+    const [comment] = await db.select().from(comments).where(eq(comments.id, id));
+    return comment || undefined;
   }
 
   async updateComment(id: number, updates: Partial<Comment>): Promise<Comment> {
