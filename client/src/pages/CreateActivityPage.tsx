@@ -156,14 +156,20 @@ export default function CreateActivityPage() {
       return;
     }
 
-    // Check for HEIC files and show helpful message
+    // Improved HEIC detection - also check for empty or unknown file types
     const fileName = file.name.toLowerCase();
     const fileType = file.type.toLowerCase();
     
-    if (fileType === 'image/heic' || fileType === 'image/heif' || fileName.endsWith('.heic') || fileName.endsWith('.heif')) {
+    // HEIC files often have no MIME type or unknown type
+    if (fileType === 'image/heic' || 
+        fileType === 'image/heif' || 
+        fileName.endsWith('.heic') || 
+        fileName.endsWith('.heif') ||
+        (fileName.includes('.heic') || fileName.includes('.heif')) ||
+        (fileType === '' && (fileName.endsWith('.heic') || fileName.endsWith('.heif')))) {
       toast({
         title: "HEIC-Format nicht unterstützt",
-        description: "Bitte konvertieren Sie HEIC-Dateien zu JPG/PNG oder verwenden Sie die iPhone-Kamera im JPG-Modus (Einstellungen > Kamera > Formate > Kompatibler).",
+        description: "iPhone HEIC-Dateien können nicht verarbeitet werden. Bitte ändern Sie die iPhone-Kamera-Einstellungen zu 'Kompatibler' (Einstellungen > Kamera > Formate) oder konvertieren Sie die Datei zu JPG/PNG.",
         variant: "destructive",
       });
       return;
@@ -184,8 +190,8 @@ export default function CreateActivityPage() {
     
     reader.onerror = () => {
       toast({
-        title: "Datei kann nicht gelesen werden",
-        description: "Möglicherweise ist dies eine HEIC-Datei. Verwenden Sie JPG/PNG oder ändern Sie die iPhone-Kamera zu 'Kompatibler' Modus.",
+        title: "HEIC-Datei erkannt",
+        description: "Diese Datei ist wahrscheinlich eine HEIC-Datei von einem iPhone. Bitte ändern Sie die iPhone-Kamera-Einstellungen zu 'Kompatibler' oder konvertieren Sie die Datei zu JPG/PNG.",
         variant: "destructive",
       });
       setIsImageUploading(false);
@@ -316,7 +322,7 @@ export default function CreateActivityPage() {
                               <label className="cursor-pointer">
                                 <input
                                   type="file"
-                                  accept="image/*"
+                                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                                   onChange={handleImageUpload}
                                   className="hidden"
                                 />

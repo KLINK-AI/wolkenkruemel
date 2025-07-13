@@ -95,6 +95,23 @@ export default function ProfilePage() {
         return;
       }
 
+      // Check for HEIC files
+      const fileName = file.name.toLowerCase();
+      const fileType = file.type.toLowerCase();
+      
+      if (fileType === 'image/heic' || 
+          fileType === 'image/heif' || 
+          fileName.endsWith('.heic') || 
+          fileName.endsWith('.heif') ||
+          (fileType === '' && (fileName.endsWith('.heic') || fileName.endsWith('.heif')))) {
+        toast({
+          title: "HEIC-Format nicht unterstützt",
+          description: "iPhone HEIC-Dateien können nicht verarbeitet werden. Bitte ändern Sie die iPhone-Kamera-Einstellungen zu 'Kompatibler' oder konvertieren Sie die Datei zu JPG/PNG.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -103,6 +120,13 @@ export default function ProfilePage() {
           ...prev,
           avatarUrl: result
         }));
+      };
+      reader.onerror = () => {
+        toast({
+          title: "HEIC-Datei erkannt",
+          description: "Diese Datei ist wahrscheinlich eine HEIC-Datei. Bitte verwenden Sie JPG/PNG oder ändern Sie die iPhone-Kamera-Einstellungen.",
+          variant: "destructive",
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -244,7 +268,7 @@ export default function ProfilePage() {
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                         onChange={handleImageUpload}
                         className="hidden"
                       />
