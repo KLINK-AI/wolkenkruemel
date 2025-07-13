@@ -412,6 +412,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!activity) {
         return res.status(404).json({ message: "Activity not found" });
       }
+      
+      // Increment view count
+      await storage.incrementActivityViews(id);
+      
       res.json(activity);
     } catch (error: any) {
       res.status(500).json({ message: error.message });

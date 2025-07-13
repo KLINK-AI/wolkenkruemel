@@ -45,7 +45,7 @@ export function UserStats({ userId, compact = false, className = "" }: UserStats
   const statItems = [
     {
       icon: CheckCircle,
-      label: compact ? "Beherrscht" : "Hunde beherrschen das",
+      label: compact ? "Beherrscht mein Hund" : "Beherrscht mein Hund",
       value: stats.activitiesCompleted,
       color: "text-green-600"
     },

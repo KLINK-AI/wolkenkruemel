@@ -437,7 +437,7 @@ export default function ActivityDetailPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Aufrufe</span>
-                    <span className="font-semibold">-</span>
+                    <span className="font-semibold">{activity.views || 0}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Likes</span>

@@ -55,6 +55,7 @@ export const activities = pgTable("activities", {
   isApproved: boolean("is_approved").default(false),
   likes: integer("likes").default(0),
   completions: integer("completions").default(0),
+  views: integer("views").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

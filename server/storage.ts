@@ -46,6 +46,7 @@ export interface IStorage {
   likeActivity(userId: number, activityId: number): Promise<void>;
   unlikeActivity(userId: number, activityId: number): Promise<void>;
   isActivityLikedByUser(userId: number, activityId: number): Promise<boolean>;
+  incrementActivityViews(activityId: number): Promise<void>;
   
   // Comment operations
   getCommentsByPost(postId: number): Promise<(Comment & { author: User, replies?: (Comment & { author: User })[] })[]>;
@@ -1344,6 +1345,13 @@ export class DatabaseStorage implements IStorage {
       .from(activityProgress)
       .where(eq(activityProgress.userId, userId))
       .orderBy(desc(activityProgress.updatedAt));
+  }
+
+  async incrementActivityViews(activityId: number): Promise<void> {
+    await db
+      .update(activities)
+      .set({ views: sql`views + 1` })
+      .where(eq(activities.id, activityId));
   }
 }
 
