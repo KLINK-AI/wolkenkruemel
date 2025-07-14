@@ -1,6 +1,6 @@
 [deployment]
-build = ["node", "simple-build.js"]
-run = ["node", "production-direct.js"]
+build = ["echo", "Build: No build needed - tsx handles everything"]
+run = ["node", "deployment-ready.js"]
 deploymentTarget = "gce"
 
 [env]
