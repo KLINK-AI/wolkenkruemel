@@ -1,6 +1,6 @@
 [deployment]
 build = ["echo", "Using development server directly"]
-run = ["node", "force-development-mode.js"]
+run = ["node", "deployment-force-vite.js"]
 deploymentTarget = "gce"
 
 [env]
