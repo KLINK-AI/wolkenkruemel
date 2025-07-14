@@ -1,47 +1,35 @@
 #!/bin/bash
 
-echo "🚀 ULTIMATE DEPLOYMENT - Neue Deployment-Instanz"
-echo "💡 Erstellt neues Deployment mit echter Wolkenkrümel-App"
-echo ""
+# ULTIMATE DEPLOYMENT SOLUTION - Umgeht alle Replit-Deployment-Probleme
+echo "🚀 ULTIMATE DEPLOYMENT SOLUTION - START"
 
-# 1. Prüfe aktuelle Konfiguration
-echo "📋 1. Aktuelle Deployment-Konfiguration:"
-cat .replit.deploy
-echo ""
+# 1. Cleanup alter Build-Artefakte
+echo "🧹 Cleanup alter Build-Artefakte..."
+rm -rf dist/ build/ .next/ .vite/ node_modules/.vite/
 
-# 2. Teste Build-Prozess
-echo "🏗️ 2. Teste Build-Prozess:"
-node simple-build.js
-echo ""
+# 2. Environment zwingend setzen
+export NODE_ENV=development
+export PORT=${PORT:-5000}
 
-# 3. Teste Production-Server
-echo "🧪 3. Teste Production-Server (5 Sekunden):"
-timeout 5 node production-direct.js &
-PID=$!
-sleep 6
-kill $PID 2>/dev/null
-echo "✅ Production-Server-Test abgeschlossen"
-echo ""
+echo "✅ Environment gesetzt:"
+echo "NODE_ENV: $NODE_ENV"
+echo "PORT: $PORT"
 
-# 4. Deployment-Status
-echo "📊 4. Deployment-Bereitschaft:"
-echo "✅ Build-Skript: simple-build.js"
-echo "✅ Run-Skript: production-direct.js"
-echo "✅ Echte App: server/index.ts mit tsx"
-echo "✅ Database: PostgreSQL mit 18 Activities"
-echo "✅ Features: Passwort-Management, HEIC, Community"
-echo ""
+# 3. Dependencies prüfen
+echo "📦 Prüfe Dependencies..."
+if [ ! -d "node_modules" ]; then
+    echo "Installing dependencies..."
+    npm install
+fi
 
-echo "🎯 NÄCHSTE SCHRITTE:"
-echo "1. Aktuelles Deployment stoppen/beenden"
-echo "2. Neues Deployment mit aktueller Konfiguration starten"
-echo "3. Deployment wird echte React-App verwenden"
-echo ""
+# 4. Database Connection testen
+echo "🔍 Teste Database Connection..."
+node -e "
+const { neon } = require('@neondatabase/serverless');
+const sql = neon(process.env.DATABASE_URL);
+sql\`SELECT 1\`.then(() => console.log('✅ Database OK')).catch(e => console.error('❌ Database Error:', e));
+"
 
-echo "💡 REPLIT DEPLOYMENT ANWEISUNG:"
-echo "- Gehe zu Deployment Tab"
-echo "- Suche nach 'New Deployment' oder 'Redeploy' Button"
-echo "- Oder stoppe aktuelles Deployment und starte neues"
-echo ""
-
-echo "✅ BEREIT FÜR NEUES DEPLOYMENT!"
+# 5. Server mit Production-Strategie starten
+echo "🚀 Starte Server mit Production-Strategie..."
+exec node start-production.js

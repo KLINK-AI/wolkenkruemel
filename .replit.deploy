@@ -1,6 +1,6 @@
 [deployment]
-build = ["echo", "Production build will be handled by deployment script"]
-run = ["node", "start.js"]
+build = ["chmod", "+x", "ultimate-deploy.sh"]
+run = ["./ultimate-deploy.sh"]
 deploymentTarget = "gce"
 
 [env]
