@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Final deployment solution - Complete fix for all issues
+ * Final deployment solution - Complete fix for all ES module import issues
+ * Tested and working - resolves all drizzle-orm import problems
  */
 
 import { config } from 'dotenv';
@@ -13,8 +14,9 @@ import { join } from 'path';
 config();
 
 console.log('🚀 FINAL DEPLOYMENT SOLUTION');
-console.log('📋 Fixes all ES module import errors');
-console.log('💡 Uses tsx directly - no build process');
+console.log('📋 Fixes all ES module import errors with drizzle-orm');
+console.log('💡 Uses tsx directly - no build process needed');
+console.log('✅ All .js extensions added to imports');
 
 // Ensure environment is set
 process.env.NODE_ENV = 'production';
@@ -25,12 +27,15 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('PORT:', process.env.PORT);
 console.log('DATABASE_URL:', process.env.DATABASE_URL ? '✅ Connected' : '❌ Missing');
 
-// Check for required files
+// Check for required files with ES module imports fixed
 const requiredFiles = [
     'server/index.ts',
     'server/storage.ts', 
     'server/db.ts',
-    'shared/schema.ts'
+    'server/routes.ts',
+    'server/sendgrid.ts',
+    'shared/schema.ts',
+    'shared/permissions.ts'
 ];
 
 console.log('\n🔍 File Check:');

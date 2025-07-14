@@ -3,16 +3,16 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import heicConvert from 'heic-convert';
 import multer from 'multer';
-import { storage, testDatabaseConnection } from "./storage";
+import { storage, testDatabaseConnection } from "./storage.js";
 import { 
   insertActivitySchema, insertPostSchema, insertCommentSchema, 
   insertEventSchema, activityProgress, insertUserSchema 
-} from "@shared/schema";
-import { getUserPermissions, canUserCreateActivity } from "../shared/permissions";
-import { db } from "./db";
+} from "../shared/schema.js";
+import { getUserPermissions, canUserCreateActivity } from "../shared/permissions.js";
+import { db } from "./db.js";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { sendEmail, generateEmailVerificationTemplate } from "./sendgrid";
+import { sendEmail, generateEmailVerificationTemplate } from "./sendgrid.js";
 import crypto from "crypto";
 import session from "express-session";
 import { Pool } from "@neondatabase/serverless";

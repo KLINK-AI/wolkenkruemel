@@ -3,9 +3,9 @@ import {
   type User, type InsertUser, type Activity, type InsertActivity, 
   type Post, type InsertPost, type Comment, type InsertComment,
   type Event, type InsertEvent, type Notification, type ActivityProgress, type InsertActivityProgress
-} from "@shared/schema";
-import { getUserPermissions, canUserCreateActivity } from "@shared/permissions";
-import { db } from "./db";
+} from "../shared/schema.js";
+import { getUserPermissions, canUserCreateActivity } from "../shared/permissions.js";
+import { db } from "./db.js";
 import { eq, desc, and, ne, sql, inArray } from "drizzle-orm";
 
 export interface IStorage {

@@ -1,4 +1,4 @@
-import { User } from "./schema";
+import { User } from "./schema.js";
 
 export type UserStatus = "unverified" | "verified" | "pending_payment" | "active" | "premium";
 export type SubscriptionTier = "free" | "premium" | "pro";
