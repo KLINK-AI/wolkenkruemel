@@ -1,6 +1,6 @@
 [deployment]
 build = ["echo", "No build needed - using direct deployment"]
-run = ["node", "immediate-deployment-fix.js"]
+run = ["node", "immediate-deploy.js"]
 deploymentTarget = "gce"
 
 [env]
