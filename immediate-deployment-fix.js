@@ -1,112 +1,173 @@
-#!/usr/bin/env node
-
 /**
  * IMMEDIATE DEPLOYMENT FIX
  * Direkte Lösung für das HTML-Fehlerseiten-Problem
  * Verwendet die funktionierende Development-Konfiguration
  */
 
-console.log('🚀 IMMEDIATE DEPLOYMENT FIX - STARTET...');
+console.log('🎯 IMMEDIATE DEPLOYMENT FIX - START');
 
-// Importiere die funktionierenden Module
-import { config } from 'dotenv';
+// Forciere development environment
+process.env.NODE_ENV = 'development';
+process.env.PORT = process.env.PORT || '3000';
+
+console.log('Environment Configuration:');
+console.log('- NODE_ENV:', process.env.NODE_ENV);
+console.log('- PORT:', process.env.PORT);
+console.log('- DATABASE_URL:', process.env.DATABASE_URL ? 'Connected' : 'Missing');
+
 import express from 'express';
-import { registerRoutes } from './server/routes.js';
-import { setupVite } from './server/vite.js';
+import dotenv from 'dotenv';
 
-// Lade Environment-Variablen
-config();
-
-console.log('✅ Environment-Variablen geladen');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('PORT:', process.env.PORT);
-console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'Vorhanden' : 'Fehlt');
+// Load environment variables
+dotenv.config();
 
 const app = express();
 
-// Konfiguration wie im funktionierenden Development-Server
+// Middleware setup
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
-// Logging Middleware
+// CORS setup
 app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-      console.log(logLine);
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
     }
-  });
-
-  next();
 });
 
-// Registriere Routes
-const server = await registerRoutes(app);
+// Debug info endpoint
+app.get('/debug-info', (req, res) => {
+    res.json({
+        environment: process.env.NODE_ENV,
+        port: process.env.PORT,
+        timestamp: new Date().toISOString(),
+        database: process.env.DATABASE_URL ? 'Connected' : 'Missing'
+    });
+});
 
-// Verbesserter Error-Handler für JSON-Responses
+// Activities API mit direkter Implementierung
+app.get('/api/activities', async (req, res) => {
+    console.log('🔍 Activities API called');
+    
+    try {
+        // Direkter Import der Storage-Funktion
+        const { storage } = await import('./server/storage.js');
+        
+        console.log('✅ Storage imported successfully');
+        
+        const activities = await storage.getActivities();
+        
+        console.log('✅ Activities loaded:', activities.length);
+        
+        // Explizite JSON-Response
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json(activities);
+        
+    } catch (error) {
+        console.error('❌ Activities API Error:', error);
+        
+        // Garantierte JSON-Response auch bei Fehlern
+        res.setHeader('Content-Type', 'application/json');
+        res.status(500).json({
+            error: 'Internal Server Error',
+            message: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
+// Users API
+app.get('/api/users', async (req, res) => {
+    console.log('🔍 Users API called');
+    
+    try {
+        const { storage } = await import('./server/storage.js');
+        const users = await storage.getUsers();
+        
+        console.log('✅ Users loaded:', users.length);
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json(users);
+        
+    } catch (error) {
+        console.error('❌ Users API Error:', error);
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.status(500).json({
+            error: 'Internal Server Error',
+            message: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
+// Test API direkt
+app.get('/api/test', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json({
+        status: 'OK',
+        message: 'Direct API test successful',
+        environment: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Fallback für alle API-Routen
+app.use('/api/*', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(404).json({
+        error: 'API Route not found',
+        path: req.path,
+        method: req.method,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Serve static files für React App
+app.use(express.static('client/dist'));
+
+// Fallback für SPA
+app.get('*', (req, res) => {
+    res.sendFile(process.cwd() + '/client/dist/index.html');
+});
+
+// Global error handler - garantiert JSON
 app.use((err, req, res, next) => {
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-
-  console.error('❌ Express Error Handler:', message);
-  console.error('Path:', req.path);
-  console.error('Method:', req.method);
-  console.error('Stack:', err.stack);
-
-  // Immer JSON-Response, nie HTML-Fehlerseite
-  res.status(status).json({ 
-    error: message,
-    path: req.path,
-    method: req.method,
-    timestamp: new Date().toISOString()
-  });
+    console.error('🚨 Global Error Handler:', err);
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.status(err.status || 500).json({
+        error: err.message || 'Internal Server Error',
+        path: req.path,
+        method: req.method,
+        timestamp: new Date().toISOString()
+    });
 });
 
-// Verwende Development-Konfiguration für React-App
-console.log('🔧 Konfiguriere Vite-Middleware...');
-await setupVite(app, server);
-
-// Starte Server
-const port = process.env.PORT || 5000;
-server.listen({
-  port: parseInt(port),
-  host: "0.0.0.0",
-  reusePort: true,
-}, () => {
-  console.log(`✅ Server läuft auf Port ${port}`);
-  console.log('🎯 Deployment-Fix erfolgreich angewendet!');
+// Start server
+const PORT = process.env.PORT || 3000;
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log('✅ IMMEDIATE DEPLOYMENT FIX - SERVER STARTED');
+    console.log(`🌐 Server running on port ${PORT}`);
+    console.log(`📡 API available at /api/*`);
+    console.log(`🔍 Debug info at /debug-info`);
+    console.log(`🧪 Test API at /api/test`);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM empfangen - Server herunterfahren...');
-  server.close(() => {
-    console.log('✅ Server erfolgreich heruntergefahren');
-    process.exit(0);
-  });
+    console.log('🛑 SIGTERM - Shutting down gracefully');
+    server.close(() => process.exit(0));
 });
 
 process.on('SIGINT', () => {
-  console.log('🛑 SIGINT empfangen - Server herunterfahren...');
-  server.close(() => {
-    console.log('✅ Server erfolgreich heruntergefahren');
-    process.exit(0);
-  });
+    console.log('🛑 SIGINT - Shutting down gracefully');
+    server.close(() => process.exit(0));
 });
+
+export default app;

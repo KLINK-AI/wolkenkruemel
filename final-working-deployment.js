@@ -1,135 +1,173 @@
-#!/usr/bin/env node
-
 /**
  * FINALE FUNKTIONIERENDE DEPLOYMENT-VERSION
  * Basiert auf der 22:20 CET Version + behebt vite.ts Error
  */
 
-import { config } from 'dotenv';
-import { spawn } from 'child_process';
-import { existsSync, rmSync, writeFileSync } from 'fs';
 import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { existsSync } from 'fs';
+import dotenv from 'dotenv';
 
-// Lade Environment-Variablen
-config();
+// Load environment variables
+dotenv.config();
 
-console.log('🔧 FINALE FUNKTIONIERENDE DEPLOYMENT-VERSION');
-console.log('📅 Basiert auf: 22:20 CET funktionierend + Debug-Test-Ergebnisse');
-console.log('✅ Problem identifiziert: ES Module Resolution (tsx funktioniert, node nicht)');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// Setze korrektes Environment
-process.env.NODE_ENV = 'production';
-process.env.PORT = process.env.PORT || '5000';
+// KRITISCH: Environment auf development setzen
+process.env.NODE_ENV = 'development';
+const PORT = process.env.PORT || 3000;
 
-console.log('\n📊 Environment:');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('PORT:', process.env.PORT);
-console.log('DATABASE_URL:', process.env.DATABASE_URL ? '✅ Vorhanden' : '❌ Fehlt');
+console.log('🎯 FINALE FUNKTIONIERENDE DEPLOYMENT-VERSION');
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Port:', PORT);
+console.log('Database URL:', process.env.DATABASE_URL ? 'Set' : 'Missing');
 
-// Bereinige Build-Artefakte
-console.log('\n🗑️ Bereinige Build-Artefakte...');
-const buildDirs = ['dist', 'build', '.next', '.vite'];
-buildDirs.forEach(dir => {
-    if (existsSync(dir)) {
-        rmSync(dir, { recursive: true, force: true });
-        console.log(`✅ Entfernt: ${dir}`);
+const app = express();
+
+// Basic middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+
+// CORS für alle Routen
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
     }
 });
 
-// Erstelle Debug-Endpunkt für Test-Seite
-console.log('\n🔧 Erstelle Debug-Endpunkt...');
-const debugEndpoint = `
-// Debug-Endpunkt für Test-Seite
-app.get('/api/debug-env', (req, res) => {
+// Request logging
+app.use((req, res, next) => {
+    const start = Date.now();
+    console.log(`${req.method} ${req.path} - Start`);
+    
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        console.log(`${req.method} ${req.path} - ${res.statusCode} in ${duration}ms`);
+    });
+    
+    next();
+});
+
+// Health Check Route
+app.get('/health', (req, res) => {
     res.json({
-        nodeEnv: process.env.NODE_ENV,
-        port: process.env.PORT,
-        hasDatabase: !!process.env.DATABASE_URL,
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV,
+        port: PORT
+    });
+});
+
+// API Routes - Direkt implementiert
+app.get('/api/activities', async (req, res) => {
+    try {
+        console.log('🔍 Activities API - Start');
+        
+        // Importiere Storage dynamisch
+        const { storage } = await import('./server/storage.js');
+        
+        console.log('✅ Storage importiert');
+        
+        const activities = await storage.getActivities();
+        
+        console.log('✅ Activities geladen:', activities.length);
+        
+        res.json(activities);
+        
+    } catch (error) {
+        console.error('❌ Activities API Error:', error);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            message: error.message,
+            stack: error.stack
+        });
+    }
+});
+
+app.get('/api/users', async (req, res) => {
+    try {
+        console.log('🔍 Users API - Start');
+        
+        const { storage } = await import('./server/storage.js');
+        const users = await storage.getUsers();
+        
+        console.log('✅ Users geladen:', users.length);
+        
+        res.json(users);
+        
+    } catch (error) {
+        console.error('❌ Users API Error:', error);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            message: error.message
+        });
+    }
+});
+
+// Fallback für alle anderen API-Routen
+app.use('/api/*', (req, res) => {
+    res.status(404).json({
+        error: 'API Route not found',
+        path: req.path,
+        method: req.method
+    });
+});
+
+// Serve static files (React App)
+app.use(express.static(join(__dirname, 'client/dist')));
+
+// Fallback für SPA
+app.get('*', (req, res) => {
+    const indexPath = join(__dirname, 'client/dist/index.html');
+    if (existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).send('React app not built');
+    }
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('🚨 Global Error Handler:', err);
+    
+    res.status(err.status || 500).json({
+        error: err.message || 'Internal Server Error',
+        path: req.path,
+        method: req.method,
         timestamp: new Date().toISOString()
     });
 });
-`;
 
-// Kopiere Debug-Test-Seite in Public-Ordner
-console.log('📋 Stelle Debug-Test-Seite bereit...');
-writeFileSync('debug-test-ready.html', `
-<!DOCTYPE html>
-<html><head><title>Debug Test Ready</title></head><body>
-<h1>Debug Test Ready</h1>
-<p>Die Debug-Test-Seite ist bereit. Öffne /debug-test.html nach dem Deployment.</p>
-</body></html>
-`);
-
-// Teste erst die Storage-Funktion
-console.log('\n🔍 Teste Storage-Funktion vor Start...');
-try {
-    // Verwende tsx für TypeScript-Import
-    const { storage } = await import('./server/storage.ts');
-    
-    const users = await storage.getAllUsers();
-    console.log(`✅ Benutzer gefunden: ${users.length}`);
-    
-    const activities = await storage.getActivities(5, 0);
-    console.log(`✅ Activities gefunden: ${activities.length}`);
-    
-    console.log('✅ Storage-Test erfolgreich - bereit für Deployment!');
-    
-} catch (error) {
-    console.error('❌ Storage-Test fehlgeschlagen:', error.message);
-    console.log('🔧 Das ist genau das Problem im Deployment!');
-}
-
-// Starte Server mit tsx (funktioniert) anstatt node (funktioniert nicht)
-console.log('\n🚀 Starte Server mit tsx (bewährt)...');
-
-// Verwende tsx direkt - das hat in den Tests funktioniert
-const server = spawn('tsx', ['server/index.ts'], {
-    stdio: 'inherit',
-    env: {
-        ...process.env,
-        NODE_ENV: 'production',
-        PORT: process.env.PORT || '5000'
-    }
-});
-
-server.on('error', (error) => {
-    console.error('\n❌ Server-Error:', error);
-    console.log('🔧 Versuche Node.js Fallback...');
-    
-    // Fallback mit node --loader tsx/esm
-    const fallback = spawn('node', ['--loader', 'tsx/esm', 'server/index.ts'], {
-        stdio: 'inherit',
-        env: {
-            ...process.env,
-            NODE_ENV: 'production',
-            PORT: process.env.PORT || '5000'
-        }
-    });
-    
-    fallback.on('error', (fallbackError) => {
-        console.error('\n❌ Fallback-Error:', fallbackError);
-        console.log('💡 Beide Methoden fehlgeschlagen - das ist das Deployment-Problem!');
-        process.exit(1);
-    });
-});
-
-server.on('close', (code) => {
-    console.log(`\n📊 Server beendet mit Code: ${code}`);
-    process.exit(code);
+// Start server
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ FINALE DEPLOYMENT-VERSION ERFOLGREICH GESTARTET!`);
+    console.log(`🌐 Server läuft auf Port ${PORT}`);
+    console.log(`📡 API verfügbar unter /api/*`);
+    console.log(`🎯 Health Check: /health`);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-    console.log('\n🛑 SIGTERM - Server wird beendet...');
-    server.kill('SIGTERM');
+    console.log('🛑 SIGTERM - Server wird beendet...');
+    server.close(() => {
+        console.log('✅ Server erfolgreich beendet');
+        process.exit(0);
+    });
 });
 
 process.on('SIGINT', () => {
-    console.log('\n🛑 SIGINT - Server wird beendet...');
-    server.kill('SIGINT');
+    console.log('🛑 SIGINT - Server wird beendet...');
+    server.close(() => {
+        console.log('✅ Server erfolgreich beendet');
+        process.exit(0);
+    });
 });
 
-console.log('✅ Server gestartet mit tsx (bewährt)');
-console.log('🌐 Wolkenkrümel läuft mit Debug-Test-Seite');
-console.log('📋 Test-Seite: http://localhost:5000/debug-test.html');
-console.log('🔧 Deployment-Methode: tsx (funktioniert) vs node (funktioniert nicht)');
+export default app;

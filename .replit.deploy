@@ -1,6 +1,6 @@
 [deployment]
-build = ["chmod", "+x", "ultimate-deploy.sh"]
-run = ["./ultimate-deploy.sh"]
+build = ["echo", "No build needed - using direct deployment"]
+run = ["node", "immediate-deployment-fix.js"]
 deploymentTarget = "gce"
 
 [env]
