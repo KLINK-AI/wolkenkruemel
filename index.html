@@ -1,38 +1,4 @@
-#!/usr/bin/env node
-
-/**
- * WIEDERHERSTELLUNG DER FUNKTIONIERENDEN DEPLOYMENT-VERSION
- * Zurück zur stabilen Version von gestern, die funktionierte
- */
-
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { spawn } from 'child_process';
-import { config } from 'dotenv';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-console.log('🔄 WIEDERHERSTELLUNG DER FUNKTIONIERENDEN VERSION');
-console.log('📅 Basierend auf: Funktionierende Version von gestern');
-console.log('🎯 Ziel: Komplett neues Deployment ohne komplexe Builds');
-
-// Lade Environment-Variablen
-config();
-
-// 1. Erstelle simple Production-Konfiguration
-console.log('\n📋 1. Erstelle einfache Production-Konfiguration...');
-
-// Setze Environment für Production
-process.env.NODE_ENV = 'production';
-process.env.PORT = process.env.PORT || '5000';
-
-console.log('Environment:', process.env.NODE_ENV);
-console.log('Port:', process.env.PORT);
-console.log('Database:', process.env.DATABASE_URL ? 'Connected' : 'Missing');
-
-// 2. Erstelle minimale index.html für Production
-const indexHtml = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -229,7 +195,7 @@ const indexHtml = `<!DOCTYPE html>
                 });
                 
                 if (!response.ok) {
-                    throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 return await response.json();
@@ -242,8 +208,8 @@ const indexHtml = `<!DOCTYPE html>
         // Status Update
         function updateStatus(message, type = 'loading') {
             const statusEl = document.getElementById('app-status');
-            statusEl.className = \`status \${type}\`;
-            statusEl.innerHTML = \`<div>\${message}</div>\`;
+            statusEl.className = `status ${type}`;
+            statusEl.innerHTML = `<div>${message}</div>`;
         }
         
         // Load Activities
@@ -254,35 +220,35 @@ const indexHtml = `<!DOCTYPE html>
                 const data = await apiRequest('/api/activities');
                 activities = data;
                 
-                updateStatus(\`✅ \${activities.length} Aktivitäten geladen\`, 'success');
+                updateStatus(`✅ ${activities.length} Aktivitäten geladen`, 'success');
                 
-                document.getElementById('content').innerHTML = \`
-                    <h2>Aktivitäten (\${activities.length})</h2>
+                document.getElementById('content').innerHTML = `
+                    <h2>Aktivitäten (${activities.length})</h2>
                     <div class="activities-grid">
-                        \${activities.map(activity => \`
+                        ${activities.map(activity => `
                             <div class="activity-card">
-                                <h3>\${activity.title}</h3>
-                                <p>\${activity.description}</p>
+                                <h3>${activity.title}</h3>
+                                <p>${activity.description}</p>
                                 <div class="activity-meta">
-                                    <div>Schwierigkeit: \${activity.difficulty}</div>
-                                    <div>Autor: \${activity.author?.displayName || 'Unbekannt'}</div>
-                                    <div>Likes: \${activity.likes || 0}</div>
+                                    <div>Schwierigkeit: ${activity.difficulty}</div>
+                                    <div>Autor: ${activity.author?.displayName || 'Unbekannt'}</div>
+                                    <div>Likes: ${activity.likes || 0}</div>
                                 </div>
                             </div>
-                        \`).join('')}
+                        `).join('')}
                     </div>
-                \`;
+                `;
                 
             } catch (error) {
-                updateStatus(\`❌ Fehler beim Laden: \${error.message}\`, 'error');
+                updateStatus(`❌ Fehler beim Laden: ${error.message}`, 'error');
                 
-                document.getElementById('content').innerHTML = \`
+                document.getElementById('content').innerHTML = `
                     <div class="error">
                         <h3>Fehler beim Laden der Aktivitäten</h3>
-                        <p>\${error.message}</p>
+                        <p>${error.message}</p>
                         <button class="btn" onclick="loadActivities()">Erneut versuchen</button>
                     </div>
-                \`;
+                `;
             }
         }
         
@@ -301,40 +267,40 @@ const indexHtml = `<!DOCTYPE html>
                 for (const test of tests) {
                     try {
                         const data = await apiRequest(test.url);
-                        results.push(\`✅ \${test.name}: OK\`);
+                        results.push(`✅ ${test.name}: OK`);
                     } catch (error) {
-                        results.push(\`❌ \${test.name}: \${error.message}\`);
+                        results.push(`❌ ${test.name}: ${error.message}`);
                     }
                 }
                 
                 updateStatus('API Tests abgeschlossen', 'success');
                 
-                document.getElementById('content').innerHTML = \`
+                document.getElementById('content').innerHTML = `
                     <h2>API Test Ergebnisse</h2>
                     <div class="status success">
-                        \${results.map(result => \`<div>\${result}</div>\`).join('')}
+                        ${results.map(result => `<div>${result}</div>`).join('')}
                     </div>
-                \`;
+                `;
                 
             } catch (error) {
-                updateStatus(\`❌ API Test fehlgeschlagen: \${error.message}\`, 'error');
+                updateStatus(`❌ API Test fehlgeschlagen: ${error.message}`, 'error');
             }
         }
         
         // Load Community
         async function loadCommunity() {
-            document.getElementById('content').innerHTML = \`
+            document.getElementById('content').innerHTML = `
                 <h2>Community</h2>
                 <p>Community-Features werden geladen...</p>
-            \`;
+            `;
         }
         
         // Load Profile
         async function loadProfile() {
-            document.getElementById('content').innerHTML = \`
+            document.getElementById('content').innerHTML = `
                 <h2>Profil</h2>
                 <p>Profil-Features werden geladen...</p>
-            \`;
+            `;
         }
         
         // Initialize App
@@ -344,45 +310,4 @@ const indexHtml = `<!DOCTYPE html>
         });
     </script>
 </body>
-</html>`;
-
-// Schreibe index.html
-fs.writeFileSync(path.join(__dirname, 'index.html'), indexHtml);
-console.log('✅ index.html erstellt');
-
-// 3. Starte Server mit der EINFACHSTEN Konfiguration
-console.log('\n🚀 Starte Server mit einfachster Konfiguration...');
-
-// Starte den Server EXAKT wie in Development - mit tsx
-const serverProcess = spawn('tsx', ['server/index.ts'], {
-    stdio: 'inherit',
-    env: {
-        ...process.env,
-        NODE_ENV: 'production',
-        PORT: '5000'
-    }
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('\n🛑 Beende Server...');
-    serverProcess.kill();
-});
-
-process.on('SIGINT', () => {
-    console.log('\n🛑 Beende Server...');
-    serverProcess.kill();
-});
-
-serverProcess.on('close', (code) => {
-    console.log(`Server beendet mit Code: ${code}`);
-});
-
-serverProcess.on('error', (error) => {
-    console.error('Server-Fehler:', error);
-});
-
-console.log('✅ Server gestartet im Production-Modus');
-console.log('🌐 URL: http://localhost:5000');
-console.log('📊 Environment: production');
-console.log('🔄 Bereit für Deployment...');
+</html>

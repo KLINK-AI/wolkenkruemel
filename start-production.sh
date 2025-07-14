@@ -1,13 +1,7 @@
 #!/bin/bash
-
-# Production start script
-echo "Starting Wolkenkrümel production server..."
-
-# Set environment variables
 export NODE_ENV=production
-
-# Ensure dist directory exists
-mkdir -p dist/public
-
-# Start the server
-node dist/index.js
+export PORT=5000
+echo "🚀 Starte Production Server..."
+echo "📍 Environment: $NODE_ENV"
+echo "🌐 Port: $PORT"
+tsx server/index.ts
