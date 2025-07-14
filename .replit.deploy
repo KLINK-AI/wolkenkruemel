@@ -1,6 +1,6 @@
-[deployment]
-build = ["node", "final-production-fix.js"]
-run = ["node", "dist/start-ultimate.js"]
+[[deployment]
+build = ["node", "simple-build.js"]
+run = ["node", "dist/start-simple.js"]
 deploymentTarget = "gce"
 
 [env]
