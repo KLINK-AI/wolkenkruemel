@@ -174,7 +174,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       } else {
                           const errorText = await response.text();
                           results.innerHTML = \`<p class="error">❌ Activities API fehlgeschlagen: \${response.status}</p>\`;
-                          results.innerHTML += \`<p class="error">Error: \${errorText}</p>\`;
+                          
+                          // Try to parse JSON error
+                          try {
+                              const errorJson = JSON.parse(errorText);
+                              results.innerHTML += \`<p class="error">Message: \${errorJson.message || 'Unknown error'}</p>\`;
+                              if (errorJson.stack) {
+                                  results.innerHTML += \`<p class="error">Stack: \${errorJson.stack.substring(0, 200)}...</p>\`;
+                              }
+                          } catch {
+                              results.innerHTML += \`<p class="error">Raw Error: \${errorText.substring(0, 200)}...</p>\`;
+                          }
+                          
                           log(\`Activities API fehlgeschlagen: \${response.status} - \${errorText}\`, 'error');
                       }
                   } catch (error) {
@@ -619,12 +630,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Activities
   app.get("/api/activities", async (req, res) => {
     try {
+      console.log('🔍 Activities API called');
+      
       const limit = parseInt(req.query.limit as string) || 20;
       const offset = parseInt(req.query.offset as string) || 0;
+      
+      console.log('📊 Parameters:', { limit, offset });
+      
+      // Test database connection first
+      console.log('🗄️ Testing database connection...');
+      await testDatabaseConnection();
+      console.log('✅ Database connection successful');
+      
+      console.log('📋 Calling storage.getActivities...');
       const activities = await storage.getActivities(limit, offset);
+      console.log('✅ Activities retrieved:', activities.length);
+      
       res.json(activities);
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      console.error('❌ Activities API Error:', error);
+      console.error('Stack:', error.stack);
+      
+      // Send detailed error info
+      res.status(500).json({ 
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
