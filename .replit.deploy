@@ -1,6 +1,6 @@
 [deployment]
-build = ["echo", "Build: No build needed - tsx handles everything"]
-run = ["node", "deployment-ready.js"]
+build = ["echo", "No build - tsx handles TypeScript compilation"]
+run = ["node", "final-deployment-solution.js"]
 deploymentTarget = "gce"
 
 [env]
