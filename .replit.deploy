@@ -1,6 +1,6 @@
 [deployment]
 build = ["echo", "No build needed - using direct deployment"]
-run = ["node", "force-working-deployment.js"]
+run = ["tsx", "server/index.ts"]
 deploymentTarget = "gce"
 
 [env]
