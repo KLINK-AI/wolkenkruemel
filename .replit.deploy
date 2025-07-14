@@ -1,6 +1,6 @@
 [deployment]
 build = ["echo", "Production build will be handled by deployment script"]
-run = ["node", "final-working-deployment.js"]
+run = ["node", "production-deployment-final-solution.js"]
 deploymentTarget = "gce"
 
 [env]
