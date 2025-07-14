@@ -1,6 +1,6 @@
 [deployment]
 build = ["echo", "Production build will be handled by deployment script"]
-run = ["node", "production-deployment-vite-fix.js"]
+run = ["node", "production-deployment-development-mode.js"]
 deploymentTarget = "gce"
 
 [env]
