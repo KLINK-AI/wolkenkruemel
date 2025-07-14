@@ -40,6 +40,229 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const PgSession = connectPgSimple(session);
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   
+  // Debug route for deployment testing
+  app.get('/debug-test', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="de">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>🧪 Wolkenkrümel Deployment Debug</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  max-width: 800px;
+                  margin: 0 auto;
+                  padding: 20px;
+                  background-color: #f5f5f5;
+              }
+              .container {
+                  background: white;
+                  padding: 20px;
+                  border-radius: 8px;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              }
+              .test-section {
+                  margin: 20px 0;
+                  padding: 15px;
+                  border: 1px solid #ddd;
+                  border-radius: 5px;
+              }
+              .success { color: #4CAF50; }
+              .error { color: #f44336; }
+              .warning { color: #ff9800; }
+              .info { color: #2196F3; }
+              button {
+                  background: #4CAF50;
+                  color: white;
+                  border: none;
+                  padding: 10px 20px;
+                  border-radius: 4px;
+                  cursor: pointer;
+                  margin: 5px;
+              }
+              button:hover { background: #45a049; }
+              button:disabled { background: #ccc; cursor: not-allowed; }
+              .activity-card {
+                  border: 1px solid #ddd;
+                  margin: 10px 0;
+                  padding: 15px;
+                  border-radius: 5px;
+                  background: #f9f9f9;
+              }
+              .log {
+                  background: #000;
+                  color: #0f0;
+                  padding: 10px;
+                  border-radius: 4px;
+                  font-family: monospace;
+                  white-space: pre-wrap;
+                  max-height: 200px;
+                  overflow-y: auto;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <h1>🧪 Wolkenkrümel Deployment Debug</h1>
+              <p class="info">Debug-Tool für das Deployment-Problem der Activities API</p>
+              
+              <div class="test-section">
+                  <h2>1. Environment Status</h2>
+                  <p><strong>NODE_ENV:</strong> ${process.env.NODE_ENV}</p>
+                  <p><strong>PORT:</strong> ${process.env.PORT || 'undefined'}</p>
+                  <p><strong>Database:</strong> ${process.env.DATABASE_URL ? 'Connected' : 'Missing'}</p>
+                  <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+              </div>
+              
+              <div class="test-section">
+                  <h2>2. API-Tests</h2>
+                  <button onclick="testActivitiesAPI()">Test Activities API</button>
+                  <button onclick="testUsersAPI()">Test Users API</button>
+                  <div id="api-results"></div>
+              </div>
+              
+              <div class="test-section">
+                  <h2>3. Activities anzeigen</h2>
+                  <button onclick="loadAllActivities()">Alle Activities laden</button>
+                  <div id="activities-display"></div>
+              </div>
+              
+              <div class="test-section">
+                  <h2>4. Debug-Log</h2>
+                  <button onclick="clearLog()">Log löschen</button>
+                  <div id="debug-log" class="log"></div>
+              </div>
+          </div>
+
+          <script>
+              const API_BASE = window.location.origin;
+              
+              function log(message, type = 'info') {
+                  const logDiv = document.getElementById('debug-log');
+                  const timestamp = new Date().toLocaleTimeString();
+                  const logEntry = \`[\${timestamp}] \${type.toUpperCase()}: \${message}\\n\`;
+                  logDiv.textContent += logEntry;
+                  logDiv.scrollTop = logDiv.scrollHeight;
+              }
+              
+              function clearLog() {
+                  document.getElementById('debug-log').textContent = '';
+              }
+              
+              async function testActivitiesAPI() {
+                  const results = document.getElementById('api-results');
+                  results.innerHTML = '<p>Teste Activities API...</p>';
+                  
+                  try {
+                      log('Teste Activities API: ' + API_BASE + '/api/activities');
+                      const response = await fetch(\`\${API_BASE}/api/activities\`);
+                      
+                      log(\`API Response Status: \${response.status}\`);
+                      
+                      if (response.ok) {
+                          const activities = await response.json();
+                          results.innerHTML = \`<p class="success">✅ Activities API erfolgreich: \${activities.length} Aktivitäten gefunden</p>\`;
+                          log(\`Activities API erfolgreich: \${activities.length} Aktivitäten gefunden\`);
+                          
+                          if (activities.length > 0) {
+                              const preview = activities.slice(0, 3).map(a => \`- \${a.title} (ID: \${a.id})\`).join('\\n');
+                              results.innerHTML += \`<p class="info">Beispiel-Aktivitäten:\\n\${preview}</p>\`;
+                              log('Beispiel-Aktivitäten: ' + preview);
+                          }
+                      } else {
+                          const errorText = await response.text();
+                          results.innerHTML = \`<p class="error">❌ Activities API fehlgeschlagen: \${response.status}</p>\`;
+                          results.innerHTML += \`<p class="error">Error: \${errorText}</p>\`;
+                          log(\`Activities API fehlgeschlagen: \${response.status} - \${errorText}\`, 'error');
+                      }
+                  } catch (error) {
+                      results.innerHTML = \`<p class="error">❌ Activities API Fehler: \${error.message}</p>\`;
+                      log(\`Activities API Fehler: \${error.message}\`, 'error');
+                  }
+              }
+              
+              async function testUsersAPI() {
+                  const results = document.getElementById('api-results');
+                  results.innerHTML += '<p>Teste Users API...</p>';
+                  
+                  try {
+                      log('Teste Users API: ' + API_BASE + '/api/users');
+                      const response = await fetch(\`\${API_BASE}/api/users\`);
+                      
+                      if (response.ok) {
+                          const users = await response.json();
+                          results.innerHTML += \`<p class="success">✅ Users API erfolgreich: \${users.length} Benutzer gefunden</p>\`;
+                          log(\`Users API erfolgreich: \${users.length} Benutzer gefunden\`);
+                      } else {
+                          const errorText = await response.text();
+                          results.innerHTML += \`<p class="error">❌ Users API fehlgeschlagen: \${response.status}</p>\`;
+                          log(\`Users API fehlgeschlagen: \${response.status} - \${errorText}\`, 'error');
+                      }
+                  } catch (error) {
+                      results.innerHTML += \`<p class="error">❌ Users API Fehler: \${error.message}</p>\`;
+                      log(\`Users API Fehler: \${error.message}\`, 'error');
+                  }
+              }
+              
+              async function loadAllActivities() {
+                  const display = document.getElementById('activities-display');
+                  display.innerHTML = '<p>Lade alle Activities...</p>';
+                  
+                  try {
+                      log('Lade alle Activities für Anzeige');
+                      const response = await fetch(\`\${API_BASE}/api/activities\`);
+                      
+                      if (response.ok) {
+                          const activities = await response.json();
+                          
+                          if (activities.length === 0) {
+                              display.innerHTML = '<p class="warning">⚠️ Keine Activities gefunden</p>';
+                              log('Keine Activities gefunden', 'warning');
+                              return;
+                          }
+                          
+                          display.innerHTML = \`<h3>✅ \${activities.length} Activities gefunden:</h3>\`;
+                          
+                          activities.forEach(activity => {
+                              const card = document.createElement('div');
+                              card.className = 'activity-card';
+                              card.innerHTML = \`
+                                  <h4>\${activity.title}</h4>
+                                  <p><strong>ID:</strong> \${activity.id}</p>
+                                  <p><strong>Schwierigkeit:</strong> \${activity.difficulty}</p>
+                                  <p><strong>Beschreibung:</strong> \${activity.description || 'Keine Beschreibung'}</p>
+                                  <p><strong>Bilder:</strong> \${activity.images?.length || 0}</p>
+                                  <p><strong>Erstellt:</strong> \${new Date(activity.createdAt).toLocaleString()}</p>
+                              \`;
+                              display.appendChild(card);
+                          });
+                          
+                          log(\`\${activities.length} Activities erfolgreich angezeigt\`);
+                      } else {
+                          const errorText = await response.text();
+                          display.innerHTML = \`<p class="error">❌ Laden fehlgeschlagen: \${response.status}</p>\`;
+                          display.innerHTML += \`<p class="error">Error: \${errorText}</p>\`;
+                          log(\`Laden fehlgeschlagen: \${response.status} - \${errorText}\`, 'error');
+                      }
+                  } catch (error) {
+                      display.innerHTML = \`<p class="error">❌ Fehler beim Laden: \${error.message}</p>\`;
+                      log(\`Fehler beim Laden: \${error.message}\`, 'error');
+                  }
+              }
+              
+              // Automatisch Activities-Test beim Laden
+              window.addEventListener('load', () => {
+                  log('Debug-Test-Seite geladen');
+                  testActivitiesAPI();
+              });
+          </script>
+      </body>
+      </html>
+    `);
+  });
+  
   app.use(session({
     store: new PgSession({
       pool: pool,
