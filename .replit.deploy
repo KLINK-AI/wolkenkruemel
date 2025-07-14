@@ -1,8 +1,8 @@
 [deployment]
 build = ["echo", "Production build will be handled by deployment script"]
-run = ["node", "production-deployment-final-solution.js"]
+run = ["npx", "tsx", "server/index.ts"]
 deploymentTarget = "gce"
 
 [env]
-NODE_ENV = "production"
+NODE_ENV = "development"
 PORT = "5000"
