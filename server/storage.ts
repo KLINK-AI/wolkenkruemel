@@ -172,9 +172,9 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(activities)
       .leftJoin(users, eq(activities.authorId, users.id))
+      .orderBy(desc(activities.createdAt))
       .limit(limit)
-      .offset(offset)
-      .orderBy(desc(activities.createdAt));
+      .offset(offset);
 
     return results
       .filter(result => result.users)
