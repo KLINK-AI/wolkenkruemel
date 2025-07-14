@@ -1,6 +1,6 @@
 [deployment]
 build = ["echo", "Production build will be handled by deployment script"]
-run = ["npx", "tsx", "server/index.ts"]
+run = ["node", "start.js"]
 deploymentTarget = "gce"
 
 [env]
