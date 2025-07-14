@@ -168,20 +168,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getActivities(limit = 50, offset = 0): Promise<(Activity & { author: User })[]> {
-    const results = await db
-      .select()
-      .from(activities)
-      .leftJoin(users, eq(activities.authorId, users.id))
-      .orderBy(desc(activities.createdAt))
-      .limit(limit)
-      .offset(offset);
+    try {
+      const results = await db
+        .select()
+        .from(activities)
+        .leftJoin(users, eq(activities.authorId, users.id))
+        .orderBy(desc(activities.createdAt))
+        .limit(limit)
+        .offset(offset);
 
-    return results
-      .filter(result => result.users)
-      .map(result => ({
+      console.log('📊 Raw query results:', results.length);
+
+      const filtered = results.filter(result => result.users);
+      console.log('📊 Filtered results:', filtered.length);
+
+      const transformed = filtered.map(result => ({
         ...result.activities,
         author: result.users!
       }));
+      
+      console.log('📊 Transformed results:', transformed.length);
+      return transformed;
+    } catch (error) {
+      console.error('❌ getActivities Database Error:', error);
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      throw error;
+    }
   }
 
   async getActivity(id: number): Promise<(Activity & { author: User }) | undefined> {
