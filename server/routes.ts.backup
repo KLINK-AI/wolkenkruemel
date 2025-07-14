@@ -1953,6 +1953,56 @@ function getLimitsByTier(tier: string) {
     }
   };
   
+  return limits[tier] || limits.free;
+}
+
+// Direct Activities Test Route (bypasses storage layer)
+app.get('/api/activities-direct', async (req, res) => {
+  try {
+    console.log('🔍 Direct Activities API called');
+    
+    // Import db and schema directly
+    const { db } = await import('./db.js');
+    const { activities, users } = await import('../shared/schema.js');
+    const { eq, desc } = await import('drizzle-orm');
+    
+    console.log('📊 Executing direct database query...');
+    
+    // Direct database query
+    const results = await db
+      .select()
+      .from(activities)
+      .leftJoin(users, eq(activities.authorId, users.id))
+      .orderBy(desc(activities.createdAt))
+      .limit(10);
+    
+    console.log('✅ Direct query successful, results:', results.length);
+    
+    // Transform results
+    const transformed = results
+      .filter(result => result.users)
+      .map(result => ({
+        ...result.activities,
+        author: result.users
+      }));
+    
+    console.log('✅ Transformed results:', transformed.length);
+    
+    res.json({ 
+      success: true, 
+      count: transformed.length,
+      activities: transformed
+    });
+    
+  } catch (error) {
+    console.error('❌ Direct Activities API Error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message,
+      stack: error.stack 
+    });
+  }
+});
 
   return server;
 }
