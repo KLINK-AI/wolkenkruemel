@@ -1,6 +1,6 @@
 [deployment]
-build = ["echo", "No build - tsx handles TypeScript compilation"]
-run = ["node", "final-deployment-solution.js"]
+build = ["echo", "Production build will be handled by deployment script"]
+run = ["node", "production-deployment-vite-fix.js"]
 deploymentTarget = "gce"
 
 [env]
