@@ -1,7 +1,8 @@
 [deployment]
-build = ["node", "production-direct.js"]
-run = ["node", "dist/start-direct.js"]
+build = ["node", "final-production-fix.js"]
+run = ["node", "dist/start-ultimate.js"]
 deploymentTarget = "gce"
 
 [env]
 NODE_ENV = "production"
+PORT = "5000"
