@@ -5,384 +5,112 @@
  * Zurück zur stabilen Version von gestern, die funktionierte
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { spawn } from 'child_process';
 import { config } from 'dotenv';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-console.log('🔄 WIEDERHERSTELLUNG DER FUNKTIONIERENDEN VERSION');
-console.log('📅 Basierend auf: Funktionierende Version von gestern');
-console.log('🎯 Ziel: Komplett neues Deployment ohne komplexe Builds');
+import { spawn } from 'child_process';
+import { existsSync, rmSync } from 'fs';
 
 // Lade Environment-Variablen
 config();
 
-// 1. Erstelle simple Production-Konfiguration
-console.log('\n📋 1. Erstelle einfache Production-Konfiguration...');
+console.log('🔄 WIEDERHERSTELLUNG DER FUNKTIONIERENDEN VERSION');
+console.log('📅 Basiert auf: July 13, 2025 vor 22:20 CET');
+console.log('✅ Status: Letzte bekannte funktionierende Deployment-Version');
 
-// Setze Environment für Production
+// Setze Environment wie in der funktionierenden Version
 process.env.NODE_ENV = 'production';
 process.env.PORT = process.env.PORT || '5000';
 
-console.log('Environment:', process.env.NODE_ENV);
-console.log('Port:', process.env.PORT);
-console.log('Database:', process.env.DATABASE_URL ? 'Connected' : 'Missing');
+console.log('\n📊 Environment (wie in funktionierender Version):');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT);
+console.log('DATABASE_URL:', process.env.DATABASE_URL ? '✅ Vorhanden' : '❌ Fehlt');
 
-// 2. Erstelle minimale index.html für Production
-const indexHtml = `<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wolkenkrümel - Dog Training Platform</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-        .error {
-            color: #dc3545;
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
-        .success {
-            color: #155724;
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .logo svg {
-            width: 60px;
-            height: 60px;
-        }
-        .logo h1 {
-            color: #2d3748;
-            font-size: 2.5rem;
-            margin: 10px 0;
-        }
-        .logo p {
-            color: #718096;
-            font-size: 1.1rem;
-        }
-        .status {
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-family: monospace;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-        .status.loading {
-            background: #e3f2fd;
-            border: 1px solid #90caf9;
-        }
-        .status.success {
-            background: #e8f5e8;
-            border: 1px solid #81c784;
-        }
-        .status.error {
-            background: #ffebee;
-            border: 1px solid #ef5350;
-        }
-        .nav {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        .nav a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: 500;
-        }
-        .nav a:hover {
-            color: #0056b3;
-        }
-        .activities-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-        .activity-card {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .activity-card h3 {
-            color: #2d3748;
-            margin: 0 0 10px 0;
-        }
-        .activity-card p {
-            color: #718096;
-            margin: 0 0 15px 0;
-        }
-        .activity-meta {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .btn:hover {
-            background: #0056b3;
-        }
-        .btn-secondary {
-            background: #6c757d;
-        }
-        .btn-secondary:hover {
-            background: #545b62;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="30" r="15" fill="#87CEEB" opacity="0.7"/>
-                <circle cx="35" cy="25" r="8" fill="#B0E0E6" opacity="0.6"/>
-                <circle cx="65" cy="35" r="10" fill="#ADD8E6" opacity="0.5"/>
-                <circle cx="45" cy="20" r="6" fill="#E0F6FF" opacity="0.8"/>
-                <ellipse cx="50" cy="65" rx="20" ry="15" fill="#8B4513"/>
-                <circle cx="42" cy="60" r="3" fill="#000"/>
-                <circle cx="58" cy="60" r="3" fill="#000"/>
-                <ellipse cx="50" cy="70" rx="6" ry="4" fill="#000"/>
-                <ellipse cx="35" cy="75" rx="8" ry="5" fill="#8B4513"/>
-                <ellipse cx="65" cy="75" rx="8" ry="5" fill="#8B4513"/>
-                <ellipse cx="30" cy="85" rx="5" ry="3" fill="#8B4513"/>
-                <ellipse cx="70" cy="85" rx="5" ry="3" fill="#8B4513"/>
-            </svg>
-            <h1>Wolkenkrümel</h1>
-            <p>Dog Training Platform</p>
-        </div>
-        
-        <div id="app-status" class="status loading">
-            <div>🔄 Initialisiere Anwendung...</div>
-            <div>📡 Verbinde mit API...</div>
-            <div>🐕 Lade Aktivitäten...</div>
-        </div>
-        
-        <div class="nav">
-            <a href="#" onclick="loadActivities()">Aktivitäten</a>
-            <a href="#" onclick="loadCommunity()">Community</a>
-            <a href="#" onclick="loadProfile()">Profil</a>
-            <a href="#" onclick="testAPI()">API Test</a>
-        </div>
-        
-        <div id="content">
-            <div class="loading">Lade Inhalte...</div>
-        </div>
-    </div>
+// Bereinige alle Build-Artefakte die Konflikte verursachen könnten
+console.log('\n🗑️ Bereinige potenzielle Konflikte...');
+const conflictingDirs = ['dist', 'build', '.next', '.vite', 'public'];
+conflictingDirs.forEach(dir => {
+    if (existsSync(dir)) {
+        rmSync(dir, { recursive: true, force: true });
+        console.log(`✅ Entfernt: ${dir}`);
+    }
+});
 
-    <script>
-        let activities = [];
-        let currentUser = null;
-        
-        // API Helper
-        async function apiRequest(url, options = {}) {
-            try {
-                const response = await fetch(url, {
-                    ...options,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...options.headers
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
-                }
-                
-                return await response.json();
-            } catch (error) {
-                console.error('API Error:', error);
-                throw error;
-            }
-        }
-        
-        // Status Update
-        function updateStatus(message, type = 'loading') {
-            const statusEl = document.getElementById('app-status');
-            statusEl.className = \`status \${type}\`;
-            statusEl.innerHTML = \`<div>\${message}</div>\`;
-        }
-        
-        // Load Activities
-        async function loadActivities() {
-            try {
-                updateStatus('🔄 Lade Aktivitäten...', 'loading');
-                
-                const data = await apiRequest('/api/activities');
-                activities = data;
-                
-                updateStatus(\`✅ \${activities.length} Aktivitäten geladen\`, 'success');
-                
-                document.getElementById('content').innerHTML = \`
-                    <h2>Aktivitäten (\${activities.length})</h2>
-                    <div class="activities-grid">
-                        \${activities.map(activity => \`
-                            <div class="activity-card">
-                                <h3>\${activity.title}</h3>
-                                <p>\${activity.description}</p>
-                                <div class="activity-meta">
-                                    <div>Schwierigkeit: \${activity.difficulty}</div>
-                                    <div>Autor: \${activity.author?.displayName || 'Unbekannt'}</div>
-                                    <div>Likes: \${activity.likes || 0}</div>
-                                </div>
-                            </div>
-                        \`).join('')}
-                    </div>
-                \`;
-                
-            } catch (error) {
-                updateStatus(\`❌ Fehler beim Laden: \${error.message}\`, 'error');
-                
-                document.getElementById('content').innerHTML = \`
-                    <div class="error">
-                        <h3>Fehler beim Laden der Aktivitäten</h3>
-                        <p>\${error.message}</p>
-                        <button class="btn" onclick="loadActivities()">Erneut versuchen</button>
-                    </div>
-                \`;
-            }
-        }
-        
-        // Test API
-        async function testAPI() {
-            try {
-                updateStatus('🔄 Teste API-Verbindung...', 'loading');
-                
-                const tests = [
-                    { name: 'Activities API', url: '/api/activities' },
-                    { name: 'Health Check', url: '/api/health' },
-                ];
-                
-                let results = [];
-                
-                for (const test of tests) {
-                    try {
-                        const data = await apiRequest(test.url);
-                        results.push(\`✅ \${test.name}: OK\`);
-                    } catch (error) {
-                        results.push(\`❌ \${test.name}: \${error.message}\`);
-                    }
-                }
-                
-                updateStatus('API Tests abgeschlossen', 'success');
-                
-                document.getElementById('content').innerHTML = \`
-                    <h2>API Test Ergebnisse</h2>
-                    <div class="status success">
-                        \${results.map(result => \`<div>\${result}</div>\`).join('')}
-                    </div>
-                \`;
-                
-            } catch (error) {
-                updateStatus(\`❌ API Test fehlgeschlagen: \${error.message}\`, 'error');
-            }
-        }
-        
-        // Load Community
-        async function loadCommunity() {
-            document.getElementById('content').innerHTML = \`
-                <h2>Community</h2>
-                <p>Community-Features werden geladen...</p>
-            \`;
-        }
-        
-        // Load Profile
-        async function loadProfile() {
-            document.getElementById('content').innerHTML = \`
-                <h2>Profil</h2>
-                <p>Profil-Features werden geladen...</p>
-            \`;
-        }
-        
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', function() {
-            updateStatus('🚀 Anwendung gestartet', 'success');
-            loadActivities();
+// Teste erst die Storage-Funktion direkt
+console.log('\n🔍 1. Teste Storage-Funktion...');
+
+try {
+    // Importiere und teste DatabaseStorage
+    const { storage } = await import('./server/storage.js');
+    
+    const users = await storage.getAllUsers();
+    console.log(`✅ Benutzer gefunden: ${users.length}`);
+    
+    const activities = await storage.getActivities(10, 0);
+    console.log(`✅ Activities gefunden: ${activities.length}`);
+    
+    if (activities.length > 0) {
+        console.log('   Beispiel-Activities:');
+        activities.slice(0, 2).forEach(activity => {
+            console.log(`   - ${activity.title} (ID: ${activity.id})`);
         });
-    </script>
-</body>
-</html>`;
+    }
+    
+    console.log('✅ Storage-Test erfolgreich!');
+    
+} catch (error) {
+    console.error('❌ Storage-Test fehlgeschlagen:', error.message);
+    console.log('💡 Dies könnte das Problem im Deployment sein');
+}
 
-// Schreibe index.html
-fs.writeFileSync(path.join(__dirname, 'index.html'), indexHtml);
-console.log('✅ index.html erstellt');
+// Starte Server EXAKT wie in der funktionierenden Version
+console.log('\n🚀 2. Starte Server (wie in funktionierender Version)...');
 
-// 3. Starte Server mit der EINFACHSTEN Konfiguration
-console.log('\n🚀 Starte Server mit einfachster Konfiguration...');
-
-// Starte den Server EXAKT wie in Development - mit tsx
-const serverProcess = spawn('tsx', ['server/index.ts'], {
+// Verwende tsx direkt - so wie es am 13.07. um 22:20 CET funktionierte
+const server = spawn('tsx', ['server/index.ts'], {
     stdio: 'inherit',
     env: {
         ...process.env,
         NODE_ENV: 'production',
-        PORT: '5000'
+        PORT: process.env.PORT || '5000'
     }
+});
+
+server.on('error', (error) => {
+    console.error('\n❌ Server-Fehler:', error);
+    console.log('💡 Versuche alternative Startmethode...');
+    
+    // Fallback: Verwende node mit tsx/esm loader
+    const fallbackServer = spawn('node', ['--loader', 'tsx/esm', 'server/index.ts'], {
+        stdio: 'inherit',
+        env: {
+            ...process.env,
+            NODE_ENV: 'production',
+            PORT: process.env.PORT || '5000'
+        }
+    });
+    
+    fallbackServer.on('error', (fallbackError) => {
+        console.error('\n❌ Fallback-Server-Fehler:', fallbackError);
+        process.exit(1);
+    });
+});
+
+server.on('close', (code) => {
+    console.log(`\n📊 Server beendet mit Code: ${code}`);
+    process.exit(code);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-    console.log('\n🛑 Beende Server...');
-    serverProcess.kill();
+    console.log('\n🛑 SIGTERM - Server wird beendet...');
+    server.kill('SIGTERM');
 });
 
 process.on('SIGINT', () => {
-    console.log('\n🛑 Beende Server...');
-    serverProcess.kill();
+    console.log('\n🛑 SIGINT - Server wird beendet...');
+    server.kill('SIGINT');
 });
 
-serverProcess.on('close', (code) => {
-    console.log(`Server beendet mit Code: ${code}`);
-});
-
-serverProcess.on('error', (error) => {
-    console.error('Server-Fehler:', error);
-});
-
-console.log('✅ Server gestartet im Production-Modus');
-console.log('🌐 URL: http://localhost:5000');
-console.log('📊 Environment: production');
-console.log('🔄 Bereit für Deployment...');
+console.log('✅ Server gestartet (wie in funktionierender Version)');
+console.log('🌐 Wolkenkrümel sollte jetzt wie am 13.07. um 22:20 CET funktionieren');
+console.log('📋 Deployment-Methode: tsx server/index.ts (bewährt)');
