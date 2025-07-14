@@ -1,8 +1,8 @@
 [deployment]
-build = ["echo", "No build needed - using direct deployment"]
-run = ["node", "production-deployment-final.js"]
+build = ["echo", "Using development server directly"]
+run = ["node", "simple-deployment.js"]
 deploymentTarget = "gce"
 
 [env]
-NODE_ENV = "development"
+NODE_ENV = "production"
 PORT = "5000"
