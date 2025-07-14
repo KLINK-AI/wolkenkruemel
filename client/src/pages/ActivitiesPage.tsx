@@ -258,11 +258,11 @@ export default function ActivitiesPage() {
               <Link href={`/activities/${activity.id}`}>
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                   {activity.images && activity.images.length > 0 && (
-                    <div className="aspect-video relative overflow-hidden rounded-t-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
+                    <div className="relative overflow-hidden rounded-t-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center p-4">
                       <img 
                         src={activity.images[0]} 
                         alt={activity.title}
-                        className="max-w-full max-h-full object-contain"
+                        className="max-w-full max-h-64 object-contain rounded-lg"
                       />
                     </div>
                   )}
@@ -310,11 +310,11 @@ export default function ActivitiesPage() {
             ) : (
               <Card className="opacity-75">
                 {activity.images && activity.images.length > 0 && (
-                  <div className="aspect-video relative overflow-hidden rounded-t-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
+                  <div className="relative overflow-hidden rounded-t-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center p-4">
                     <img 
                       src={activity.images[0]} 
                       alt={activity.title}
-                      className="max-w-full max-h-full object-contain"
+                      className="max-w-full max-h-64 object-contain rounded-lg"
                     />
                   </div>
                 )}
