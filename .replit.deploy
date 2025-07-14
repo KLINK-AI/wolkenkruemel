@@ -1,6 +1,6 @@
 [deployment]
-build = ["echo", "Build completed - using restore working version"]
-run = ["node", "restore-working-deployment.js"]
+build = ["node", "simple-build.js"]
+run = ["node", "production-direct.js"]
 deploymentTarget = "gce"
 
 [env]

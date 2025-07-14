@@ -11,51 +11,43 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-console.log('📦 Einfacher Build-Prozess...');
+console.log('🏗️ EINFACHER BUILD-PROZESS');
+console.log('📦 Bereite echte Wolkenkrümel-App für Deployment vor');
 
-// Lösche alten dist Ordner
-if (fs.existsSync('dist')) {
-    fs.rmSync('dist', { recursive: true, force: true });
+// Erstelle dist-Ordner
+if (!fs.existsSync('dist')) {
+    fs.mkdirSync('dist', { recursive: true });
 }
 
-// Erstelle dist Ordner
-fs.mkdirSync('dist', { recursive: true });
-
-// Kopiere alle notwendigen Dateien direkt
+// Kopiere wichtige Dateien
 const filesToCopy = [
-    'server',
-    'shared',
-    'client',
     'package.json',
-    'vite.config.ts',
-    'drizzle.config.ts',
-    'postcss.config.js',
-    'tailwind.config.ts'
+    'package-lock.json',
+    '.env'
 ];
 
-filesToCopy.forEach(item => {
-    const source = path.join(__dirname, item);
-    const dest = path.join(__dirname, 'dist', item);
-    
-    if (fs.existsSync(source)) {
-        if (fs.statSync(source).isDirectory()) {
-            fs.cpSync(source, dest, { recursive: true });
-        } else {
-            fs.copyFileSync(source, dest);
-        }
-        console.log(`✅ Kopiert: ${item}`);
+filesToCopy.forEach(file => {
+    if (fs.existsSync(file)) {
+        fs.copyFileSync(file, path.join('dist', file));
+        console.log(`✅ Kopiert: ${file}`);
     }
 });
 
-// Erstelle Environment-Datei
-const envContent = `NODE_ENV=production
-PORT=5000
-DATABASE_URL=${process.env.DATABASE_URL || ''}
-VITE_STRIPE_PUBLIC_KEY=${process.env.VITE_STRIPE_PUBLIC_KEY || ''}
-STRIPE_SECRET_KEY=${process.env.STRIPE_SECRET_KEY || ''}
-`;
+// Kopiere Ordner
+const dirsToCopy = [
+    'server',
+    'client',
+    'shared',
+    'node_modules'
+];
 
-fs.writeFileSync('dist/.env', envContent);
-console.log('✅ Environment-Datei erstellt');
+dirsToCopy.forEach(dir => {
+    if (fs.existsSync(dir)) {
+        fs.cpSync(dir, path.join('dist', dir), { recursive: true });
+        console.log(`✅ Kopiert: ${dir}/`);
+    }
+});
 
-console.log('🎉 Einfacher Build abgeschlossen!');
+console.log('✅ Build abgeschlossen');
+console.log('📂 Alle Dateien in dist/ bereit');
+console.log('🚀 Bereit für Deployment mit echter App');
