@@ -1,6 +1,6 @@
 [deployment]
-build = ["echo", "Build completed - immediate deploy"]
-run = ["node", "immediate-deploy.js"]
+build = ["node", "restore-22-20-version.js"]
+run = ["node", "direct-start.js"]
 deploymentTarget = "gce"
 
 [env]
