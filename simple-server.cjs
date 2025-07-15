@@ -1,25 +1,4 @@
-/**
- * EINFACHER BUILD-PROZESS
- * Kopiert nur die notwendigen Dateien ohne komplexe Transformationen
- */
-
-import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
-import { config } from 'dotenv';
-
-config();
-
-console.log('🔧 Simple Build Process Starting...');
-
-// Cleanup
-if (existsSync('dist')) {
-    rmSync('dist', { recursive: true });
-}
-if (existsSync('build')) {
-    rmSync('build', { recursive: true });
-}
-
-// Create simple server that definitely works
-const simpleServerCode = `const express = require('express');
+const express = require('express');
 require('dotenv').config();
 
 const app = express();
@@ -29,7 +8,7 @@ app.use(express.json());
 
 // Simple root page that works
 app.get('/', (req, res) => {
-    res.send(\`
+    res.send(`
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -71,9 +50,9 @@ app.get('/', (req, res) => {
         <h1>🐕☁️ Wolkenkrümel</h1>
         <h2>✅ Server erfolgreich gestartet!</h2>
         <p><strong>Status:</strong> Deployment funktioniert</p>
-        <p><strong>Zeit:</strong> \${new Date().toLocaleString()}</p>
-        <p><strong>Environment:</strong> \${process.env.NODE_ENV}</p>
-        <p><strong>Port:</strong> \${port}</p>
+        <p><strong>Zeit:</strong> ${new Date().toLocaleString()}</p>
+        <p><strong>Environment:</strong> ${process.env.NODE_ENV}</p>
+        <p><strong>Port:</strong> ${port}</p>
     </div>
     
     <div class="card info">
@@ -103,7 +82,7 @@ app.get('/', (req, res) => {
     </script>
 </body>
 </html>
-    \`);
+    `);
 });
 
 // Health check endpoint
@@ -119,13 +98,6 @@ app.get('/api/health', (req, res) => {
 
 // Start server
 app.listen(port, '0.0.0.0', () => {
-    console.log(\`🚀 Simple server running on port \${port}\`);
-    console.log(\`✅ Basic deployment successful\`);
+    console.log(`🚀 Simple server running on port ${port}`);
+    console.log(`✅ Basic deployment successful`);
 });
-`;
-
-writeFileSync('simple-server.cjs', simpleServerCode);
-
-console.log('✅ Simple server created (simple-server.cjs)');
-console.log('✅ Build process completed');
-console.log('📊 Server will start with basic functionality');

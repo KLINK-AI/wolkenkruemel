@@ -1,6 +1,6 @@
 [deployment]
-build = ["echo", "Build completed - final deployment"]
-run = ["node", "final-deployment.js"]
+build = ["echo", "Build completed - immediate deploy"]
+run = ["node", "immediate-deploy.js"]
 deploymentTarget = "gce"
 
 [env]
