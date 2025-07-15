@@ -1,6 +1,6 @@
 [deployment]
-build = ["echo", "Build completed - CommonJS server"]
-run = ["node", "immediate-server.cjs"]
+build = ["echo", "Minimal build - no dependencies"]
+run = ["node", "minimal-server.js"]
 deploymentTarget = "gce"
 
 [env]
