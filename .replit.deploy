@@ -1,8 +1,8 @@
 [deployment]
-build = ["echo", "Using development server directly"]
-run = ["node", "deployment-force-vite.js"]
+build = ["echo", "Build completed - using final working deployment"]
+run = ["node", "final-working-deployment.js"]
 deploymentTarget = "gce"
 
 [env]
-NODE_ENV = "development"
+NODE_ENV = "production"
 PORT = "5000"

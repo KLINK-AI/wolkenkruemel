@@ -1,44 +1,4 @@
-#!/usr/bin/env node
-
-/**
- * WIEDERHERSTELLUNG DER FUNKTIONIERENDEN DEPLOYMENT-VERSION
- * Zurück zur stabilen Version von gestern, die funktionierte
- */
-
-import { config } from 'dotenv';
-import { spawn } from 'child_process';
-import { existsSync, rmSync, mkdirSync, writeFileSync } from 'fs';
-
-// Load environment variables
-config();
-
-console.log('🔄 WIEDERHERSTELLUNG DER FUNKTIONIERENDEN VERSION');
-console.log('📅 Zurück zur stabilen Version von July 13, 2025');
-console.log('✅ Mit Debug-Seite und funktionierendem Activities API');
-
-// Set production environment
-process.env.NODE_ENV = 'production';
-process.env.PORT = process.env.PORT || '5001';
-
-console.log('\n📊 Environment Check:');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('PORT:', process.env.PORT);
-console.log('DATABASE_URL:', process.env.DATABASE_URL ? '✅ Connected' : '❌ Missing');
-
-// Clean up any build artifacts
-const buildDirs = ['dist', 'build', '.next', '.vite'];
-buildDirs.forEach(dir => {
-    if (existsSync(dir)) {
-        rmSync(dir, { recursive: true, force: true });
-        console.log(`✅ Cleaned ${dir}`);
-    }
-});
-
-// Create public directory for static files
-mkdirSync('public', { recursive: true });
-
-// Create comprehensive debug page like July 13
-const debugHtml = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -194,7 +154,7 @@ const debugHtml = `<!DOCTYPE html>
         
         function addLog(message) {
             const timestamp = new Date().toLocaleTimeString();
-            logs.push(\`[\${timestamp}] \${message}\`);
+            logs.push(`[${timestamp}] ${message}`);
             if (logs.length > 100) logs.shift();
             
             const logContent = document.getElementById('log-content');
@@ -214,18 +174,18 @@ const debugHtml = `<!DOCTYPE html>
             const textElement = document.getElementById(elementId.replace('-status', '-text'));
             
             element.className = 'status-card ' + (success ? 'status-ok' : 'status-error');
-            element.innerHTML = \`<strong>\${elementId.replace('-status', '').replace('-', ' ').toUpperCase()}:</strong> <span>\${message}</span>\`;
+            element.innerHTML = `<strong>${elementId.replace('-status', '').replace('-', ' ').toUpperCase()}:</strong> <span>${message}</span>`;
             
-            addLog(\`\${elementId}: \${message}\`);
+            addLog(`${elementId}: ${message}`);
         }
         
         async function testAPI(endpoint) {
-            addLog(\`Testing \${endpoint}...\`);
+            addLog(`Testing ${endpoint}...`);
             try {
                 const response = await fetch(endpoint);
                 const data = await response.json();
-                addLog(\`✅ \${endpoint} - Status: \${response.status}\`);
-                addLog(\`Data: \${JSON.stringify(data, null, 2)}\`);
+                addLog(`✅ ${endpoint} - Status: ${response.status}`);
+                addLog(`Data: ${JSON.stringify(data, null, 2)}`);
                 
                 if (endpoint === '/api/activities' && Array.isArray(data)) {
                     showActivities(data);
@@ -233,7 +193,7 @@ const debugHtml = `<!DOCTYPE html>
                 
                 return { success: true, data };
             } catch (error) {
-                addLog(\`❌ \${endpoint} - Error: \${error.message}\`);
+                addLog(`❌ ${endpoint} - Error: ${error.message}`);
                 return { success: false, error: error.message };
             }
         }
@@ -248,14 +208,14 @@ const debugHtml = `<!DOCTYPE html>
             activities.forEach(activity => {
                 const card = document.createElement('div');
                 card.className = 'activity-card';
-                card.innerHTML = \`
-                    <div class="activity-title">\${activity.title}</div>
+                card.innerHTML = `
+                    <div class="activity-title">${activity.title}</div>
                     <div class="activity-meta">
-                        ID: \${activity.id}<br>
-                        Schwierigkeit: \${activity.difficulty}<br>
-                        Erstellt: \${new Date(activity.createdAt).toLocaleDateString()}
+                        ID: ${activity.id}<br>
+                        Schwierigkeit: ${activity.difficulty}<br>
+                        Erstellt: ${new Date(activity.createdAt).toLocaleDateString()}
                     </div>
-                \`;
+                `;
                 grid.appendChild(card);
             });
         }
@@ -267,17 +227,17 @@ const debugHtml = `<!DOCTYPE html>
             // Test 1: Server Health
             const serverTest = await testAPI('/api/test');
             updateStatus('server-status', serverTest.success, 
-                serverTest.success ? 'Server läuft' : \`Server Fehler: \${serverTest.error}\`);
+                serverTest.success ? 'Server läuft' : `Server Fehler: ${serverTest.error}`);
             
             // Test 2: Database
             const usersTest = await testAPI('/api/users');
             updateStatus('database-status', usersTest.success, 
-                usersTest.success ? \`Database verbunden (\${usersTest.data.length} Users)\` : \`Database Fehler: \${usersTest.error}\`);
+                usersTest.success ? `Database verbunden (${usersTest.data.length} Users)` : `Database Fehler: ${usersTest.error}`);
             
             // Test 3: Activities (most critical)
             const activitiesTest = await testAPI('/api/activities');
             updateStatus('activities-status', activitiesTest.success, 
-                activitiesTest.success ? \`Activities API funktioniert (\${activitiesTest.data.length} Activities)\` : \`Activities Fehler: \${activitiesTest.error}\`);
+                activitiesTest.success ? `Activities API funktioniert (${activitiesTest.data.length} Activities)` : `Activities Fehler: ${activitiesTest.error}`);
             
             addLog('✅ Initial tests completed');
         }
@@ -289,43 +249,4 @@ const debugHtml = `<!DOCTYPE html>
         setInterval(runInitialTests, 30000);
     </script>
 </body>
-</html>`;
-
-writeFileSync('public/index.html', debugHtml);
-console.log('✅ Created comprehensive debug page');
-
-// Start the server exactly like July 13 version
-console.log('\n🚀 Starting server with tsx (July 13 configuration)...');
-const server = spawn('tsx', ['server/index.ts'], {
-    stdio: 'inherit',
-    env: {
-        ...process.env,
-        NODE_ENV: 'production',
-        PORT: process.env.PORT || '5001'
-    }
-});
-
-server.on('error', (error) => {
-    console.error('\n❌ Server error:', error);
-    process.exit(1);
-});
-
-server.on('close', (code) => {
-    console.log(`\n📊 Server closed with code: ${code}`);
-    process.exit(code);
-});
-
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('\n🛑 SIGTERM received');
-    server.kill('SIGTERM');
-});
-
-process.on('SIGINT', () => {
-    console.log('\n🛑 SIGINT received');
-    server.kill('SIGINT');
-});
-
-console.log('✅ Stable deployment server started');
-console.log('🌐 Debug page available at root URL');
-console.log('📊 Full API testing and monitoring enabled');
+</html>
