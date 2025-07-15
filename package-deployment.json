@@ -1,0 +1,14 @@
+{
+  "name": "wolkenkruemel-deployment",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "bulletproof-server.js",
+  "scripts": {
+    "start": "node bulletproof-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "@neondatabase/serverless": "^0.9.0",
+    "dotenv": "^16.3.1"
+  }
+}

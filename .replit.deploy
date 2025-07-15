@@ -1,6 +1,6 @@
 [deployment]
-build = ["echo", "Build completed - using final working deployment"]
-run = ["node", "final-working-deployment.js"]
+build = ["echo", "Build completed - final deployment"]
+run = ["node", "final-deployment.js"]
 deploymentTarget = "gce"
 
 [env]
