@@ -17,9 +17,10 @@
 - Keine anderen .env* Dateien gefunden
 
 ## 3. Deployment Test nach Secrets
-**Status**: ⏳ BEREIT ZUM TESTEN
-- Nach Deployment Secrets Konfiguration wird neuer Deployment-Test durchgeführt
-- Erwartetes Ergebnis: NODE_ENV=development wird korrekt angewendet
+**Status**: ❌ NEUER FEHLER
+- NODE_ENV=development Secret hinzugefügt
+- **RESULT**: Internal Server Error - Server startet nicht mehr
+- **Problem**: NODE_ENV=development verursacht Server-Start-Fehler in Production
 
 ## Root Cause Analysis
 Das Problem war wahrscheinlich:
@@ -27,19 +28,23 @@ Das Problem war wahrscheinlich:
 2. Deployment Secrets haben Priorität über .replit.deploy [env]
 3. Standard NODE_ENV=production wird verwendet ohne Deployment Secret
 
-## Antwort für Support
+## Update für Support
 ```
 Hi,
 
-Thank you for the clarification. I've checked all three points:
+Update on the deployment test:
 
-1. **Deployment Secrets**: No, I was only setting NODE_ENV in the .replit.deploy [env] section. I haven't added NODE_ENV through "Add deployment secret" in the Deployment tool yet.
+1. ✅ **Deployment Secret added**: NODE_ENV=development was successfully added as deployment secret
+2. ✅ **No .env conflicts**: Confirmed no NODE_ENV in .env file
+3. ❌ **New issue**: After adding NODE_ENV=development secret, deployment now fails with "Internal Server Error" and server won't start at all
 
-2. **.env file check**: Confirmed - there's no NODE_ENV in the .env file. The .env only contains API keys (BREVO_API_KEY, BREVO_SMTP_PASS, etc.) and no NODE_ENV override.
+**Current Status**: 
+- Before: Server started but used NODE_ENV=production (Activities API 500 errors)
+- After: Server doesn't start at all with NODE_ENV=development secret
 
-3. **Next steps**: I will now add NODE_ENV=development as a deployment secret and try a new deployment.
+**Screenshots**: Attached current deployment error page
 
-This explains why NODE_ENV was showing as "production" despite being set to "development" in .replit.deploy. The deployment secrets likely have priority over the .replit.deploy [env] section.
+This suggests there might be a fundamental incompatibility between the deployment environment and NODE_ENV=development mode. The development server configuration might not be suitable for the production deployment environment.
 
-I'll add the deployment secret now and test again.
+Should we try a different approach or remove the NODE_ENV secret?
 ```

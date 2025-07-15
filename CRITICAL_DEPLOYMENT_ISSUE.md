@@ -1,48 +1,32 @@
-# 🚨 CRITICAL DEPLOYMENT ISSUE
+# KRITISCHES DEPLOYMENT-PROBLEM
 
-## Root Cause Identified:
-**Build Process Still Running Despite Configuration**
+## Problem Eskalation
+**Datum**: July 15, 2025 17:03
+**Status**: Server-Start-Fehler nach Support-Empfehlung
 
-The .replit.deploy configuration shows:
-```
-build = ["echo", "No build - tsx handles TypeScript compilation"]
-```
+## Situation
+1. **Support-Empfehlung**: NODE_ENV=development als Deployment Secret hinzufügen
+2. **Ergebnis**: Server startet nicht mehr - "Internal Server Error"
+3. **Verschlechterung**: Vorher 500-Fehler bei API-Calls, jetzt kompletter Server-Crash
 
-But deployment logs show it's still attempting to use the build process and creating ES module errors.
+## Beweislage
+- **Screenshot**: Bildschirmfoto 2025-07-15 um 17.03.52 zeigt "Internal Server Error"
+- **Vorher**: Server startete mit NODE_ENV=production (Activities API 500)
+- **Nachher**: Server startet nicht mit NODE_ENV=development
 
-## Current Errors:
-1. `ERR_UNSUPPORTED_DIR_IMPORT` - drizzle-orm/pg-core directory import
-2. `Build process created incorrect module structure`
-3. `Application crash looping due to module resolution failures`
+## Root Cause
+NODE_ENV=development ist **NICHT KOMPATIBEL** mit Replit Production-Deployment-Umgebung:
+- Development mode erwartet Vite-Server-Setup
+- Production deployment hat keine Vite-Dependencies
+- setupVite() schlägt in Production-Container fehl
 
-## Solution Applied:
-### final-deployment-solution.js
-- Uses tsx directly (no build process)
-- Bypasses all ES module compilation issues
-- Creates fallback HTML while server starts
-- Handles all environment setup
-- Includes comprehensive error handling
+## Lösung für Support
+**NODE_ENV=development Secret ENTFERNEN** und anderen Ansatz versuchen:
+- NODE_ENV=production beibehalten
+- ES-Module-Imports über andere Wege lösen
+- Build-Prozess reparieren statt umgehen
 
-### Key Points:
-- **No Build Process**: tsx compiles TypeScript at runtime
-- **No ES Module Issues**: Direct execution avoids bundling problems
-- **Production Ready**: Sets NODE_ENV=production
-- **Fallback System**: HTML page while server initializes
-
-## Why This Should Work:
-1. **Development Works**: Same setup as working development environment
-2. **No Bundling**: tsx handles all TypeScript compilation
-3. **No ES Module Errors**: Direct imports work with tsx
-4. **Production Environment**: Still optimized for production
-
-## Files Updated:
-- `.replit.deploy` → Uses final-deployment-solution.js
-- `final-deployment-solution.js` → Complete deployment script
-- `index.html` → Created as fallback
-
-## Next Steps:
-1. Stop current deployment (if running)
-2. Click "Deploy" to use new configuration
-3. Should work without ES module errors
-
-**This eliminates the build process entirely and uses tsx directly like development!**
+## Nächste Schritte
+1. NODE_ENV Secret entfernen
+2. Deployment ohne Secret testen
+3. Alternative Lösungsansätze diskutieren
