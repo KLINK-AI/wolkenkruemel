@@ -1,6 +1,6 @@
 [deployment]
-build = ["node", "restore-22-20-version.js"]
-run = ["node", "direct-start.js"]
+build = ["echo", "Build completed - CommonJS server"]
+run = ["node", "immediate-server.cjs"]
 deploymentTarget = "gce"
 
 [env]
