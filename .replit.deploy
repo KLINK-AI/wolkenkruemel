@@ -1,8 +1,7 @@
 [deployment]
-build = ["echo", "Final 2025 Deployment - Fresh logs for Support"]
-run = ["node", "final-deployment-2025.js"]
+build = ["npm", "run", "build"]
+run = ["npm", "start"]
 deploymentTarget = "gce"
 
 [env]
 NODE_ENV = "production"
-PORT = "5000"
