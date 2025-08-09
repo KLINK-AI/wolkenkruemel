@@ -12,28 +12,30 @@ git commit -m "Wolkenkrümel - Ready for Vercel deployment"
 
 **Status**: ✅ Bereits vorbereitet
 
-## SCHRITT 2: GitHub Account & Repository
+## SCHRITT 2: GitHub Repository aktualisieren ✅
 
-### 2.1 GitHub Account:
-1. Gehen Sie zu **github.com**
-2. Erstellen Sie einen Account (falls noch nicht vorhanden)
-3. Verifizieren Sie Ihre Email
+### 2.1 GitHub Account: ✅ BEREITS VORHANDEN
+- Sie haben bereits einen GitHub Account
+- Repository `wolkenkruemel` existiert bereits
 
-### 2.2 Neues Repository erstellen:
-1. Klicken Sie auf **"New repository"**
-2. **Repository Name**: `wolkenkruemel`
-3. **Beschreibung**: `Dog Training Community Platform`
-4. **Visibility**: Private (empfohlen)
-5. ❌ **NICHT** "Initialize with README" anklicken
-6. Klicken Sie **"Create repository"**
+### 2.2 Repository verwenden: ✅ PERFEKT
+- Wir verwenden Ihr bestehendes Repository
+- Alle Ihre bisherigen Commits bleiben erhalten
+- Der aktuelle Code wird einfach aktualisiert
 
-### 2.3 Code von Replit zu GitHub:
+### 2.3 Code zu GitHub pushen:
+**Führen Sie diese Befehle in Replit aus:**
+
 ```bash
-# Diese Befehle werden Ihnen von GitHub angezeigt:
-git remote add origin https://github.com/IHRUSERNAME/wolkenkruemel.git
-git branch -M main
-git push -u origin main
+# Aktuellen Stand committen
+git add .
+git commit -m "Add Vercel configuration and deployment setup"
+
+# Zum GitHub Repository pushen
+git push origin main
 ```
+
+**Ihr Repository wird aktualisiert, nicht überschrieben!**
 
 ## SCHRITT 3: Vercel Account & Deployment
 
