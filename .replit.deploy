@@ -1,7 +1,3 @@
 [deployment]
-build = ["npm", "run", "build"]
 run = ["npm", "start"]
 deploymentTarget = "gce"
-
-[env]
-NODE_ENV = "production"
