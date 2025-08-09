@@ -22,7 +22,7 @@ import connectPgSimple from "connect-pg-simple";
 let stripe: Stripe | null = null;
 if (process.env.STRIPE_SECRET_KEY) {
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2024-06-20",
+    apiVersion: "2024-06-20" as any,
   });
   console.log('✅ Stripe initialized with secret key');
 } else {
@@ -43,6 +43,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const PgSession = connectPgSimple(session);
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   
+  // Simple health check
+  app.get('/api/health', (req, res) => {
+    res.json({
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      hasDatabase: !!process.env.DATABASE_URL,
+      hasStripe: !!process.env.STRIPE_SECRET_KEY
+    });
+  });
+
   // Debug route for deployment testing
   app.get('/debug-test', (req, res) => {
     res.send(`
@@ -1840,7 +1851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update user with subscription info
       await storage.updateUser(user.id, { 
         stripeSubscriptionId: subscription.id,
-        tier: 'premium'
+        subscriptionTier: 'premium'
       });
 
       const invoice = subscription.latest_invoice as any;
@@ -1893,7 +1904,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (user) {
               const isActive = subscription.status === 'active' || subscription.status === 'trialing';
               await storage.updateUser(user.id, {
-                tier: isActive ? 'premium' : 'free',
+                subscriptionTier: isActive ? 'premium' : 'free',
                 stripeSubscriptionId: subscription.id
               });
             }
@@ -1912,7 +1923,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const user = await storage.getUserByStripeCustomerId(deletedCustomer.id);
             if (user) {
               await storage.updateUser(user.id, {
-                tier: 'free',
+                subscriptionTier: 'free',
                 stripeSubscriptionId: null
               });
             }
