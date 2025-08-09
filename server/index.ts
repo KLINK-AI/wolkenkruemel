@@ -62,19 +62,20 @@ app.use((req, res, next) => {
     });
   });
 
-  // DEPLOYMENT FIX: Force setupVite in all environments
-  // Production deployment needs React app served via Vite
+  // VERCEL FIX: Use static files in production, setupVite in development
   console.log('🔧 Environment check - app.get("env"):', app.get("env"));
   console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
   
-  // Always use setupVite for proper React app serving
-  await setupVite(app, server);
-  console.log('✅ Using setupVite for React app serving');
+  if (process.env.NODE_ENV === "production") {
+    serveStatic(app);
+    console.log('✅ Using serveStatic for production (Vercel)');
+  } else {
+    await setupVite(app, server);
+    console.log('✅ Using setupVite for development');
+  }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // VERCEL: Use dynamic port for Vercel, fallback to 5000 for local
+  const port = process.env.PORT || 5000;
   server.listen({
     port,
     host: "0.0.0.0",
