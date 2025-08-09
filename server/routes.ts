@@ -18,13 +18,16 @@ import session from "express-session";
 import { Pool } from "@neondatabase/serverless";
 import connectPgSimple from "connect-pg-simple";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+// Initialize Stripe only if key is available (optional for basic functionality)
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2024-06-20",
+  });
+  console.log('✅ Stripe initialized with secret key');
+} else {
+  console.log('⚠️ Stripe not initialized - subscription features disabled');
 }
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-06-20",
-});
 
 // Configure multer for HEIC uploads
 const upload = multer({
@@ -1424,6 +1427,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if user already has an active subscription
       if (user.stripeSubscriptionId) {
+        if (!stripe) {
+          return res.status(503).json({ error: "Stripe not configured - subscription features unavailable" });
+        }
         const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
         
         // If subscription is active, return existing client secret
@@ -1445,6 +1451,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create or find customer
       let customerId = user.stripeCustomerId;
       if (!customerId) {
+        if (!stripe) {
+          return res.status(503).json({ error: "Stripe not configured - subscription features unavailable" });
+        }
         const customer = await stripe.customers.create({
           email: user.email,
           name: user.displayName || user.username,
@@ -1452,6 +1461,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerId = customer.id;
       }
 
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe not configured - subscription features unavailable" });
+      }
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [{ price: priceId }],
@@ -1767,6 +1779,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/create-payment-intent", async (req, res) => {
     try {
       const { amount } = req.body;
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe not configured - payment features unavailable" });
+      }
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
         currency: "eur",
@@ -1797,6 +1812,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let customerId = user.stripeCustomerId;
       
       if (!customerId) {
+        if (!stripe) {
+          return res.status(503).json({ error: "Stripe not configured - subscription features unavailable" });
+        }
         const customer = await stripe.customers.create({
           email: user.email,
           name: user.displayName || user.username,
@@ -1808,6 +1826,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create subscription
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe not configured - subscription features unavailable" });
+      }
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [{ price: priceId }],
@@ -1847,6 +1868,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     let event;
     try {
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe not configured - webhook features unavailable" });
+      }
       event = stripe.webhooks.constructEvent(req.body, sig!, webhookSecret);
     } catch (err: any) {
       console.log(`Webhook signature verification failed.`, err.message);
@@ -1858,6 +1882,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case 'customer.subscription.created':
         case 'customer.subscription.updated':
           const subscription = event.data.object;
+          if (!stripe) {
+            console.error('Stripe not configured for webhook processing');
+            return res.status(503).json({ error: "Stripe not configured" });
+          }
           const customer = await stripe.customers.retrieve(subscription.customer as string);
           
           if (customer && !customer.deleted) {
@@ -1874,6 +1902,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
         case 'customer.subscription.deleted':
           const deletedSub = event.data.object;
+          if (!stripe) {
+            console.error('Stripe not configured for webhook processing');
+            return res.status(503).json({ error: "Stripe not configured" });
+          }
           const deletedCustomer = await stripe.customers.retrieve(deletedSub.customer as string);
           
           if (deletedCustomer && !deletedCustomer.deleted) {
